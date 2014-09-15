@@ -77,17 +77,17 @@ public class Parser {
 								author[i] = author[i].trim();
 							}
 							authors.addAll(Arrays.asList(author));
-							
+
+							// Saves author organization
+							if (seg.length > 1) {
+								doc.setField(FieldNames.AUTHORORG,
+										seg[1].replace("</AUTHOR>", "").
+										trim());
+							}
 							if (line.endsWith("</AUTHOR>")) {
 								// Saves author
 								doc.setField(FieldNames.AUTHOR, authors.
 										toArray(new String[authors.size()]));
-								// Saves author organization
-								if (seg.length > 1) {
-									doc.setField(FieldNames.AUTHORORG,
-											seg[1].replace("</AUTHOR>", "").
-											trim());
-								}
 								field = FieldNames.PLACE;
 							}
 							break;

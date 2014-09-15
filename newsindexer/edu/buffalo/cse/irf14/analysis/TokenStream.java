@@ -4,6 +4,8 @@
 package edu.buffalo.cse.irf14.analysis;
 
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author nikhillo
@@ -12,6 +14,22 @@ import java.util.Iterator;
  * behavior
  */
 public class TokenStream implements Iterator<Token>{
+	// List index on token stream
+	private int index;
+	// Tokens included in this stream 
+	private List<Token> tokenList;
+	
+	/**
+	 * Constructor. Construct a token stream.
+	 * @param tokens tokens to be included in this stream
+	 */
+	public TokenStream(Token...tokens) {
+		index = -1;
+		tokenList = new ArrayList<Token>();
+		for (Token token: tokens) {
+			tokenList.add(token);
+		}
+	}
 	
 	/**
 	 * Method that checks if there is any Token left in the stream
@@ -21,8 +39,8 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	@Override
 	public boolean hasNext() {
-		// TODO YOU MUST IMPLEMENT THIS
-		return false;
+		// TODO YOU MUST IMPLEMENT THIS		
+		return index < (tokenList.size() - 1);
 	}
 
 	/**
@@ -35,7 +53,14 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public Token next() {
 		// TODO YOU MUST IMPLEMENT THIS
-		return null;
+		Token next = null;
+		
+		if (index < (tokenList.size() - 1)) {
+			++index;
+			next = tokenList.get(index);
+		}
+		
+		return next;
 	}
 	
 	/**
@@ -47,7 +72,7 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		
+		tokenList.remove(index);
 	}
 	
 	/**
@@ -57,6 +82,7 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void reset() {
 		//TODO : YOU MUST IMPLEMENT THIS
+		index = -1;
 	}
 	
 	/**
@@ -70,6 +96,7 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void append(TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS
+		tokenList.addAll(stream.tokenList);
 	}
 	
 }

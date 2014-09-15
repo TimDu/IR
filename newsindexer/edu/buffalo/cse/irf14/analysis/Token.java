@@ -18,6 +18,13 @@ public class Token {
 	private char[] termBuffer;
 	
 	/**
+	 * Default constructor.
+	 */
+	public Token() {
+		termText = new String();
+	}
+	
+	/**
 	 * Method to set the termText to given text.
 	 * This is a sample implementation and you CAN change this
 	 * to suit your class definition and data structure needs.
@@ -67,6 +74,10 @@ public class Token {
 	 */
 	protected void merge(Token...tokens) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		for (Token token: tokens) {
+			termText += " " + token.getTermText();
+		}
+		termBuffer = termText.toCharArray();
 	}
 	
 	/**
@@ -84,6 +95,6 @@ public class Token {
 	@Override
 	public String toString() {
 		//TODO: YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		return termText;
 	}
 }

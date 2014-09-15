@@ -1,7 +1,6 @@
 package edu.buffalo.cse.irf14.analysis.test;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import edu.buffalo.cse.irf14.analysis.TokenFilter;
 import edu.buffalo.cse.irf14.analysis.TokenFilterFactory;

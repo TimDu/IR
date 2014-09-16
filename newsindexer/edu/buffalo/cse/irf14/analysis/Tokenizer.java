@@ -3,16 +3,22 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
+import java.util.regex.Matcher;
+
 /**
  * @author nikhillo
  * Class that converts a given string into a {@link TokenStream} instance
  */
 public class Tokenizer {
+	
+	private String delimiter;
+	
 	/**
 	 * Default constructor. Assumes tokens are whitespace delimited
 	 */
 	public Tokenizer() {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		delimiter = new String(" ");
 	}
 	
 	/**
@@ -21,6 +27,10 @@ public class Tokenizer {
 	 */
 	public Tokenizer(String delim) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		delimiter = delim;
+		delimiter = delimiter.replaceAll(
+				Matcher.quoteReplacement("\\"),
+				Matcher.quoteReplacement("\\\\"));
 	}
 	
 	/**
@@ -39,6 +49,16 @@ public class Tokenizer {
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		String []terms = str.split(delimiter);
+		Token []tokens = new Token[terms.length];
+
+		if (terms.length > 0) {
+			for (int i = 0; i < terms.length; ++i) {
+				tokens[i] = new Token();
+				tokens[i].setTermText(terms[i]);
+			}
+		}
+		
+		return new TokenStream(tokens);
 	}
 }

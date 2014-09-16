@@ -98,5 +98,4 @@ public class TokenStream implements Iterator<Token>{
 		//TODO : YOU MUST IMPLEMENT THIS
 		tokenList.addAll(stream.tokenList);
 	}
-	
 }

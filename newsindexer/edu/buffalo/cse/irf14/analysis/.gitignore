@@ -7,3 +7,5 @@
 /TokenStream.class
 /Tokenizer.class
 /TokenizerException.class
+/Symbol.class
+/SymbolTest.class

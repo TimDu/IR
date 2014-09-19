@@ -4,30 +4,32 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import edu.buffalo.cse.irf14.analysis.AccentsType;
+import edu.buffalo.cse.irf14.analysis.SpecialCharType;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
 
-public class AccentsTest {
+public class SpecialCharTypeTest {
 
 	@Test
-	public void testAccents() {
-		String test = "Ȳ Ǭ á a̋ à ȁ";
-		String result = "Y O a a a a";
+	public void test() {
+		String test = "Ȳ Ǭ. á a̋ a 3 ? =";
+		String result = "Ȳ Ǭ. á a̋ a 3 ?";
 		try {
 			TokenStream stream = new Tokenizer().consume(test);
 			TokenStream answer = new Tokenizer().consume(result);
-			AccentsType accents = new AccentsType(stream);
+			SpecialCharType sChar = new SpecialCharType(stream);
 			while (stream.hasNext()) {
-				accents.increment();
+				sChar.increment();
 			}
-			stream = accents.getStream();
+			stream = sChar.getStream();
 			stream.reset();
 			while (answer.hasNext()) {
 				assertEquals(
 						answer.next().toString(), stream.next().toString());
 			}
+			assertTrue(stream.hasNext());
+			stream.next();
 			assertFalse(stream.hasNext());
 		} catch (TokenizerException e) {
 			// TODO Auto-generated catch block

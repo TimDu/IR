@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import edu.buffalo.cse.irf14.analysis.Symbol;
+import edu.buffalo.cse.irf14.analysis.SymbolType;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
@@ -25,7 +25,7 @@ public class SymbolTest {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		Symbol symb = new Symbol(testStream);
+		SymbolType symb = new SymbolType(testStream);
 		while (testStream.hasNext()) {
 			try {
 				symb.increment();

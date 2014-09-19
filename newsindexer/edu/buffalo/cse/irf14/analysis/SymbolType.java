@@ -4,7 +4,7 @@ package edu.buffalo.cse.irf14.analysis;
 /**
  * Token filter implementation that handles SYMBOL
  */
-public class Symbol extends TokenFilter {
+public class SymbolType extends TokenFilter {
 	
 	final String []endMark = {".", "!", "?"};
 	final String []goodApos = {"'ve", "n't", "'ll"};
@@ -15,7 +15,7 @@ public class Symbol extends TokenFilter {
 	 * Inherent constructor.
 	 * @param stream the token stream to be filtered
 	 */
-	public Symbol(TokenStream stream) {
+	public SymbolType(TokenStream stream) {
 		super(stream);
 	}
 

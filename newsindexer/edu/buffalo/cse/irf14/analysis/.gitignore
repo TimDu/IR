@@ -9,3 +9,9 @@
 /TokenizerException.class
 /Symbol.class
 /SymbolTest.class
+/Symbol_Type.class
+/Accents_Type.class
+/SpecialChar_Type.class
+/AccentsType.class
+/SymbolType.class
+/SpecialCharType.class

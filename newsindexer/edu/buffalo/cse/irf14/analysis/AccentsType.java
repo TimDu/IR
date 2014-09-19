@@ -3,15 +3,21 @@ package edu.buffalo.cse.irf14.analysis;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
-public class Accents extends TokenFilter {
+/**
+ * Token Filter that handles Accents type
+ */
+public class AccentsType extends TokenFilter {
 
-	public Accents(TokenStream stream) {
+	/**
+	 * Inherent constructor.
+	 * @param stream the token stream to be filtered
+	 */
+	public AccentsType(TokenStream stream) {
 		super(stream);
 	}
 
 	@Override
 	public void increment() throws TokenizerException {
-		// TODO Auto-generated method stub
 		Token tok = stream.next();
 		if (tok == null) {
 			throw new TokenizerException();
@@ -29,7 +35,6 @@ public class Accents extends TokenFilter {
 
 	@Override
 	public TokenStream getStream() {
-		// TODO Auto-generated method stub
 		return stream;
 	}
 

@@ -26,6 +26,9 @@ public class Symbol extends TokenFilter {
 		String []segs = null;
 		
 		tok = stream.next();
+		if (tok == null) {
+			throw new TokenizerException();
+		}
 		term = tok.getTermText();
 		if (term == null) {
 			throw new TokenizerException();

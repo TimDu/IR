@@ -101,16 +101,18 @@ public class Parser {
 						if (meta.length > 1) {
 							doc.setField(FieldNames.PLACE, 
 									seg[0].substring(0,
-											seg[0].lastIndexOf(",")).trim());
+											seg[0].lastIndexOf(",")).
+											trim());
 							doc.setField(FieldNames.NEWSDATE,
 									meta[meta.length - 1].trim());
 						} else {
 							meta[0] = meta[0].trim();
 							try {
-							new SimpleDateFormat(
-									"MMM d", Locale.ENGLISH).parse(meta[0]);
-							// This is a news date
-							doc.setField(FieldNames.NEWSDATE, meta[0]);
+								new SimpleDateFormat(
+										"MMM d", Locale.ENGLISH).
+										parse(meta[0]);
+								// This is a news date
+								doc.setField(FieldNames.NEWSDATE, meta[0]);
 							} catch (ParseException e) {
 								// This is a place
 								doc.setField(FieldNames.PLACE, meta[0]);

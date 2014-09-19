@@ -13,7 +13,7 @@ public class SpecialCharTypeTest {
 
 	@Test
 	public void test() {
-		String test = "Ȳ Ǭ. á a̋ a 3 ? =";
+		String test = "Ȳ Ǭ. á a̋ a 3 ? \\";
 		String result = "Ȳ Ǭ. á a̋ a 3 ?";
 		try {
 			TokenStream stream = new Tokenizer().consume(test);

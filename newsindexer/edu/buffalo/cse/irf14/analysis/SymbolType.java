@@ -21,15 +21,13 @@ public class SymbolType extends TokenFilter {
 
 	@Override
 	public void increment() throws TokenizerException {
-		Token tok = null;
-		String term = null;
 		String []segs = null;
 		
-		tok = stream.next();
+		Token tok = stream.next();
 		if (tok == null) {
 			throw new TokenizerException();
 		}
-		term = tok.getTermText();
+		String term = tok.getTermText();
 		if (term == null) {
 			throw new TokenizerException();
 		}

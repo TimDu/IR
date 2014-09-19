@@ -1,7 +1,7 @@
 package edu.buffalo.cse.irf14.analysis;
 
 /**
- * Token filter that handles SpecialChar type
+ * Token filter that handles SpecialChar type.
  */
 public class SpecialCharType extends TokenFilter{
 	
@@ -14,7 +14,13 @@ public class SpecialCharType extends TokenFilter{
 	@Override
 	public void increment() throws TokenizerException {
 		Token tok = stream.next();
+		if (tok == null) {
+			throw new TokenizerException();
+		}
 		String term = tok.toString();
+		if (term == null) {
+			throw new TokenizerException();
+		}
 
 		for (int i = 0; i < term.length(); ++i) {
 			// Test whether this is or is not a number

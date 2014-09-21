@@ -4,7 +4,7 @@ package edu.buffalo.cse.irf14.analysis;
 /**
  * Token filter implementation that handles SYMBOL
  */
-public class SymbolType extends TokenFilter {
+public class SymbolRule extends TokenFilter {
 	
 	final String []endMark = {".", "!", "?"};
 	final String []goodApos = {"'ve", "n't", "'ll"};
@@ -15,12 +15,12 @@ public class SymbolType extends TokenFilter {
 	 * Inherent constructor.
 	 * @param stream the token stream to be filtered
 	 */
-	public SymbolType(TokenStream stream) {
+	public SymbolRule(TokenStream stream) {
 		super(stream);
 	}
 
 	@Override
-	public void increment() throws TokenizerException {
+	public boolean increment() throws TokenizerException {
 		String []segs = null;
 		
 		Token tok = stream.next();
@@ -86,6 +86,8 @@ public class SymbolType extends TokenFilter {
 			term.replace("-", "");
 		}
 		tok.setTermText(term);
+		
+		return stream.hasNext();
 	}
 
 	@Override

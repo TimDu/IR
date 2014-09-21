@@ -3,16 +3,16 @@ package edu.buffalo.cse.irf14.analysis;
 /**
  * Token filter that handles SpecialChar type.
  */
-public class SpecialCharType extends TokenFilter{
+public class SpecialCharRule extends TokenFilter{
 	
 	final char []specials = {'.', '!', '?', '\'', ' '};
 
-	public SpecialCharType(TokenStream stream) {
+	public SpecialCharRule(TokenStream stream) {
 		super(stream);
 	}
 
 	@Override
-	public void increment() throws TokenizerException {
+	public boolean increment() throws TokenizerException {
 		Token tok = stream.next();
 		if (tok == null) {
 			throw new TokenizerException();
@@ -43,6 +43,8 @@ public class SpecialCharType extends TokenFilter{
 				}
 			}
 		}
+		
+		return stream.hasNext();
 	}
 
 	@Override

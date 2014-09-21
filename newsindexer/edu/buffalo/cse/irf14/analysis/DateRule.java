@@ -3,14 +3,14 @@ package edu.buffalo.cse.irf14.analysis;
 /**
  * Token filter that handles Dates type.
  */
-public class DatesType extends TokenFilter {
+public class DateRule extends TokenFilter {
 
-	public DatesType(TokenStream stream) {
+	public DateRule(TokenStream stream) {
 		super(stream);
 	}
 
 	@Override
-	public void increment() throws TokenizerException {
+	public boolean increment() throws TokenizerException {
 		Token tok = stream.next();
 		if (tok == null) {
 			throw new TokenizerException();
@@ -20,7 +20,7 @@ public class DatesType extends TokenFilter {
 			throw new TokenizerException();
 		}
 		
-		
+		return false;
 	}
 
 	@Override

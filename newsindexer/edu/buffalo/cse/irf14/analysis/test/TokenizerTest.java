@@ -1,72 +1,136 @@
+/**
+ * 
+ */
 package edu.buffalo.cse.irf14.analysis.test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
 
+/**
+ * @author nikhillo
+ *
+ */
 public class TokenizerTest {
-
+	private static Tokenizer spaceTknizer;
+	private static Tokenizer delimTknizer;
+	
+	@BeforeClass
+	public static final void beforeClass() {
+		spaceTknizer = new Tokenizer();
+		delimTknizer = new Tokenizer("_");
+	}
+	
+	@AfterClass
+	public static final void afterClass() {
+		spaceTknizer = null;
+		delimTknizer = null;
+	}
+	
+	/**
+	 * Test method for {@link edu.buffalo.cse.irf14.analysis.Tokenizer#consume(java.lang.String)}.
+	 */
 	@Test
-	public void testWhiteSpaceDelim() {
-		int index = 0;
-		Tokenizer tokenizer = new Tokenizer();
-		String input = "This is a test.";
-		String []tester = {"This", "is", "a", "test."};
-
+	public final void testNull() {
 		try {
-			TokenStream stream = tokenizer.consume(input);
-			while (stream.hasNext()) {
-				assertEquals(tester[index++], stream.next().toString());
-			}
+			spaceTknizer.consume(null);
+			fail("Exception not thrown when expected!");
 		} catch (TokenizerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			assertNotNull(e);
 		}
 	}
-
+	
+	/**
+	 * Test method for {@link edu.buffalo.cse.irf14.analysis.Tokenizer#consume(java.lang.String)}.
+	 */
 	@Test
-	public void testSpecialDelim() {
-		int index = 0;
-		Tokenizer tokenizer0 = new Tokenizer("\t");
-		Tokenizer tokenizer1 = new Tokenizer("	");
-		Tokenizer tokenizer2 = new Tokenizer("\\");
-		Tokenizer tokenizer3 = new Tokenizer("\\\\");
-		String []tester = {"This", "is", "a", "test."};
+	public final void testEmpty() {
+		try {
+			spaceTknizer.consume("");
+			fail("Exception not thrown when expected!");
+		} catch (TokenizerException e) {
+			assertNotNull(e);
+		}
+	}
+	
+	/**
+	 * Test method for {@link edu.buffalo.cse.irf14.analysis.Tokenizer#consume(java.lang.String)}.
+	 */
+	@Test
+	public final void testOneToken() {
+		try {
+			TokenStream ts = spaceTknizer.consume("test");
+			assertArrayEquals(new String[]{"test"}, serializeStream(ts));
+			
+			ts = delimTknizer.consume("test");
+			assertArrayEquals(new String[]{"test"}, serializeStream(ts));
+		} catch (TokenizerException e) {
+			fail("Exception thrown when not expected!");
+		}
+	}
+	
+	/**
+	 * Test method for {@link edu.buffalo.cse.irf14.analysis.Tokenizer#consume(java.lang.String)}.
+	 */
+	@Test
+	public final void testMultipleTokens() {
+		try {
+			TokenStream ts = spaceTknizer.consume("This is a longer test");
+			assertArrayEquals(new String[]{"This", "is", "a", "longer", "test"}, serializeStream(ts));
+			
+			ts = delimTknizer.consume("This_is_a_longer_test");
+			assertArrayEquals(new String[]{"This", "is", "a", "longer", "test"}, serializeStream(ts));
+		} catch (TokenizerException e) {
+			fail("Exception thrown when not expected!");
+		}
+	}
+	
+	/**
+	 * Test method for {@link edu.buffalo.cse.irf14.analysis.Tokenizer#consume(java.lang.String)}.
+	 */
+	@Test
+	public final void testMultipleTokensWithMultipleDelims() {
+		try {
+			TokenStream ts = spaceTknizer.consume("   This    is  a     longer     test    ");
+			assertArrayEquals(new String[]{"This", "is", "a", "longer", "test"}, serializeStream(ts));
+			
+			ts = delimTknizer.consume("__This____is___a__longer____test_____");
+			assertArrayEquals(new String[]{"This", "is", "a", "longer", "test"}, serializeStream(ts));
+		} catch (TokenizerException e) {
+			fail("Exception thrown when not expected!");
+		}
+	}
+	
+	private static final String[] serializeStream(TokenStream stream) {
+		ArrayList<String> list = new ArrayList<String>();
+		Token t;
+		String str;
+		stream.reset();
 		
-		try {
-			String input = "This\tis\ta\ttest.";
-			// Test 0
-			TokenStream stream = tokenizer0.consume(input);
-			while (stream.hasNext()) {
-				assertEquals(tester[index++], stream.next().toString());
+		while (stream.hasNext()) {
+			t = stream.next();
+			
+			if (t != null) {
+				str = t.toString();
+				
+				if (str != null && !str.isEmpty())
+					list.add(str);
 			}
-			// Test 1
-			index = 0;
-			stream = tokenizer1.consume(input);
-			while (stream.hasNext()) {
-				assertEquals(tester[index++], stream.next().toString());
-			}
-			// Test 2
-			index = 0;
-			input = "This\\is\\a\\test.";
-			stream = tokenizer2.consume(input);
-			while (stream.hasNext()) {
-				assertEquals(tester[index++], stream.next().toString());
-			}
-			// Test 3
-			index = 0;
-			input = "This\\\\is\\\\a\\\\test.";
-			stream = tokenizer3.consume(input);
-			while (stream.hasNext()) {
-				assertEquals(tester[index++], stream.next().toString());
-			}
-		} catch (TokenizerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		
+		String[] rv = new String[list.size()];
+		rv = list.toArray(rv);
+		return rv;
+		
 	}
+
 }

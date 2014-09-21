@@ -5,3 +5,12 @@
 /SymbolTest.class
 /AccentsTest.class
 /SpecialCharTypeTest.class
+/AccentRuleTest.class
+/CapitalizationRuleTest.class
+/DateRuleTest.class
+/NumberRuleTest.class
+/SpecialCharRuleTest.class
+/StemmerRuleTest.class
+/StopWordsRuleTest.class
+/SymbolRuleTest.class
+/TokenTest.class

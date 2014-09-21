@@ -16,3 +16,7 @@
 /SymbolType.class
 /SpecialCharType.class
 /DatesType.class
+/AccentRule.class
+/DateRule.class
+/SpecialCharRule.class
+/SymbolRule.class

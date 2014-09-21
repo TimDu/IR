@@ -6,19 +6,20 @@ import java.util.regex.Pattern;
 /**
  * Token Filter that handles Accents type
  */
-public class AccentsType extends TokenFilter {
+public class AccentRule extends TokenFilter {
 
 	/**
 	 * Inherent constructor.
 	 * @param stream the token stream to be filtered
 	 */
-	public AccentsType(TokenStream stream) {
+	public AccentRule(TokenStream stream) {
 		super(stream);
 	}
 
 	@Override
-	public void increment() throws TokenizerException {
+	public boolean increment() throws TokenizerException {
 		Token tok = stream.next();
+		
 		if (tok == null) {
 			throw new TokenizerException();
 		}
@@ -31,6 +32,8 @@ public class AccentsType extends TokenFilter {
 	    Pattern pattern = Pattern.compile("\\p{Mn}|\\p{Me}");
 	    term = pattern.matcher(nfdNormalizedString).replaceAll("");
 	    tok.setTermText(term);
+	    
+		return stream.hasNext();
 	}
 
 	@Override

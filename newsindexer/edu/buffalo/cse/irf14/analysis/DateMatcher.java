@@ -13,16 +13,16 @@ public class DateMatcher {
 
 	private final static String day = "((0?[1-9])|"
 			+ "([12][0-9])|([3][01]))";
-	private final static String month = "(jan(uaray)?|feb(urary)?|"
+	private final static String month = "(jan(uary)?|feb(urary)?|"
 			+ "mar(ch)?|apr(il)?|may|jun(e)?|jul(y)?|aug(ust)?|"
 			+ "sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?|"
 			+ "(0?[1-9])|[10-12])";
-	private final static String year = "((\\d{4}([-/]\\d\\d)?)|"
+	private final static String year = "((\\d{4}([-\\/]\\d\\d)?)|"
 			+ "(\\d{3}( |)(ad|bc))|(\\d{2}( |)(ad|bc))|"
 			+ "(\\d{1}( |)(ad|bc)))";
 	private final static String time = "(([0-9]|[01][0-9]|2[0-3]):"
 			+ "[0-5][0-9]:([0-5][0-9]|)( |)((am|pm)|))";
-	private final static String delimiter = "(, | |/|-|\\.)";
+	private final static String delimiter = "(, | |\\/|-|\\.)";
 	
 	private final static String date1 = "(" + day + delimiter
 			+ month + "(" + delimiter + year + ")?" + ")";
@@ -31,9 +31,10 @@ public class DateMatcher {
 	private final static String date3 = "(" + "(" + month
 			+ delimiter + ")?" + year + ")";
 	
-	private final static Pattern pattern =
-			Pattern.compile(date1 + "|" + date2 + "|" + date3
-					+ "|" + time);
+	//private final static Pattern pattern =
+			//Pattern.compile(date1 + "|" + date2 + "|" + date3
+					//+ "|" + time, Pattern.CASE_INSENSITIVE);
+	private final static Pattern pattern = Pattern.compile("(0?[1-9])|([12][0-9])|([3][01])", Pattern.CASE_INSENSITIVE);
 	
 	/**
 	 * Parses and finds valid date(s) from words.
@@ -63,7 +64,7 @@ public class DateMatcher {
 	 * @return well formatted date
 	 */
 	private static String convert(String input) {
-		String result = new String();
+		String result = new String();System.out.println(input);
 		String delim = null;
 		String []dateElements = new String[5];
 		String []segs = input.split(delimiter);
@@ -109,17 +110,17 @@ public class DateMatcher {
 					dateElements[0] = segs[i];
 				} else {
 					// Only the cases of 4 digits' year
-					dateElements[0] = segs[i].split("-|/")[0];
+					dateElements[0] = segs[i].split("-|\\/")[0];
 
 					if (segs[i].contains("-")) {
 						delim = "-";
-					} else if (segs[i].contains("/")) {
-						delim = "/";
+					} else if (segs[i].contains("\\/")) {
+						delim = "\\/";
 					}
 					if (delim != null) {
 						dateElements[4] =
 								dateElements[0].substring(0, 2)
-								+ segs[i].split("-|/")[1];
+								+ segs[i].split("-|\\/")[1];
 					}
 				}
 			} else if (segs[i].matches(time)) {

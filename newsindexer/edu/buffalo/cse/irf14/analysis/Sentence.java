@@ -1,9 +1,11 @@
 package edu.buffalo.cse.irf14.analysis;
 
 public class Sentence {
+	
 	private boolean allCaps;
 	private Token firstToken;
 	private Token lastToken;
+	
 	public Sentence()
 	{
 		allCaps = false;

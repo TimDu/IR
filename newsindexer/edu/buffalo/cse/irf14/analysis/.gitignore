@@ -20,3 +20,8 @@
 /DateRule.class
 /SpecialCharRule.class
 /SymbolRule.class
+/CapitalizationRule.class
+/NumericRule.class
+/Sentence.class
+/StemmerRule.class
+/StopWordRule.class

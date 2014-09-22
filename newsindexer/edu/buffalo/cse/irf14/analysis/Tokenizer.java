@@ -46,52 +46,40 @@ public class Tokenizer {
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		if (str == null || str.length() <= 0) {
-			tokens[0] = new Token();
-			tokens[0].setTermText(terms[0]);
 			throw new TokenizerException();
 		}
 		String []terms = str.split(delimiter);
 		Token []tokens = new Token[terms.length];
 		Sentence contSentence = new Sentence();
 		boolean newSentence = true;
-		if (terms.length > 0) {
-			
-			for (int i = 0; i < terms.length; ++i) {
-				tokens[i] = new Token();
-				tokens[i].setTermText(terms[i]);
-				tokens[i].setSentenceContainer(contSentence);
-				if(newSentence)
-				{
-					contSentence.setFirstToken(tokens[i]);
-					newSentence = false;
-				}
-				
-				if(terms[i].toUpperCase() != terms[i])
-				{
-					contSentence.setAllCaps(false);
-				}
-				
-				if(terms[i].contains("."))
-				{
-					contSentence.setLastToken(tokens[i]);
-					contSentence = new Sentence();
-					newSentence = true;
-				}
-				else if(i + 1 == terms.length)
-				{
-					contSentence.setLastToken(tokens[i]);
-				}
+		
+		for (int i = 0; i < terms.length; ++i) {
+			tokens[i] = new Token();
+			tokens[i].setTermText(terms[i]);
+			tokens[i].setSentenceContainer(contSentence);
+			if(newSentence)
+			{
+				contSentence.setFirstToken(tokens[i]);
+				newSentence = false;
 			}
 			
-			return new TokenStream(tokens);
-		} else {
-			// TODO: FIX ME
-			// this won't work... terms.length == 0, 
-			// therefore terms[0] won't be valid
-			// If this is even needed, add sentence logic
-			assert(false);
-			tokens[0] = new Token();
-			tokens[0].setTermText(terms[0]);
+			if(terms[i].toUpperCase() != terms[i])
+			{
+				contSentence.setAllCaps(false);
+			}
+			
+			if(terms[i].contains(". "))
+			{
+				contSentence.setLastToken(tokens[i]);
+				contSentence = new Sentence();
+				newSentence = true;
+			}
+			else if(i + 1 == terms.length)
+			{
+				contSentence.setLastToken(tokens[i]);
+			}
 		}
+		
+		return new TokenStream(tokens);
 	}
 }

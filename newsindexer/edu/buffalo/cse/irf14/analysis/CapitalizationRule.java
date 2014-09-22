@@ -1,8 +1,5 @@
 package edu.buffalo.cse.irf14.analysis;
 
-import java.text.Normalizer;
-import java.util.regex.Pattern;
-
 public class CapitalizationRule extends TokenFilter {
 	
 	Token chainReference; 
@@ -57,8 +54,8 @@ public class CapitalizationRule extends TokenFilter {
 			tok.setTermText(term.toLowerCase());
 		}
 		else if(term == term.toUpperCase())
-		{
-			tok.setTermText(term);
+		{//NOTE: this condition might be unecessary
+			//tok.setTermText(term);
 		}
 		else if(tok == tok.getSentenceContainer().getFirstToken())
 		{

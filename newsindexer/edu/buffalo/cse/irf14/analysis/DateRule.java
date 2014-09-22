@@ -21,6 +21,7 @@ public class DateRule extends TokenFilter {
 		if (term == null) {
 			throw new TokenizerException();
 		}
+		
 		Map<String, String> map = DateMatcher.mapDates(term);
 		
 		for (String raw: map.keySet()) {

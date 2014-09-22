@@ -18,7 +18,7 @@ public class SymbolRule extends TokenFilter {
 	public SymbolRule(TokenStream stream) {
 		super(stream);
 	}
-
+	
 	@Override
 	public boolean increment() throws TokenizerException {
 		String []segs = null;

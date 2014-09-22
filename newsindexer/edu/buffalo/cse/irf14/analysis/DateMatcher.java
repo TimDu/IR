@@ -1,7 +1,7 @@
 package edu.buffalo.cse.irf14.analysis;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,21 +41,20 @@ public class DateMatcher {
 	 * @return a array of {@code string} if the result has date,
 	 * {@code null} if no date is found
 	 */
-	public static String[] findDate(String words) {
+	public static Map<String, String> mapDates(String words) {
 		// Sub sequence that contains a raw date
 		String subSeq;
 		Matcher matcher = pattern.matcher(words);
-		// Result list
-		List<String> list = new LinkedList<String>();
+		// Result map that stores mapping between raw date
+		// and formatted date
+		Map<String, String> map = new HashMap<String, String>();
 		
 		while (matcher.find()) {
 			subSeq = matcher.group();
-			subSeq = convert(subSeq);
-			list.add(subSeq);
+			map.put(subSeq, convert(subSeq));
 		}
 		
-		return list.isEmpty() ? null :
-			list.toArray(new String[list.size()]);
+		return map;
 	}
 	
 	/**

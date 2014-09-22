@@ -36,7 +36,7 @@ public class CapitalizationRule extends TokenFilter {
 		// 2. Else, Check if current token is in all caps, if so return
 		// 3. Else, Check if first word, if so always force lower case
 		// 4. Else Check if camel casing is in effect for current word
-		//    check if adjacents words are upper case
+		//    check if adjacent words are upper case
 		
 		// Error checking
 		Token tok = stream.next();
@@ -52,10 +52,6 @@ public class CapitalizationRule extends TokenFilter {
 		if(tok.getSentenceContainer().getAllCaps())
 		{
 			tok.setTermText(term.toLowerCase());
-		}
-		else if(term == term.toUpperCase())
-		{//NOTE: this condition might be unnecessary
-			//tok.setTermText(term);
 		}
 		else if(tok == tok.getSentenceContainer().getFirstToken())
 		{

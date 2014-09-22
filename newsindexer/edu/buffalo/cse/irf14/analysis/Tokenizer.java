@@ -68,7 +68,7 @@ public class Tokenizer {
 				contSentence.setAllCaps(false);
 			}
 			
-			terms[i].trim();
+			terms[i] = terms[i].trim();
 			if(terms[i].endsWith(".") ||
 					terms[i].endsWith("!") ||
 					terms[i].endsWith("?") ||

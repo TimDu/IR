@@ -74,8 +74,7 @@ public class TokenStream implements Iterator<Token>{
 		// TODO YOU MUST IMPLEMENT THIS
 		if(index >= 0 && index < tokenList.size())
 		{
-			tokenList.remove(index);
-			index--;
+			tokenList.remove(index--);
 		}
 	}
 	

@@ -20,8 +20,7 @@ public class DateRuleTest extends TFRuleBaseTest {
 	public void testRule() {
 		
 		try{
-			String []result = runTest(TokenFilterType.SPECIALCHARS, "Vidya Balan born 1 January "
-								+ "1978 is an Indian actress.");
+			String []result = runTest(TokenFilterType.DATE, "It was now about 10:15 am.");
 			for (int i = 0; i < result.length; ++i) {
 				//System.out.println(result[i]);
 			}

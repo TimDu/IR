@@ -54,7 +54,7 @@ public class CapitalizationRule extends TokenFilter {
 			tok.setTermText(term.toLowerCase());
 		}
 		else if(term == term.toUpperCase())
-		{//NOTE: this condition might be unecessary
+		{//NOTE: this condition might be unnecessary
 			//tok.setTermText(term);
 		}
 		else if(tok == tok.getSentenceContainer().getFirstToken())

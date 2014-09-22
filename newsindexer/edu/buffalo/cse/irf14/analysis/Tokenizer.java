@@ -68,7 +68,13 @@ public class Tokenizer {
 				contSentence.setAllCaps(false);
 			}
 			
-			if(terms[i].contains(". "))
+			terms[i].trim();
+			if(terms[i].endsWith(".") ||
+					terms[i].endsWith("!") ||
+					terms[i].endsWith("?") ||
+					terms[i].contains(". ") ||
+					terms[i].contains("! ") ||
+					terms[i].contains("? "))
 			{
 				contSentence.setLastToken(tokens[i]);
 				contSentence = new Sentence();
@@ -77,6 +83,8 @@ public class Tokenizer {
 			else if(i + 1 == terms.length)
 			{
 				contSentence.setLastToken(tokens[i]);
+				contSentence = new Sentence();
+				newSentence = true;
 			}
 		}
 		

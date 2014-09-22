@@ -68,10 +68,10 @@ public class DateMatcher {
 		String []dateElements = new String[5];
 		String []segs = input.split(delimiter);
 		
-		dateElements[0] = "1900";	// Default year
-		dateElements[1] = "01";	// Default month
-		dateElements[2] = "01";	// Default day
-		dateElements[3] = "00:00:00";	// Default time
+		dateElements[0] = null;	// Default year
+		dateElements[1] = null;	// Default month
+		dateElements[2] = null;	// Default day
+		dateElements[3] = null;	// Default time
 		dateElements[4] = null;	// Alternate year
 		
 		for (int i = 0; i < segs.length; ++i) {
@@ -110,6 +110,7 @@ public class DateMatcher {
 				} else {
 					// Only the cases of 4 digits' year
 					dateElements[0] = segs[i].split("-|/")[0];
+
 					if (segs[i].contains("-")) {
 						delim = "-";
 					} else if (segs[i].contains("/")) {
@@ -130,16 +131,46 @@ public class DateMatcher {
 			}
 		}
 		
-		for (int i = 0; i < dateElements.length - 1; ++i) {
-			result += dateElements[i];
-		}
-		if (dateElements[4] != null) {
-			result += dateElements[4];
-			for (int i = 1; i <dateElements.length - 1; ++i) {
-				result += dateElements[i];
+		// Generate formatted date
+		for (int i = 0; i < dateElements.length - 2; ++i) {
+			if (dateElements[i] != null) {
+				for (int j = 0; j < dateElements.length - 2; ++j) {
+					if (dateElements[j] == null) {
+						result += addDefaultDate(j);
+					}
+				}
 			}
+		}
+		// Generate formatted time stamp
+		if (dateElements[3] != null) {
+			result += dateElements[3];
+		}
+		// Generate alternate date
+		if (dateElements[4] != null) {
+			result += dateElements[4]
+					+ result.substring(4, result.length());
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Adds default date value
+	 * @param i date content indicator
+	 */
+	private static String addDefaultDate(int i) {
+		switch(i) {
+		case 0:
+		case 4:
+			return "1900";
+		case 1:
+			return "01";
+		case 2:
+			return "01";
+		case 3:
+			return "00:00:00";
+		default:
+			return "";
+		}
 	}
 }

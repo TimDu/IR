@@ -7,9 +7,13 @@ package edu.buffalo.cse.irf14.analysis;
 public class SymbolRule extends TokenFilter {
 	
 	final String []endMark = {".", "!", "?"};
-	final String []goodApos = {"'ve", "n't", "'ll"};
-	final String []alterApos = {" have", " not", " will"};
-	final String []badApos = {"'d", "'s", "s'", "'re", "'m", "'"};
+	final String []goodApos =
+		{"shan't", "won't", "'ve", "n't", "'m", "'re",
+			"'ll", "'d", "'em"};
+	final String []alterApos =
+		{"shall not", "will not", " have", " not",
+			" am", " are", " will", " would", "them"};
+	final String []badApos = {"'s", "'"};
 
 	/**
 	 * Inherent constructor.
@@ -32,13 +36,22 @@ public class SymbolRule extends TokenFilter {
 			throw new TokenizerException();
 		}
 		
-		// Find and eliminate end marks in current
-		// token
-		for (String mark: endMark) {
-			term = term.replace(mark + " ", " ");
-			if (term.endsWith(mark)) {
-				term = term.substring(0,
-						term.length() - 1);
+		// Find and eliminate end marks in current token
+		boolean hasMore = true;
+		while (hasMore) {
+			hasMore = false;
+			
+			for (String mark: endMark) {
+				// End marks in the middle
+				while (term.contains(mark + " ")) {
+					term = term.replace(mark + " ", " ");
+					hasMore = true;
+				}
+				// End marks in the end
+				while (term.endsWith(mark)) {
+					term = term.substring(0, term.length() - 1);
+					hasMore = true;
+				}
 			}
 		}
 		
@@ -48,9 +61,10 @@ public class SymbolRule extends TokenFilter {
 			term = term.replace(goodApos[i] + " ",
 					alterApos[i] + " ");
 		}
+		
 		// Remove unqualified apostrophes
 		for (String mark: badApos) {
-			term = term.replace(mark + " ", " ");
+			term = term.replace(mark, "");
 		}
 		term = term.substring(0, term.length() - 1);
 		
@@ -59,23 +73,29 @@ public class SymbolRule extends TokenFilter {
 		if (segs.length > 1) {
 			term = new String();
 			for (int i = 0; i < segs.length - 1; ++i) {
-				if (isNumber(segs[i].
-						charAt(segs[i].length() - 1)) &&
-						isAlpha(segs[i + 1].charAt(0))) {
+				if (segs[i].isEmpty()) continue;
+				char thisLast = segs[i]
+						.charAt(segs[i].length() - 1);
+				char nextFirst = segs[i + 1].charAt(0);
+				
+				if (isNumber(thisLast) &&
+						(isAlpha(nextFirst) ||
+						(isNumber(nextFirst)))) {
 					term += segs[i] + "-";
-				} else if (isAlpha(segs[i].
-						charAt(segs[i].length() - 1)) &&
-						isNumber(segs[i + 1].charAt(0))) {
+				} else if (isAlpha(thisLast) &&
+						isNumber(nextFirst)) {
 					term += segs[i] + "-";
-				} else if (isSpace(segs[i].
-						charAt(segs[i].length() - 1))) {
-					if (isSpace(segs[i + 1].charAt(0))){
+				} else if (isUpper(thisLast) &&
+						isUpper(nextFirst)) {
+					term += segs[i] + "-";
+				} else if (isSpace(thisLast)) {
+					if (isSpace(nextFirst)){
 						term += segs[i].substring(
 								0, segs[i].length() - 1);
 					} else {
 						term += segs[i];
 					}
-				} else if (isSpace(segs[i + 1].charAt(0))) {
+				} else if (isSpace(nextFirst)) {
 					term += segs[i];
 				} else {
 					term += segs[i] + " ";
@@ -83,9 +103,14 @@ public class SymbolRule extends TokenFilter {
 			}
 			term += segs[segs.length - 1];
 		} else {
-			term.replace("-", "");
+			term = term.replace("-", "");
 		}
-		tok.setTermText(term);
+		
+		if (term.isEmpty()) {
+			stream.remove();
+		} else {
+			tok.setTermText(term);
+		}
 		
 		return stream.hasNext();
 	}
@@ -100,11 +125,15 @@ public class SymbolRule extends TokenFilter {
 	 * @param c tested character
 	 */
 	private boolean isNumber(char c) {
-		if (c <= '9' && c >= '0') {
-			return true;
-		} else {
-			return false;
-		}
+		return (c <= '9' && c >= '0');
+	}
+	
+	/**
+	 * Tests if this is a alphabetic character
+	 * @param c tested character
+	 */
+	private boolean isUpper(char c) {
+		return (c >= 'A' && c <= 'Z');
 	}
 	
 	/**
@@ -112,11 +141,7 @@ public class SymbolRule extends TokenFilter {
 	 * @param c tested character
 	 */
 	private boolean isAlpha(char c) {
-		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-			return true;
-		} else {
-			return false;
-		}
+		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 	}
 	
 	/**
@@ -124,10 +149,6 @@ public class SymbolRule extends TokenFilter {
 	 * @param c tested character
 	 */
 	private boolean isSpace(char c) {
-		if (c == ' ') {
-			return true;
-		} else {
-			return false;
-		}
+		return c == ' ';
 	}
 }

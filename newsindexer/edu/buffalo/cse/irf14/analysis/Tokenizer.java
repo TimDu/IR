@@ -45,19 +45,24 @@ public class Tokenizer {
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		String []terms = str.split(delimiter);
-		Token []tokens = new Token[terms.length];
-
-		if (terms.length > 0) {
-			for (int i = 0; i < terms.length; ++i) {
-				tokens[i] = new Token();
-				tokens[i].setTermText(terms[i]);
+		// Exceptions handle
+		if (str != null && str.length() > 0) {
+			String []terms = str.split(delimiter);
+			Token []tokens = new Token[terms.length];
+	
+			if (terms.length > 0) {
+				for (int i = 0; i < terms.length; ++i) {
+					tokens[i] = new Token();
+					tokens[i].setTermText(terms[i]);
+				}
+			} else {
+				tokens[0] = new Token();
+				tokens[0].setTermText(terms[0]);
 			}
+			
+			return new TokenStream(tokens);
 		} else {
-			tokens[0] = new Token();
-			tokens[0].setTermText(terms[0]);
+			throw new TokenizerException();
 		}
-		
-		return new TokenStream(tokens);
 	}
 }

@@ -32,7 +32,7 @@ public class SymbolRuleTest extends TFRuleBaseTest {
 				assertArrayEquals(new String[]{"Put", "them"}, runTest(TokenFilterType.SYMBOL, "Put 'em"));
 				
 				//as single quotes
-				assertArrayEquals(new String[]{"quote","test"}, runTest(TokenFilterType.SYMBOL, "'quote test'"));
+				assertArrayEquals(new String[]{"quote","test"}, runTest(TokenFilterType.SYMBOL, "'quote test'"));			
 				assertArrayEquals(new String[]{"f(x)","=","df/dx"},runTest(TokenFilterType.SYMBOL, "f'(x) = df/dx"));
 				assertArrayEquals(new String[]{"f(x)","=","df/dx" }, runTest(TokenFilterType.SYMBOL, "f''(x) = df'/dx"));
 			} catch (TokenizerException e) {

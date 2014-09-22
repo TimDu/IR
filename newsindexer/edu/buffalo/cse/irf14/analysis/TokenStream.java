@@ -16,7 +16,8 @@ import java.util.List;
 public class TokenStream implements Iterator<Token>{
 	// List index on token stream
 	private int index;
-	// Tokens included in this stream 
+	private Token currentToken;
+	// Tokens included in this stream
 	private List<Token> tokenList;
 	
 	/**
@@ -25,6 +26,7 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public TokenStream(Token...tokens) {
 		index = -1;
+		currentToken = null;
 		tokenList = new ArrayList<Token>();
 		for (Token token: tokens) {
 			tokenList.add(token);
@@ -59,6 +61,7 @@ public class TokenStream implements Iterator<Token>{
 			++index;
 			next = tokenList.get(index);
 		}
+		currentToken = next;
 		
 		return next;
 	}
@@ -72,7 +75,12 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		tokenList.remove(index);
+		if (index > -1 && index < tokenList.size()) {
+			if (currentToken != null) {
+				tokenList.remove(index--);
+				currentToken = null;
+			}
+		}
 	}
 	
 	/**
@@ -83,6 +91,7 @@ public class TokenStream implements Iterator<Token>{
 	public void reset() {
 		//TODO : YOU MUST IMPLEMENT THIS
 		index = -1;
+		currentToken = null;
 	}
 	
 	/**
@@ -96,7 +105,9 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void append(TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS
-		tokenList.addAll(stream.tokenList);
+		if (stream != null) {
+			tokenList.addAll(stream.tokenList);
+		}
 	}
 	
 	/**
@@ -109,7 +120,6 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public Token getCurrent() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return null;
+		return currentToken;
 	}
-	
 }

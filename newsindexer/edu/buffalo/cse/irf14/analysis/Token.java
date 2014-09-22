@@ -93,12 +93,14 @@ public class Token {
 	 * @param tokens
 	 *            The token array to be merged
 	 */
-	protected void merge(Token... tokens) {
-		// TODO : YOU MUST IMPLEMENT THIS METHOD
-		for (Token token : tokens) {
-			termText += " " + token.getTermText();
+	protected void merge(Token...tokens) {
+		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		if (tokens != null) {
+			for (Token token: tokens) {
+				termText += " " + token.getTermText();
+			}
+			termBuffer = termText.toCharArray();
 		}
-		termBuffer = termText.toCharArray();
 	}
 
 	/**

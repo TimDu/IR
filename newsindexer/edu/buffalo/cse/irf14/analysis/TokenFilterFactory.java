@@ -72,6 +72,24 @@ public class TokenFilterFactory {
 			break;
 		}
 
-		return null;
+		TokenFilter filter = null;
+		
+		switch (type) {
+		case SYMBOL:
+			filter = new SymbolRule(stream);
+			break;
+		case ACCENT:
+			filter = new AccentRule(stream);
+			break;
+		case SPECIALCHARS:
+			filter = new SpecialCharRule(stream);
+			break;
+		case DATE:
+			filter = new DateRule(stream);
+			break;
+		default: break;
+		}
+		
+		return filter;
 	}
 }

@@ -1,5 +1,7 @@
 package edu.buffalo.cse.irf14.analysis;
 
+import java.util.Map;
+
 /**
  * Token filter that handles Dates type.
  */
@@ -19,16 +21,18 @@ public class DateRule extends TokenFilter {
 		if (term == null) {
 			throw new TokenizerException();
 		}
+		Map<String, String> map = DateMatcher.mapDates(term);
 		
-		return false;
+		for (String raw: map.keySet()) {
+			term.replace(raw, map.get(raw));
+		}
+		tok.setTermText(term);
+		
+		return stream.hasNext();
 	}
 
 	@Override
 	public TokenStream getStream() {
 		return stream;
 	}
-
-	/**
-	 * 
-	 */
 }

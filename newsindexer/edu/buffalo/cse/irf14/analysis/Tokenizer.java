@@ -45,6 +45,11 @@ public class Tokenizer {
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		if (str == null || str.length() <= 0) {
+			tokens[0] = new Token();
+			tokens[0].setTermText(terms[0]);
+			throw new TokenizerException();
+		}
 		String []terms = str.split(delimiter);
 		Token []tokens = new Token[terms.length];
 		Sentence contSentence = new Sentence();
@@ -77,6 +82,8 @@ public class Tokenizer {
 					contSentence.setLastToken(tokens[i]);
 				}
 			}
+			
+			return new TokenStream(tokens);
 		} else {
 			// TODO: FIX ME
 			// this won't work... terms.length == 0, 
@@ -86,7 +93,5 @@ public class Tokenizer {
 			tokens[0] = new Token();
 			tokens[0].setTermText(terms[0]);
 		}
-		
-		return new TokenStream(tokens);
 	}
 }

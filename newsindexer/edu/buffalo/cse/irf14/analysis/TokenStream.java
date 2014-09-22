@@ -72,7 +72,11 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		tokenList.remove(index);
+		if(index >= 0 && index < tokenList.size())
+		{
+			tokenList.remove(index);
+			index--;
+		}
 	}
 	
 	/**
@@ -109,7 +113,11 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public Token getCurrent() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return null;
+		if(index < 0 || index >= tokenList.size())
+		{
+			return null;
+		}
+		return tokenList.get(index);
 	}
 	
 }

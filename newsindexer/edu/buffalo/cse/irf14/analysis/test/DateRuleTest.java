@@ -20,9 +20,11 @@ public class DateRuleTest extends TFRuleBaseTest {
 	public void testRule() {
 		
 		try{
-			String []result = runTest(TokenFilterType.DATE, "It was now about 10:15 am.");
+			String []result = runTest(TokenFilterType.DATE, "The Academy operated until "
+					+ "it was destroyed by Lucius "
+					+ "Cornelius Sulla in 84 BC");
 			for (int i = 0; i < result.length; ++i) {
-				//System.out.println(result[i]);
+				System.out.println(result[i]);
 			}
 				assertArrayEquals(
 						new String[] { "Vidya", "Balan", "born",

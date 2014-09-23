@@ -16,6 +16,9 @@ import java.util.List;
 public class TokenStream implements Iterator<Token>{
 	// List index on token stream
 	private int index;
+	// Removal indicator, true whenever current 
+	// token has performed a removal
+	private boolean isRemoved;
 	// Tokens included in this stream 
 	private List<Token> tokenList;
 	
@@ -25,6 +28,7 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public TokenStream(Token...tokens) {
 		index = -1;
+		isRemoved = true;
 		tokenList = new ArrayList<Token>();
 		for (Token token: tokens) {
 			tokenList.add(token);
@@ -54,10 +58,14 @@ public class TokenStream implements Iterator<Token>{
 	public Token next() {
 		// TODO YOU MUST IMPLEMENT THIS
 		Token next = null;
+		isRemoved = true;
 		
 		if (index < (tokenList.size() - 1)) {
 			++index;
 			next = tokenList.get(index);
+			isRemoved = false;
+		} else if (index == tokenList.size() - 1) {
+			++index;
 		}
 		
 		return next;
@@ -74,7 +82,10 @@ public class TokenStream implements Iterator<Token>{
 		// TODO YOU MUST IMPLEMENT THIS
 		if(index >= 0 && index < tokenList.size())
 		{
-			tokenList.remove(index--);
+			if (!isRemoved) {
+				tokenList.remove(index--);
+				isRemoved = true;
+			}
 		}
 	}
 	
@@ -99,7 +110,9 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void append(TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS
-		tokenList.addAll(stream.tokenList);
+		if (stream != null) {
+			tokenList.addAll(stream.tokenList);
+		}
 	}
 	
 	/**
@@ -112,11 +125,20 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public Token getCurrent() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		if(index < 0 || index >= tokenList.size())
+		if(isRemoved || index < 0 || index >= tokenList.size())
 		{
 			return null;
 		}
 		return tokenList.get(index);
 	}
 	
+	/**
+	 * Method to move one token back on token list. This operation is
+	 * considered to be used by Date formatting.
+	 */
+	public void previous() {
+		if (index > -1) {
+			--index;
+		}
+	}
 }

@@ -11,17 +11,17 @@ import java.util.regex.Pattern;
  */
 public class DateMatcher {
 
-	private final static String day = "(((0)?[1-9])|"
-			+ "([12][0-9])|([3][01]))";
+	private final static String day = "(([12][0-9])|"
+			+ "([3][01])|(0)?[1-9])";
 	private final static String month = "(jan(uary)?|feb(urary)?|"
 			+ "mar(ch)?|apr(il)?|may|jun(e)?|jul(y)?|aug(ust)?|"
 			+ "sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?|"
-			+ "(0?[1-9])|[10-12])";
+			+ "[10-12]|(0?[1-9]))";
 	private final static String year = "((\\d{4}([-\\/]\\d\\d)?)|"
 			+ "(\\d{3}( |)(ad|bc))|(\\d{2}( |)(ad|bc))|"
 			+ "(\\d{1}( |)(ad|bc)))";
-	private final static String time = "(([0-9]|[01][0-9]|2[0-3]):"
-			+ "[0-5][0-9]:([0-5][0-9]|)( |)((am|pm)|))";
+	private final static String time = "(([01][0-9]|2[0-3]|[0-9])(:"
+			+ "[0-5][0-9](:[0-5][0-9])?)?(( |)(am|pm))?)";
 	private final static String delimiter = "(,|, | |\\/|-|\\.)";
 	
 	private final static String date1 = "(" + day + delimiter
@@ -45,7 +45,8 @@ public class DateMatcher {
 	// This pattern has strong guarantee on date format
 	private final static Pattern pattern =
 			Pattern.compile(date1 + "|" + date2 + "|" + date3
-					+ "|" + time, Pattern.CASE_INSENSITIVE);
+					+ "|" + time + delimiter,
+					Pattern.CASE_INSENSITIVE);
 	
 	/**
 	 * Method to tell if this parameter term contains a date
@@ -61,8 +62,8 @@ public class DateMatcher {
 	}
 	
 	/**
-	 * Method to tell if the current string is likely to
-	 * have subsequent date information in the next token.
+	 * Method to tell if the current string should consider
+	 * having subsequent date information in the next token.
 	 * @param term term from a token
 	 * @return {@code true} if next token could have
 	 * subsequent date information; otherwise, {@code false}
@@ -143,7 +144,7 @@ public class DateMatcher {
 		Map<String, String> map = null;
 		
 		while (matcher.find()) {
-			keySeq = matcher.group();System.out.println(keySeq);
+			keySeq = matcher.group();
 			valSeq = convert(keySeq);
 			if (!valSeq.isEmpty()) {
 				if (map == null) {
@@ -163,10 +164,13 @@ public class DateMatcher {
 	 */
 	private static String convert(String input) {
 		String result = new String();
-		String delim = null;
-		String endDelim = null;
+		String midDelim = extractMiddle(input);		
+		String endDelim = extractEnd(input);
+		String timeDelim = extractTimeEnd(input);
+
+		input = yearPreproc(input, midDelim);
 		String []dateElements = new String[5];
-		String []segs = input.split(" ");
+		String []segs = input.split(delimiter);
 		
 		dateElements[0] = null;	// Default year
 		dateElements[1] = null;	// Default month
@@ -176,15 +180,13 @@ public class DateMatcher {
 
 		for (int i = 0; i < segs.length; ++i) {
 			segs[i] = segs[i].toLowerCase();
-			if (segs[i].matches(day + delimiter + "?")) {
-				segs[i] = segs[i].split(delimiter)[0];
+			if (segs[i].matches(day)) {
 				if (segs[i].length() == 1) {
 					dateElements[2] = "0" + segs[i];
 				} else {
 					dateElements[2] = segs[i];
 				}
-			} else if (segs[i].matches(month + delimiter + "?")) {
-				segs[i] = segs[i].split(delimiter)[0];
+			} else if (segs[i].matches(month)) {
 				if (segs[i].matches("\\d+")) {
 					if (segs[i].length() == 1) {
 						segs[i] = "0" + segs[i];
@@ -193,16 +195,7 @@ public class DateMatcher {
 					segs[i] = String.valueOf(getMonth(segs[i]));
 				}
 				dateElements[1] = segs[i];
-			} else if (segs[i].matches(year + delimiter + "?")) {
-				String []tempSeg = segs[i].split(delimiter);
-				if (segs[i].endsWith(",") || segs[i].endsWith("|") ||
-						segs[i].endsWith("-") ||
-						segs[i].endsWith("/") ||
-						segs[i].endsWith(".")) {
-					endDelim = segs[i].substring(segs[i].length() - 1);
-				}
-				segs[i] = tempSeg[0];
-
+			} else if (segs[i].matches(year + "|(\\d{4}(\\d{2})?)")) {
 				if (segs[i].contains("ad")) {
 					// Only the cases where there are no more than 3
 					// digits would happen
@@ -222,26 +215,31 @@ public class DateMatcher {
 					dateElements[0] = segs[i];
 				} else {
 					// Only the cases of 4 digits' year
-					dateElements[0] = segs[i].split("-|\\/")[0];
+					dateElements[0] = segs[i].substring(0, 4);
 
-					if (segs[i].contains("-")) {
-						delim = "-";
-					} else if (segs[i].contains("\\/")) {
-						delim = "\\/";
-					}
-					if (delim != null) {
+					if (midDelim != null) {
 						dateElements[4] =
 								dateElements[0].substring(0, 2)
-								+ segs[i].split("-|\\/")[1];
+								+ segs[i].substring(4, 6);
 					}
 				}
-			} else if (segs[i].matches(time + delimiter + "?")) {
-				segs[i] = segs[i].split(delimiter)[0];
-				if (segs[i].split(":")[0].length() == 1) {
-					dateElements[3] = "0" + segs[i];
-				} else {
-					dateElements[3] = segs[i];
+			} else if (segs[i].matches(time)) {
+				if (segs[i].contains("am")) {
+					segs[i] = segs[i].split("am")[0].trim();
+				} else if (segs[i].contains("pm")) {
+					String []t = segs[i].split(":");
+					Integer hour = Integer.valueOf(t[0]);
+					if (hour < 12) {
+						hour += 12;
+					}
+					t[0] = String.valueOf(hour);
+					segs[i] = "";
+					for (String time: t) {
+						segs[i] += time + ":";
+					}
+					segs[i] = segs[i].split("pm:")[0].trim();
 				}
+				dateElements[3] = formatTime(segs[i]);
 			}
 		}
 		
@@ -262,19 +260,172 @@ public class DateMatcher {
 		}
 		// Generate formatted time stamp
 		if (dateElements[3] != null) {
-			if (result.isEmpty()) {
+			if (!result.isEmpty()) {
 				result += " ";
 			}
 			result += dateElements[3];
 		}
 		// Generate alternate date
 		if (dateElements[4] != null) {
-			result += delim + dateElements[4]
+			result += midDelim + dateElements[4]
 					+ result.substring(4, result.length());
 		}
 
-		if (endDelim != null) {
+		if (dateElements[3] != null) {
+			if (timeDelim != null) {
+				result += timeDelim;
+			}
+		} else if (endDelim != null) {
 			result += endDelim;
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * An extractor to get special symbol in the middle between
+	 * two adjacent year representations.
+	 * @param years a string that contains two year representations
+	 * @return the special symbol, or {@code null} if
+	 * not found
+	 */
+	private static String extractMiddle(String years) {
+		Matcher matcher = Pattern.compile(year).matcher(years);
+		String symbol = null;
+		
+		if (matcher.find()) {
+			// Real years representations
+			String temp = matcher.group();
+			
+			matcher = Pattern.compile(delimiter).matcher(temp);
+			// Find the middle symbol
+			if (matcher.find()) {
+				symbol = matcher.group();
+				if (years.split(symbol).length == 1) {
+					// This is the symbol in the end,
+					// restore it
+					symbol = null;
+				}
+			}
+		}
+		
+		return symbol;
+	}
+	
+	/**
+	 * An extractor to get special symbol in the end of
+	 * a year representations.
+	 * @param yr a year representation
+	 * @return the special symbol, or {@code null} if
+	 * not found
+	 */
+	private static String extractEnd(String yr) {
+		Matcher matcher = Pattern.compile(
+				year + delimiter + "?",
+				Pattern.CASE_INSENSITIVE).matcher(yr);
+		String symbol = null;
+
+		if (matcher.find()) {
+			String temp = matcher.group();
+			matcher = Pattern.compile(delimiter).matcher(temp);
+
+			// Find the end special symbol
+			while (matcher.find()) {
+				symbol = matcher.group();
+			}
+			if ((symbol != null) && !yr.endsWith(symbol)) {
+				// This is not the end symbol
+				symbol = null;
+			}
+		}
+		
+		return symbol;
+	}
+	
+	/**
+	 * Method that eliminates the special middle symbol between
+	 * two years. This step ensures the year representation would 
+	 * not get split.
+	 * @param input input line
+	 * @param middle special symbol to be removed
+	 * @return modified line
+	 */
+	private static String yearPreproc(String input, String symb) {
+		Matcher matcher = Pattern.compile(year).matcher(input);
+		
+		if (symb != null && matcher.find()) {
+			// Year representation
+			String temp = matcher.group();
+			// Replace first special symbol encountered
+			// (should be the middle one)
+			String replac = temp.replaceFirst(symb, "");
+			
+			input = input.replace(temp, replac);
+		}
+		
+		return input;
+	}
+	
+	/**
+	 * An extractor to get special symbol in the end of time
+	 * @param time a time stamp
+	 * @return extracted special symbol, or {@code null} if
+	 * not found
+	 */
+	private static String extractTimeEnd(String time) {
+		Matcher matcher = Pattern.compile(time).matcher(time);
+		
+		if (matcher.find()) {
+			matcher = Pattern.compile(delimiter)
+					.matcher(matcher.group());
+		}
+		if (matcher.find()) {
+			return matcher.group();
+		}
+		return null;
+	}
+	
+	/**
+	 * A time stamp formatter. It converts raw time to the
+	 * formatted one.
+	 * @param raw raw time
+	 * @return formatted time
+	 */
+	public static String formatTime(String raw) {
+		String result = new String();
+		String []seg = raw.split(":");
+		
+		switch(seg.length) {
+		case 1:
+			if (seg[0].length() == 1) {
+				seg[0] = "0" + seg[0];
+			}
+			result += seg[0] + ":00:00";
+			break;
+		case 2:
+			if (seg[0].length() == 1) {
+				seg[0] = "0" + seg[0];
+			}
+			if (seg[1].length() == 1) {
+				seg[1] = "0" + seg[1];
+			}
+			result += seg[0] + ":" + seg[1] + ":00";
+			break;
+		case 3:
+			if (seg[0].length() == 1) {
+				seg[0] = "0" + seg[0];
+			}
+			if (seg[1].length() == 1) {
+				seg[1] = "0" + seg[1];
+			}
+			if (seg[2].length() == 1) {
+				seg[2] = "0" + seg[2];
+			}
+			result += seg[0] + ":" + seg[1] + ":" + seg[2];
+			break;
+		default:
+			result = "00:00:00";
+			break;
 		}
 		
 		return result;
@@ -293,8 +444,6 @@ public class DateMatcher {
 			return "01";
 		case 2:
 			return "01";
-		case 3:
-			return "00:00:00";
 		default:
 			return "";
 		}

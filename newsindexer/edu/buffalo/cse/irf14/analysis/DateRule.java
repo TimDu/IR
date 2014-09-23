@@ -44,33 +44,31 @@ public class DateRule extends TokenFilter {
 					tempTerm = tempTok.toString();
 					
 					if (DateMatcher.shouldMerge(tempTerm)) {
-						tok.merge(tempTok);
 						if (tempTerm.startsWith("AD") ||
-								tempTerm.startsWith("BC")) {
+								tempTerm.startsWith("BC") ||
+								tempTerm.toLowerCase()
+								.startsWith("am") ||
+								tempTerm.toLowerCase()
+								.startsWith("pm")) {
 							term = tok.toString();
-							term = term.substring(
-									0, term.length() - 3)
-									+ term.substring(
-											term.length() - 2);
+							term += tempTerm.trim();
 							tok.setTermText(term);
-						} else if (tempTerm.toLowerCase()
-								.startsWith("am") || tempTerm
-								.toLowerCase().startsWith("pm")) {
-							term = tok.toString();
-							term = term.substring(
-									0, term.length() - 3)
-									+ term.substring(
-											term.length() - 2).toLowerCase();
-							tok.setTermText(term);
+						} else {
+							tok.merge(tempTok);
 						}
 						stream.remove();
+					} else {
+						// Do not merge this token,
+						// go back to original token
+						stream.previous();
+						break;
 					}
 				} else {
 					break;
 				}
 			}
 			// Get updated token term
-			term = tok.toString();System.out.println(term);
+			term = tok.toString();//System.out.println(term);
 		}
 		Map<String, String> map = DateMatcher.mapDates(term);
 

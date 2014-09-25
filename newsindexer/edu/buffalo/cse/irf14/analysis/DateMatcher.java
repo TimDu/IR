@@ -56,10 +56,23 @@ public class DateMatcher {
 	 * @return {@code true} if any date component is contained;
 	 * otherwise, {@code false}
 	 */
-	public static boolean matches(String str) {
+	public static boolean containedComponent(String str) {
 		Matcher matcher = dateComponent.matcher(str);
 		
 		return matcher.find();
+	}
+	
+	/**
+	 * Method to tell if this parameter term contains a date
+	 * component.
+	 * @param str term to be matched with
+	 * @return {@code true} if any date component is contained;
+	 * otherwise, {@code false}
+	 */
+	public static boolean matchDate(String str) {
+		Matcher matcher = pattern.matcher(str);
+		
+		return matcher.matches();
 	}
 	
 	/**

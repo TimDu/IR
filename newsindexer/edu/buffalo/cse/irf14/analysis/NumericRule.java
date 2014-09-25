@@ -10,13 +10,41 @@ public class NumericRule extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		return false;
+		Token tok = stream.next();
+		if (tok == null) {
+			throw new TokenizerException();
+		}
+		String term = tok.toString();
+		if (term == null) {
+			throw new TokenizerException();
+		}
+		String []eliminates = NumericMatcher.getMatches(term);
+		
+		if (eliminates != null) {
+			// Start numeric elimination
+			for (String e: eliminates) {
+				// Eliminate 'qualified' numbers
+				term = term.replaceAll(" " + e + "|" + e + " ", " ");
+				term = term.replace(e, "");
+			}
+			term = term.trim();
+		}
+
+		if (term.isEmpty()) {
+			// If nothing left in this token, remove it
+			stream.remove();
+		} else {
+			// Otherwise, update term content
+			tok.setTermText(term);
+		}
+		
+		return stream.hasNext();
 	}
 
 	@Override
 	public TokenStream getStream() {
 		// TODO Auto-generated method stub
-		return null;
+		return stream;
 	}
 
 }

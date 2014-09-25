@@ -35,7 +35,7 @@ public class DateRule extends TokenFilter {
 		}
 		
 		// Reorganize date information in tokens
-		if (DateMatcher.matches(term)) {
+		if (DateMatcher.containedComponent(term)) {
 			String tempTerm = term;
 
 			while (DateMatcher.hasNext(tempTerm)) {

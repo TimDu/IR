@@ -20,8 +20,9 @@ public class DateMatcher {
 	private final static String year = "((\\d{4}([-\\/]\\d\\d)?)|"
 			+ "(\\d{3}( |)(ad|bc))|(\\d{2}( |)(ad|bc))|"
 			+ "(\\d{1}( |)(ad|bc)))";
-	private final static String time = "(([01][0-9]|2[0-3]|[0-9])(:"
-			+ "[0-5][0-9](:[0-5][0-9])?)?(( |)(am|pm))?)";
+	private final static String time = "(([01][0-9]|2[0-3]|[0-9])("
+			+ "(:[0-5][0-9](:[0-5][0-9])?(( |)(am|pm))?))|"
+			+ "(( |)(am|pm)))";
 	private final static String delimiter = "(,|, | |\\/|-|\\.)";
 	
 	private final static String date1 = "(" + day + delimiter

@@ -219,7 +219,8 @@ public class FilterUtility {
 		
 		while (index > -1) {
 			if (index > 0 && index < (words.size() - 1)) {
-				if ((!Character.isDigit(words.get(index - 1)) ||
+				if ((!Character.isDigit(words.get(index - 1)) &&
+						!Character.isAlphabetic(words.get(index - 1)) ||
 						!Character.isDigit(words.get(index + 1)))) {
 					words.remove(index);
 				}
@@ -227,11 +228,12 @@ public class FilterUtility {
 				words.remove(0);
 			}
 			
-			if (index == words.indexOf('/')) {
-				break;
-			} else {
-				index = words.indexOf('/');
+			for (; index < words.size(); ++index) {
+				if (words.get(index) == '/') {
+					continue;
+				}
 			}
+			break;
 		}
 		
 		// Apply the result on term

@@ -25,12 +25,12 @@ public class DateMatcher {
 			+ "(( |)(am|pm)))";
 	private final static String delimiter = "(,|, | |\\/|-|\\.)";
 	
-	private final static String date1 = "(" + day + delimiter
-			+ month + "(" + delimiter + year + delimiter + "?" 
-			+")?" + ")";
-	private final static String date2 = "(" + month + delimiter
+	private final static String date1 = "(" + month + delimiter
 			+ day + "(" + delimiter + year  + delimiter + "?" 
 			+ ")?" + ")";
+	private final static String date2 = "(" + day + delimiter
+			+ month + "(" + delimiter + year + delimiter + "?" 
+			+")?" + ")";
 	private final static String date3 = "(" + "(" + month
 			+ delimiter + ")?" + year  + delimiter + "?" 
 			+ ")";

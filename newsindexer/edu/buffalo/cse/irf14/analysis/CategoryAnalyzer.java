@@ -3,7 +3,7 @@ package edu.buffalo.cse.irf14.analysis;
 /**
  * A chained analyzer specially for Category field.
  * Considered token filters:<br>
- * Symbol, Dates, Capitalization, Stemmer.
+ * Symbol, SpecialChars, Dates, Capitalization, Stemmer.
  */
 public class CategoryAnalyzer implements Analyzer {
 	
@@ -27,6 +27,15 @@ public class CategoryAnalyzer implements Analyzer {
 		// Symbol filter handler
 		if (term.isEmpty()) {
 			// This token is empty now, cannot proceed anymore
+			stream.remove();
+			return stream.hasNext();
+		} else {
+			tok.setTermText(term);
+		}
+		// SpecialChars filter
+		term = FilterUtility.updateSpecialChar(tok);
+		if (term.isEmpty()) {
+			// Empty term left, cannot proceed
 			stream.remove();
 			return stream.hasNext();
 		} else {

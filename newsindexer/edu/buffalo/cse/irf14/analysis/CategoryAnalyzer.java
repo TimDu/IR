@@ -8,12 +8,14 @@ package edu.buffalo.cse.irf14.analysis;
 public class CategoryAnalyzer implements Analyzer {
 	
 	private TokenStream stream;
+	private Token tempTok;
 	
 	/**
 	 * Method that feeds a stream to this analyzer
 	 */
 	public void setStream(TokenStream stream) {
 		this.stream = stream;
+		tempTok = null;
 	}
 	
 	@Override
@@ -24,12 +26,36 @@ public class CategoryAnalyzer implements Analyzer {
 		
 		// Symbol filter handler
 		if (term.isEmpty()) {
+			// This token is empty now, cannot proceed anymore
 			stream.remove();
+			return stream.hasNext();
 		} else {
 			tok.setTermText(term);
 		}
-		
-		//term = 
+		// Date filter
+		FilterUtility.updateDate(stream.getCurrent(), stream);
+		// Capitalization filter
+		if (FilterUtility
+				.updateCapitalization(tok)) {
+			if(Character.isUpperCase(tok.toString().charAt(0)))
+			{
+				if(tempTok != null)
+				{
+					tempTok.merge(tok);
+					stream.remove();
+				}
+				else
+				{
+					tempTok = tok;
+				}
+			}
+			else
+			{
+				tempTok = null;
+			}
+		}
+		// Stemmer filter
+		FilterUtility.updateStemmer(stream.getCurrent());
 		
 		return stream.hasNext();
 	}

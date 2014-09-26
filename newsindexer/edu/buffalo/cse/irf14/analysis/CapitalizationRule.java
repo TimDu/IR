@@ -13,7 +13,7 @@ public class CapitalizationRule extends TokenFilter {
 		Token tok = stream.next();
 		
 		if (FilterUtility
-				.updateCapitalization(tok, chainReference)) {
+				.updateCapitalization(tok)) {
 
 			if(Character.isUpperCase(tok.toString().charAt(0)))
 			{
@@ -21,7 +21,7 @@ public class CapitalizationRule extends TokenFilter {
 				{
 					chainReference.merge(tok);
 					stream.remove();
-					return true;
+					return stream.hasNext();
 				}
 				else
 				{

@@ -54,13 +54,12 @@ public class FilterUtility {
 	 * on a token if specific requirements are satisfied.
 	 * 
 	 * @param tok token to be updated
-	 * @param chainReference a Camel-cased token reference
 	 * @return {@code true} if a camel cased word appears; otherwise,
 	 * return {@code false} 
 	 * @throws TokenizerException 
 	 */
 	public static boolean
-		updateCapitalization(Token tok, Token chainReference) throws TokenizerException {
+		updateCapitalization(Token tok) throws TokenizerException {
 		/*
 		 * All tokens should be lowercased unless: 
 			*  The whole word is in caps (AIDS etc.) and the 
@@ -404,6 +403,12 @@ public class FilterUtility {
 		return stopWordSet.contains(tok.toString());
 	}
 	
+	/**
+	 * Date filter.
+	 * @param tok tokens to be updated
+	 * @param stream the stream where current token is in
+	 * @throws TokenizerException
+	 */
 	public static void updateDate(Token tok, TokenStream stream) 
 			throws TokenizerException {
 		if (tok == null) {

@@ -4,7 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import edu.buffalo.cse.irf14.analysis.CategoryAnalyzer;
+import edu.buffalo.cse.irf14.analysis.Analyzer;
+import edu.buffalo.cse.irf14.analysis.TermAnalyzer;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
@@ -17,7 +18,7 @@ public class TermAnalyzerTest {
 				+ "U.S. factories, mines and utilities "
 				+ "operated at 79.8 pct of capacity in February, "
 				+ "compared with a revised 79.6 pct in January and "
-				+ "December, the Federal reserve Board said.\n"
+				+ "December, the Federal reserve Board said. "
 				+ "The Fed previously said the rate was 79.7 pct "
 				+ "in January and 79.5 pct in December. "
 				+ "A surge in automobile assemblies in February "
@@ -27,12 +28,12 @@ public class TermAnalyzerTest {
 		String result = "need test 20140202markeddown";
 		
 		TokenStream stream = new Tokenizer().consume(test);
-		CategoryAnalyzer analyzer = new CategoryAnalyzer();
+		TermAnalyzer analyzer = new TermAnalyzer();
 		analyzer.setStream(stream);
 		while (analyzer.increment()) {}
 		stream = analyzer.getStream();
 		stream.reset();
-		while (stream.hasNext()) {
+		while (stream.hasNext()) {//stream.next();
 			System.out.println(stream.next().toString());
 			//assertEquals(result, stream.next().toString());
 		}

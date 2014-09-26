@@ -11,7 +11,7 @@ public class NumericMatcher {
 	private static String float_num = "(\\d+\\.\\d+)";
 	private static String long_num = "([1-9]\\d{0,2})(,\\d{3})+";
 	private static String combo =
-			"[1-9](\\d{0,2})(,\\d{3})*(\\.\\d*)?";
+			"[1-9](\\d{0,2})(,\\d{3})+(\\.\\d*)?";
 	
 	private static Pattern pattern = Pattern.compile(combo
 			+ "|" + float_num +  "|" + long_num + "|" + integer);
@@ -23,6 +23,10 @@ public class NumericMatcher {
 		
 		while (matcher.find()) {
 			temp = matcher.group();
+			if (temp.matches("\\d{8}")) {
+				// Prevent eliminating a year
+				continue;
+			}
 
 			list.add(temp);
 		}

@@ -129,7 +129,7 @@ public class FilterUtility {
 			throw new TokenizerException();
 		}
 		String []eliminates = NumericMatcher.getMatches(term);
-		
+
 		if (eliminates != null) {
 			// Start numeric elimination
 			for (String e: eliminates) {
@@ -140,7 +140,7 @@ public class FilterUtility {
 			}
 			term = term.trim();
 		}
-		
+	
 		return term;
 	}
 

@@ -26,58 +26,7 @@ public class DateRule extends TokenFilter {
 		 * so on and so forth. 
 		 */
 		Token tok = stream.next();
-		if (tok == null) {
-			throw new TokenizerException();
-		}
-		String term = tok.toString();
-		if (term == null) {
-			throw new TokenizerException();
-		}
-		
-		// Reorganize date information in tokens
-		if (DateMatcher.containedComponent(term)) {
-			String tempTerm = term;
-
-			while (DateMatcher.hasNext(tempTerm)) {
-				if (stream.hasNext()) {
-					Token tempTok = stream.next();
-					tempTerm = tempTok.toString();
-					
-					if (DateMatcher.shouldMerge(tempTerm)) {
-						if (tempTerm.startsWith("AD") ||
-								tempTerm.startsWith("BC") ||
-								tempTerm.toLowerCase()
-								.startsWith("am") ||
-								tempTerm.toLowerCase()
-								.startsWith("pm")) {
-							term = tok.toString();
-							term += tempTerm.trim();
-							tok.setTermText(term);
-						} else {
-							tok.merge(tempTok);
-						}
-						stream.remove();
-					} else {
-						// Do not merge this token,
-						// go back to original token
-						stream.previous();
-						break;
-					}
-				} else {
-					break;
-				}
-			}
-			// Get updated token term
-			term = tok.toString();//System.out.println(term);
-		}
-		Map<String, String> map = DateMatcher.mapDates(term);
-
-		if (map != null) {
-			for (String raw: map.keySet()) {//System.out.println(raw + "-" + map.get(raw));
-				term = term.replace(raw, map.get(raw));
-			}
-			tok.setTermText(term);
-		}
+		FilterUtility.updateDate(tok, stream);
 		
 		return stream.hasNext();
 	}

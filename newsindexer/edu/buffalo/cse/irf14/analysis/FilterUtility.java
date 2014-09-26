@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class FilterUtility {
@@ -401,6 +402,65 @@ public class FilterUtility {
 		// End error checking
 		
 		return stopWordSet.contains(tok.toString());
+	}
+	
+	public static void updateDate(Token tok, TokenStream stream) 
+			throws TokenizerException {
+		if (tok == null) {
+			throw new TokenizerException();
+		}
+		String term = tok.toString();
+		if (term == null) {
+			throw new TokenizerException();
+		}
+		
+		// Reorganize date information in tokens
+		if (DateMatcher.containedComponent(term)) {
+			String tempTerm = term;
+
+			// Merging step
+			while (DateMatcher.hasNext(tempTerm)) {
+				if (stream.hasNext()) {
+					Token tempTok = stream.next();
+					tempTerm = tempTok.toString();
+					
+					if (DateMatcher.shouldMerge(tempTerm)) {
+						if (tempTerm.startsWith("AD") ||
+								tempTerm.startsWith("BC") ||
+								tempTerm.toLowerCase()
+								.startsWith("am") ||
+								tempTerm.toLowerCase()
+								.startsWith("pm")) {
+							term = tok.toString();
+							term += tempTerm.trim();
+							tok.setTermText(term);
+						} else {
+							tok.merge(tempTok);
+						}
+						stream.remove();
+					} else {
+						// Do not merge this token,
+						// go back to original token
+						stream.previous();
+						break;
+					}
+				} else {
+					break;
+				}
+			}
+			// Get updated token term
+			term = tok.toString();
+		}
+		
+		// Alternating step
+		Map<String, String> map = DateMatcher.mapDates(term);
+
+		if (map != null) {
+			for (String raw: map.keySet()) {
+				term = term.replace(raw, map.get(raw));
+			}
+			tok.setTermText(term);
+		}
 	}
 	
 	/**

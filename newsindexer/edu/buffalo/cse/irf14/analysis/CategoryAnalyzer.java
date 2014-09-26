@@ -1,9 +1,9 @@
 package edu.buffalo.cse.irf14.analysis;
 
 /**
- * A analyzer class specially for Document ID.
- * It does simply converts a FileID received in the form
- * of TokenStream to a unique DocID
+ * A chained analyzer specially for Category field.
+ * Considered token filters:<br>
+ * Symbol, Dates, Capitalization, Stemmer.
  */
 public class CategoryAnalyzer implements Analyzer {
 	
@@ -19,8 +19,19 @@ public class CategoryAnalyzer implements Analyzer {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
+		Token tok = stream.next();
+		String term = FilterUtility.updateSymbol(tok);
 		
-		return false;
+		// Symbol filter handler
+		if (term.isEmpty()) {
+			stream.remove();
+		} else {
+			tok.setTermText(term);
+		}
+		
+		//term = 
+		
+		return stream.hasNext();
 	}
 
 	@Override

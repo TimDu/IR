@@ -24,11 +24,7 @@ public class NumericMatcher {
 		while (matcher.find()) {
 			temp = matcher.group();
 
-			// If not a date component, this should be
-			// considered as a number
-			if (!DateMatcher.matchDate(temp)) {
-				list.add(temp);
-			}
+			list.add(temp);
 		}
 		//System.out.println(list.size());
 		return list.isEmpty() ? null :

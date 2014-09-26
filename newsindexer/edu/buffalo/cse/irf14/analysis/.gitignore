@@ -28,3 +28,12 @@
 /DateType.class
 /Stemmer.class
 /NumericMatcher.class
+/DocIDAnalyzer.class
+/CategoryAnalyzer.class
+/AccentModule.class
+/AccentUtility.class
+/CapitalizationUtility.class
+/NumericUtility.class
+/SpecialCharUtility.class
+/StemmerUtility.class
+/FilterUtility.class

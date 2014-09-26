@@ -62,8 +62,6 @@ public class AnalyzerFactory {
 		 */
 
 		switch (name) {
-		case FILEID:
-			return null;
 		case TITLE:
 			return getTitleAnalyzer(stream);
 		case AUTHOR:
@@ -78,9 +76,9 @@ public class AnalyzerFactory {
 			return getContentAnalyzer(stream);
 		case CATEGORY:
 			return getCategoryAnalyzer(stream);
+		default:
+			return null;
 		}
-
-		return null;
 	}
 	
 	protected Analyzer getCategoryAnalyzer(TokenStream stream) {

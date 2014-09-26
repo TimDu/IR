@@ -2,29 +2,32 @@
  * 
  */
 package edu.buffalo.cse.irf14.index;
+
 import edu.buffalo.cse.irf14.document.Document;
+
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-
-
+import java.io.ObjectOutputStream;
 
 /**
  * @author nikhillo Class responsible for writing indexes to disk
  */
 public class IndexWriter {
 	protected String m_indexDir;
-	
+
 	protected IndexDictionary m_fileDict;
 	protected TermIndexWriter m_tiw;
+	protected CategoryIndexWriter m_ciw;
+	protected PlaceIndexWriter m_piw;
+	protected AuthorIndexWriter m_aiw;
 
+	final protected String m_fileDicFileName = "file.dict";
 	
-
-	final protected String m_termDicFileName = "term.dict";
 	final protected String m_placeDicFileName = "place.dict";
 	final protected String m_authorDicFileName = "author.dict";
 	final protected String m_categoryDicFileName = "cat.dict";
 
-	
 	final protected String m_placeIndexFileName = "place.index";
 	final protected String m_authorIndexFileName = "author.index";
 	final protected String m_categoryIndexFileName = "cat.index";
@@ -39,7 +42,7 @@ public class IndexWriter {
 		m_indexDir = indexDir;
 		m_fileDict = new IndexDictionary();
 		// TODO: Make sure we're correctly setting up our path directory!!!
-		
+
 	}
 
 	/**
@@ -59,27 +62,12 @@ public class IndexWriter {
 		 * TokenFilterFactory classes while implementing these methods.
 		 */
 
-		 
 		m_tiw.performIndexLogic(d);
-		performCategoryIndexLogic(d);
-		performPlaceIndexLogic(d);
-		performAuthorIndexLogic(d);
+		m_piw.performIndexLogic(d);
+		m_ciw.performIndexLogic(d);
+		m_aiw.performIndexLogic(d);
 
 	}
-
-	
-
-	private void performCategoryIndexLogic(Document d) {
-
-	}
-
-	private void performPlaceIndexLogic(Document d) {
-
-	}
-
-	private void performAuthorIndexLogic(Document d) {
-
-	}	
 
 	/**
 	 * Method that indicates that all open resources must be closed and cleaned
@@ -91,6 +79,15 @@ public class IndexWriter {
 	public void close() throws IndexerException {
 		try {
 			m_tiw.finishIndexing();
+			m_piw.finishIndexing();
+			m_ciw.finishIndexing();
+			m_aiw.finishIndexing();
+			FileOutputStream fileOut = new FileOutputStream(m_fileDicFileName);
+
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(m_fileDict);
+			out.close();
+			fileOut.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -104,5 +101,4 @@ public class IndexWriter {
 
 	}
 
-	
 }

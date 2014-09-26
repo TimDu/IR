@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,21 +20,23 @@ import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 
-public class TermIndexWriter implements performIndexWriterLogic{
+public class TermIndexWriter implements performIndexWriterLogic {
+
 	protected BSBITreeMap m_termIndex;
 	protected IndexDictionary m_termDict;
 	protected IndexDictionary m_fileDict;
+	final protected String m_termDicFileName = "term.dict";
 	protected int m_tempIndexNum = 0;
 	final protected String m_termIndexFileName = "term.index";
 	final protected int m_maxMappingSize;
-	public TermIndexWriter(IndexDictionary fileDict)
-	{
+
+	public TermIndexWriter(IndexDictionary fileDict) {
 		m_termIndex = new BSBITreeMap();
 		m_termDict = new IndexDictionary();
 		m_fileDict = fileDict;
 		m_maxMappingSize = 10000000;
 	}
-	
+
 	private TokenStream createTermStream(Document d, FieldNames type) {
 		Tokenizer tknizer = new Tokenizer();
 		TokenStream tstream = new TokenStream();
@@ -49,7 +52,7 @@ public class TermIndexWriter implements performIndexWriterLogic{
 		}
 		return tstream;
 	}
-	
+
 	private void createTempIndex() {
 		FileOutputStream fileOut;
 		try {
@@ -68,7 +71,7 @@ public class TermIndexWriter implements performIndexWriterLogic{
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void appendCreateTermIndex() {
 		BufferedOutputStream fileOut;
 		try {
@@ -88,11 +91,23 @@ public class TermIndexWriter implements performIndexWriterLogic{
 		}
 
 	}
-	
-	
+
+	private void writeTermDictionary() throws IOException {
+		BufferedOutputStream fileOut;
+
+		fileOut = new BufferedOutputStream(new FileOutputStream(
+				m_termDicFileName, true));
+
+		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		out.writeObject(m_termDict);
+		out.close();
+		fileOut.close();
+
+	}
+
 	@Override
 	public void performIndexLogic(Document d) {
-		
+
 		TokenStream tstream = createTermStream(d, FieldNames.CONTENT);
 		if (tstream == null) {
 			// TODO: Figure out error handling
@@ -130,10 +145,9 @@ public class TermIndexWriter implements performIndexWriterLogic{
 		}
 
 	}
-	
+
 	@Override
-	public void finishIndexing() throws ClassNotFoundException,
-			IOException {
+	public void finishIndexing() throws ClassNotFoundException, IOException {
 		createTempIndex();
 		final int numIndexes = m_tempIndexNum;
 		/*
@@ -156,22 +170,63 @@ public class TermIndexWriter implements performIndexWriterLogic{
 		}
 
 		// read from each file into our new term index
+		/*********************************************************
+		 * ife = index file element array We use this as a priority queue that
+		 * uses the current lowest term id from each temporary posting's file.
+		 * As we save each postings files in ascending order, we know this
+		 * should be the smallest
+		 * 
+		 **********************************************************/
 		IndexFileElement[] ifeArr = new IndexFileElement[numIndexes];
+
+		/*********************************************************
+		 * numObjsInFile - Counts the total number of postings per file Note
+		 * that when we write the temporary posting's file we store the number
+		 * of postings in each file as the first integer. Thus we can read in
+		 * how many postings are in a given file. This keeps track of how many
+		 * postings are in any given temporary index file.
+		 **********************************************************/
 		Integer[] numObjsInFile = new Integer[numIndexes];
+
+		/*********************************************************
+		 * currentNumObjsReadFromFile - Counts how many of the postings we've
+		 * read so far. E.g. once currentNumObjsReadFromFile[i] =
+		 * numObjsInFile[i] we know there are no more objects to be read from
+		 * the file at files[i].
+		 *********************************************************/
 		Integer[] currentNumObjsReadFromFile = new Integer[numIndexes];
+
 		// TODO: Need to make sure that the logic regarding this all
 		// files read is correct, may be difficult to fully test
 		boolean allFilesRead = true;
 
+		/*
+		 * Loop until all files have been read and all postings
+		 * have been merged.
+		 */
+		
+		/*
+		 * Initialize the number of objects in each file
+		 */
+		for (int i = 0; i < numIndexes; i++) {
+			numObjsInFile[i] = files.get(i).readInt();
+			currentNumObjsReadFromFile[i] = 0;
+		}
+		
 		while (true) {
+			/*
+			 * This array keeps track of what indices have the current
+			 * lowest element.
+			 */
 			ArrayList<Integer> lowestElements = new ArrayList<Integer>();
+			/*
+			 * This integer keeps track of what the lowest element actually is
+			 */
 			Integer lowestElement = Integer.MAX_VALUE;
-
-			for (int i = 0; i < numIndexes; i++) {
-				numObjsInFile[i] = files.get(i).readInt();
-				currentNumObjsReadFromFile[i] = 0;
-			}
-
+			
+			/*
+			 * 
+			 */
 			for (int i = 0; i < numIndexes; i++) {
 				if (ifeArr[i] == null) {
 					if (currentNumObjsReadFromFile[i] < numObjsInFile[i]) {
@@ -223,6 +278,7 @@ public class TermIndexWriter implements performIndexWriterLogic{
 
 		appendCreateTermIndex();
 		m_tempIndexNum = 0;
+		writeTermDictionary();
 
 	}
 }

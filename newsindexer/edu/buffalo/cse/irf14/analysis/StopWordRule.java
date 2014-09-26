@@ -11,7 +11,7 @@ public class StopWordRule extends TokenFilter {
 
 		Token tok = stream.next();
 
-		// use hash map for constant Big-Oh lookups
+		// use hash set for constant Big-Oh lookups
 		if (FilterUtility.updateStopWord(tok)) {
 			stream.remove();
 		}

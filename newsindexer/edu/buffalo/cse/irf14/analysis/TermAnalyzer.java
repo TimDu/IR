@@ -1,18 +1,17 @@
 package edu.buffalo.cse.irf14.analysis;
 
 /**
- * A chained analyzer specially for Category field.
- * Considered token filters:<br>
- * Symbol, SpecialChars, Dates, Capitalization, Stemmer.
+ * Analyzes any field value with full types of
+ * token filter.
  */
-public class CategoryAnalyzer implements Analyzer {
-	
+public class TermAnalyzer implements Analyzer{
+
 	private TokenStream stream = null;
 	private Token tempTok;
 	
 	/**
 	 * Method that feeds a stream to this analyzer
-	 * @param stream token stream to be analyzed
+	 * @param stream a token stream to be analyzed
 	 */
 	public void setStream(TokenStream stream) {
 		this.stream = stream;
@@ -28,49 +27,60 @@ public class CategoryAnalyzer implements Analyzer {
 		
 		Token tok = stream.next();
 		String term = FilterUtility.updateSymbol(tok);
-		
 		// Symbol filter handler
 		if (term.isEmpty()) {
-			// This token is empty now, cannot proceed anymore
+			// This token has nothing left
 			stream.remove();
 			return stream.hasNext();
 		} else {
 			tok.setTermText(term);
 		}
+		// Accents filter
+		FilterUtility.updateAccent(tok);
 		// SpecialChars filter
 		term = FilterUtility.updateSpecialChar(tok);
 		if (term.isEmpty()) {
-			// Empty term left, cannot proceed
+			// This token has nothing left
 			stream.remove();
 			return stream.hasNext();
 		} else {
 			tok.setTermText(term);
 		}
 		// Date filter
-		FilterUtility.updateDate(stream.getCurrent(), stream);
+		FilterUtility.updateDate(tok, stream);
+		// Numeric filter
+		term = FilterUtility.updateNumber(tok);
+		if (term.isEmpty()) {
+			// This token has nothing left
+			stream.remove();
+			return stream.hasNext();
+		} else {
+			tok.setTermText(term);
+		}
 		// Capitalization filter
 		if (FilterUtility
 				.updateCapitalization(tok)) {
-			if(Character.isUpperCase(tok.toString().charAt(0)))
-			{
+
+			if(Character.isUpperCase(tok.toString().charAt(0))) {
 				if(tempTok != null)
 				{
 					tempTok.merge(tok);
 					stream.remove();
-					tok = tempTok;
 				}
 				else
 				{
 					tempTok = tok;
 				}
-			}
-			else
-			{
+			} else {
 				tempTok = null;
 			}
 		}
 		// Stemmer filter
 		FilterUtility.updateStemmer(tok);
+		// Stop words filter
+		if (FilterUtility.updateStopWord(tok)) {
+			stream.remove();
+		}
 		
 		return stream.hasNext();
 	}
@@ -81,4 +91,5 @@ public class CategoryAnalyzer implements Analyzer {
 		return stream;
 	}
 
+	
 }

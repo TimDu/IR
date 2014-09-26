@@ -14,8 +14,8 @@ public class CategoryAnalyzerTest {
 	// Test Symbol, Dates, Capitalization, Stemmer chain
 	@Test
 	public void test() throws TokenizerException {
-		String test = "need-test-Feb/2/2014Marked_Down";
-		String result = "need test 20140202markeddown";
+		String test = "Need-test-Feb/2/2014";
+		String result = "need test 20140202";
 		String test1 = "___";
 		
 		TokenStream stream = new Tokenizer().consume(test);

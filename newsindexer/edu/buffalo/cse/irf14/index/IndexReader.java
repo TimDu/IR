@@ -11,6 +11,8 @@ import java.util.Map;
  * Class that emulates reading data back from a written index
  */
 public class IndexReader {
+	protected String m_indexDir;
+	private IndexType m_type;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory from which the index is to be read.
@@ -20,6 +22,8 @@ public class IndexReader {
 	 */
 	public IndexReader(String indexDir, IndexType type) {
 		//TODO
+		m_indexDir = indexDir;
+		m_type = type;
 	}
 	
 	/**

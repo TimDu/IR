@@ -18,21 +18,11 @@ public class BSBIPriorityQueue extends PriorityQueue<Integer> implements
 	private void writeObject(ObjectOutputStream o) throws IOException {
 		o.writeInt(size());
 		Integer previous = Integer.MAX_VALUE;
-		previous = this.element();
-		o.writeInt((int)previous);
+		 
 		for (Integer entry : this) {
-			// de-duplication of any possible values
-			if(entry == previous)
-			{
-				// TODO: Determine if this really occurs at all
-				assert(false);
-				continue;
-			}
-			previous = entry;
 			o.writeInt((int)entry);
 
 		}
-		// o.writeObject(propertyTwo);
 	}
 
 	private void readObject(ObjectInputStream o) throws IOException,

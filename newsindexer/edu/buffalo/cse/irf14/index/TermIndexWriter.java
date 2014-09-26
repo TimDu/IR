@@ -24,9 +24,9 @@ public class TermIndexWriter implements performIndexWriterLogic {
 	protected BSBITreeMap m_termIndex;
 	protected IndexDictionary m_termDict;
 	protected IndexDictionary m_fileDict;
-	final protected String m_termDicFileName = "term.dict";
+	
 	protected int m_tempIndexNum = 0;
-	final protected String m_termIndexFileName = "term.index";
+	
 	final protected int m_maxMappingSize;
 
 	public TermIndexWriter(IndexDictionary fileDict) {
@@ -74,8 +74,11 @@ public class TermIndexWriter implements performIndexWriterLogic {
 	private void appendCreateTermIndex() {
 		BufferedOutputStream fileOut;
 		try {
+			// TODO: Create pointers to various offsets within the file
+			// a monolithic file is no good if we can't efficiently
+			// access it's elements.
 			fileOut = new BufferedOutputStream(new FileOutputStream(
-					m_termIndexFileName, true));
+					IndexGlobalVariables.termIndexFileName, true));
 			;
 
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -95,7 +98,7 @@ public class TermIndexWriter implements performIndexWriterLogic {
 		BufferedOutputStream fileOut;
 
 		fileOut = new BufferedOutputStream(new FileOutputStream(
-				m_termDicFileName, true));
+				IndexGlobalVariables.termDicFileName, true));
 
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		out.writeObject(m_termDict);
@@ -269,9 +272,8 @@ public class TermIndexWriter implements performIndexWriterLogic {
 			
 			/*
 			 * Now, for each index in the lowestElements array combine/merge
-			 * all postings. Note that duplicates of fileIDs are only removed
-			 * during writing. Although, duplicate file ids shouldn't really
-			 * occur.
+			 * all postings. Note that duplicates of fileIDs are the way
+			 * we store term frequency and should not be removed.
 			 */
 			for (Integer i : lowestElements) {
 				if (!m_termIndex.containsKey(ifeArr[i].getTermID())) {

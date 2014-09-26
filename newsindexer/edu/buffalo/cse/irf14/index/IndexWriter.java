@@ -22,15 +22,7 @@ public class IndexWriter {
 	protected PlaceIndexWriter m_piw;
 	protected AuthorIndexWriter m_aiw;
 
-	final protected String m_fileDicFileName = "file.dict";
 	
-	final protected String m_placeDicFileName = "place.dict";
-	final protected String m_authorDicFileName = "author.dict";
-	final protected String m_categoryDicFileName = "cat.dict";
-
-	final protected String m_placeIndexFileName = "place.index";
-	final protected String m_authorIndexFileName = "author.index";
-	final protected String m_categoryIndexFileName = "cat.index";
 
 	/**
 	 * Default constructor
@@ -82,7 +74,7 @@ public class IndexWriter {
 			m_piw.finishIndexing();
 			m_ciw.finishIndexing();
 			m_aiw.finishIndexing();
-			FileOutputStream fileOut = new FileOutputStream(m_fileDicFileName);
+			FileOutputStream fileOut = new FileOutputStream(IndexGlobalVariables.fileDicFileName);
 
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(m_fileDict);

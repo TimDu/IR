@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -128,16 +127,21 @@ public class TermIndexWriter implements performIndexWriterLogic {
 
 		while (tstream.hasNext()) {
 			Token term = tstream.next();
-			// look up term
+			
+			// look up term or add it to dictionary
 			int termID = m_termDict.elementToID(term.toString());
-
+			
+			// check if the temporary term index contains it 
 			if (!m_termIndex.containsKey(termID)) {
+				// if not, add it and initialize its priority queue
 				m_termIndex.put(termID, new BSBIPriorityQueue());
 			}
-
+			
+			// now add the fileID to the posting for the given term
 			m_termIndex.get(termID).add(
 					m_fileDict.elementToID(d.getField(FieldNames.FILEID)[0]));
 
+			// if we're above the number of mappings, write to disk
 			if (m_termIndex.values().size() > m_maxMappingSize) {
 				// write to disk
 				createTempIndex();
@@ -225,7 +229,23 @@ public class TermIndexWriter implements performIndexWriterLogic {
 			Integer lowestElement = Integer.MAX_VALUE;
 			
 			/*
+			 * Loop logic:
+			 * For each temporary index check if the value of ifeArr is null.
+			 * This tells us whether the pseudo priority queue ifeArr
+			 * used the previous posting for that index and is ready for a new
+			 * one. If it's null and there are no more postings just continue
+			 * the loop, i.e. go to the next index. If this happens for all
+			 * indexes then allFilesRead will remain true telling us we can
+			 * exit the outer while loop.
 			 * 
+			 * Supposing that ifeArr has at least one non-null value, lowest
+			 * element will be set. Whenever lowest element is encountered
+			 * we keep track of what the index we encountered the lowest element
+			 * at, e.g. the lowest term ID.
+			 * 
+			 * We'll use this term ID after the loop to determine what
+			 * postings can be merged. The indices we're saving gives us
+			 * access to each term with the same lowest ID.
 			 */
 			for (int i = 0; i < numIndexes; i++) {
 				if (ifeArr[i] == null) {
@@ -233,11 +253,11 @@ public class TermIndexWriter implements performIndexWriterLogic {
 						ifeArr[i] = (IndexFileElement) files.get(i)
 								.readObject();
 						currentNumObjsReadFromFile[i]++;
-						allFilesRead = false;
 					} else {
 						continue;
 					}
 				}
+				allFilesRead = false;
 				if (lowestElement > ifeArr[i].getTermID()) {
 					lowestElement = ifeArr[i].getTermID();
 					lowestElements.clear();
@@ -246,7 +266,13 @@ public class TermIndexWriter implements performIndexWriterLogic {
 					lowestElements.add(i);
 				}
 			}
-
+			
+			/*
+			 * Now, for each index in the lowestElements array combine/merge
+			 * all postings. Note that duplicates of fileIDs are only removed
+			 * during writing. Although, duplicate file ids shouldn't really
+			 * occur.
+			 */
 			for (Integer i : lowestElements) {
 				if (!m_termIndex.containsKey(ifeArr[i].getTermID())) {
 					m_termIndex.put(ifeArr[i].getTermID(),
@@ -257,11 +283,14 @@ public class TermIndexWriter implements performIndexWriterLogic {
 						ifeArr[i].getFileIDs());
 				ifeArr[i] = null;
 			}
-
+			/* If the number of values in our in-memory term index is enough
+			 * then we need to flush to disk.
+			 * */ 
 			if (m_termIndex.values().size() > m_maxMappingSize) {
 				// write to disk
 				appendCreateTermIndex();
 			}
+			
 
 			if (allFilesRead) {
 				break;
@@ -270,14 +299,19 @@ public class TermIndexWriter implements performIndexWriterLogic {
 			allFilesRead = true;
 		}
 
-		// clean up
+		// Clean up, get rid of all those temporary files.
 		for (int i = 0; i < numIndexes; i++) {
 			File file = new File("tempIndex" + i + ".index");
 			file.delete();
 		}
-
+		
+		// Make sure we flush any remaining data
 		appendCreateTermIndex();
+		
+		// Reset our internal count of temporary indexes
 		m_tempIndexNum = 0;
+		
+		// Finally, write the term data
 		writeTermDictionary();
 
 	}

@@ -13,7 +13,7 @@ public class DateMatcher {
 
 	private final static String day = "(([12][0-9])|"
 			+ "([3][01])|(0)?[1-9])";
-	private final static String month = "(jan(uary)?|feb(urary)?|"
+	private final static String month = "(jan(uary)?|feb(ruary)?|"
 			+ "mar(ch)?|apr(il)?|may|jun(e)?|jul(y)?|aug(ust)?|"
 			+ "sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?|"
 			+ "[10-12]|(0?[1-9]))";
@@ -21,8 +21,8 @@ public class DateMatcher {
 			+ "(\\d{3}( |)(ad|bc))|(\\d{2}( |)(ad|bc))|"
 			+ "(\\d{1}( |)(ad|bc)))";
 	private final static String time = "(([01][0-9]|2[0-3]|[0-9])("
-			+ "(:[0-5][0-9](:[0-5][0-9])?(( |)(am|pm))?))|"
-			+ "(( |)(am|pm)))";
+			+ "(:[0-5][0-9](:[0-5][0-9])?(( |)(am|pm))?)|"
+			+ "(( |)(am|pm))))";
 	private final static String delimiter = "(,|, | |\\/|-|\\.)";
 	
 	private final static String date1 = "(" + month + delimiter
@@ -46,7 +46,7 @@ public class DateMatcher {
 	// This pattern has strong guarantee on date format
 	private final static Pattern pattern =
 			Pattern.compile(date1 + "|" + date2 + "|" + date3
-					+ "|" + time + delimiter,
+					+ "|" + time + "(" + delimiter + "|)" + "|" + month,
 					Pattern.CASE_INSENSITIVE);
 	
 	/**
@@ -151,7 +151,7 @@ public class DateMatcher {
 	 */
 	public static Map<String, String> mapDates(String words) {
 		String keySeq;	// Sub sequence that contains a raw date
-		String valSeq;
+		String valSeq = new String();
 		Matcher matcher = pattern.matcher(words);
 		// Result map that stores mapping between raw date
 		// and formatted date
@@ -159,7 +159,25 @@ public class DateMatcher {
 		
 		while (matcher.find()) {
 			keySeq = matcher.group();
-			valSeq = convert(keySeq);
+			if (matcher.start() == 0 && matcher.end() == words.length()) {
+				valSeq = convert(keySeq);
+			} else if (matcher.end() == words.length() &&
+					words.charAt(matcher.start() - 1) == ' ') {
+				valSeq = convert(keySeq);
+			} else if (matcher.start() == 0 &&
+					words.charAt(matcher.end()) == ' ') {
+				valSeq = convert(keySeq);
+			} else {
+				if (matcher.start() > 0 && matcher.end() < words.length()) {
+					if (words.charAt(matcher.start() - 1) == ' ' &&
+							words.charAt(matcher.end()) == ' ') {
+						valSeq = convert(keySeq);
+					}
+				} else {
+					valSeq = new String();
+				}
+			}
+			
 			if (!valSeq.isEmpty()) {
 				if (map == null) {
 					map = new HashMap<String, String>();
@@ -181,6 +199,12 @@ public class DateMatcher {
 		String midDelim = extractMiddle(input);		
 		String endDelim = extractEnd(input);
 		String timeDelim = extractTimeEnd(input);
+		
+		// Special care on Date delimiter
+		int splitLen = input.split("\\/|\\.").length;
+		if (splitLen > 1 && splitLen < 3) {
+			return result;
+		}
 
 		input = yearPreproc(input, midDelim);
 		String []dateElements = new String[5];

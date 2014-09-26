@@ -35,7 +35,6 @@ public class TermAnalyzerTest {
 		while (stream.hasNext()) {
 			System.out.println(stream.next().toString());
 			//assertEquals(result, stream.next().toString());
-			fail();
 		}
 	}
 }

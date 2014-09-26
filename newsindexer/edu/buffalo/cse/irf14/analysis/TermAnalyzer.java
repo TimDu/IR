@@ -49,7 +49,7 @@ public class TermAnalyzer implements Analyzer{
 		// Date filter
 		FilterUtility.updateDate(tok, stream);
 		// Numeric filter
-		term = FilterUtility.updateNumber(tok);
+		term = FilterUtility.updateNumber(tok);System.out.println();
 		if (term.isEmpty()) {
 			// This token has nothing left
 			stream.remove();

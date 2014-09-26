@@ -19,7 +19,7 @@ public class DateRuleTest extends TFRuleBaseTest {
 	@Test
 	public void testRule() {
 		
-		try{
+		try{System.out.println(runTest(TokenFilterType.DATE, "Jan")[0]);
 				assertArrayEquals(
 						new String[] { "Vidya", "Balan", "born",
 								"19780101", "is", "an", "Indian",

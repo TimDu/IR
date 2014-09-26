@@ -19,17 +19,17 @@ import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 
-public class TermIndexWriter {
+public class TermIndexWriter implements performIndexWriterLogic{
 	protected BSBITreeMap m_termIndex;
-	protected TermDictionary m_termDict;
-	protected FileDictionary m_fileDict;
+	protected IndexDictionary m_termDict;
+	protected IndexDictionary m_fileDict;
 	protected int m_tempIndexNum = 0;
 	final protected String m_termIndexFileName = "term.index";
 	final protected int m_maxMappingSize;
-	public TermIndexWriter(FileDictionary fileDict)
+	public TermIndexWriter(IndexDictionary fileDict)
 	{
 		m_termIndex = new BSBITreeMap();
-		m_termDict = new TermDictionary();
+		m_termDict = new IndexDictionary();
 		m_fileDict = fileDict;
 		m_maxMappingSize = 10000000;
 	}
@@ -90,8 +90,8 @@ public class TermIndexWriter {
 	}
 	
 	
-	
-	public void performTermIndexLogic(Document d) {
+	@Override
+	public void performIndexLogic(Document d) {
 		
 		TokenStream tstream = createTermStream(d, FieldNames.CONTENT);
 		if (tstream == null) {
@@ -114,14 +114,14 @@ public class TermIndexWriter {
 		while (tstream.hasNext()) {
 			Token term = tstream.next();
 			// look up term
-			int termID = m_termDict.termToID(term.toString());
+			int termID = m_termDict.elementToID(term.toString());
 
 			if (!m_termIndex.containsKey(termID)) {
 				m_termIndex.put(termID, new BSBIPriorityQueue());
 			}
 
 			m_termIndex.get(termID).add(
-					m_fileDict.fileNameToID(d.getField(FieldNames.FILEID)[0]));
+					m_fileDict.elementToID(d.getField(FieldNames.FILEID)[0]));
 
 			if (m_termIndex.values().size() > m_maxMappingSize) {
 				// write to disk
@@ -131,8 +131,8 @@ public class TermIndexWriter {
 
 	}
 	
-	
-	public void finishTermIndexing() throws ClassNotFoundException,
+	@Override
+	public void finishIndexing() throws ClassNotFoundException,
 			IOException {
 		createTempIndex();
 		final int numIndexes = m_tempIndexNum;

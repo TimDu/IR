@@ -14,7 +14,7 @@ import java.io.IOException;
 public class IndexWriter {
 	protected String m_indexDir;
 	
-	protected FileDictionary m_fileDict;
+	protected IndexDictionary m_fileDict;
 	protected TermIndexWriter m_tiw;
 
 	
@@ -37,7 +37,7 @@ public class IndexWriter {
 	 */
 	public IndexWriter(String indexDir) {
 		m_indexDir = indexDir;
-		m_fileDict = new FileDictionary();
+		m_fileDict = new IndexDictionary();
 		// TODO: Make sure we're correctly setting up our path directory!!!
 		
 	}
@@ -60,7 +60,7 @@ public class IndexWriter {
 		 */
 
 		 
-		m_tiw.performTermIndexLogic(d);
+		m_tiw.performIndexLogic(d);
 		performCategoryIndexLogic(d);
 		performPlaceIndexLogic(d);
 		performAuthorIndexLogic(d);
@@ -90,7 +90,7 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		try {
-			m_tiw.finishTermIndexing();
+			m_tiw.finishIndexing();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

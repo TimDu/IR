@@ -2,3 +2,12 @@
 /IndexType.class
 /IndexWriter.class
 /IndexerException.class
+/AuthorIndexWriter.class
+/BSBIPriorityQueue.class
+/BSBITreeMap.class
+/CategoryIndexWriter.class
+/IndexDictionary.class
+/IndexFileElement.class
+/PlaceIndexWriter.class
+/TermIndexWriter.class
+/performIndexWriterLogic.class

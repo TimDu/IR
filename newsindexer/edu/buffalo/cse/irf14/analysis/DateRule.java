@@ -1,7 +1,5 @@
 package edu.buffalo.cse.irf14.analysis;
 
-
-
 /**
  * Token filter that handles Dates type.
  */

@@ -7,11 +7,12 @@ package edu.buffalo.cse.irf14.analysis;
  */
 public class CategoryAnalyzer implements Analyzer {
 	
-	private TokenStream stream;
+	private TokenStream stream = null;
 	private Token tempTok;
 	
 	/**
 	 * Method that feeds a stream to this analyzer
+	 * @param stream token stream to be analyzed
 	 */
 	public void setStream(TokenStream stream) {
 		this.stream = stream;
@@ -21,6 +22,10 @@ public class CategoryAnalyzer implements Analyzer {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
+		if (stream == null) {
+			throw new TokenizerException();
+		}
+		
 		Token tok = stream.next();
 		String term = FilterUtility.updateSymbol(tok);
 		

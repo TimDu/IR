@@ -134,7 +134,8 @@ public class FilterUtility {
 			// Start numeric elimination
 			for (String e: eliminates) {
 				// Eliminate 'qualified' numbers
-				term = term.replaceAll(" " + e + "|" + e + " ", " ");
+				term = term.replaceAll(" " + e + " " + "|" + " "
+				+ e + "|" + e + " ", " ");
 				term = term.replace(e, "");
 			}
 			term = term.trim();
@@ -157,12 +158,13 @@ public class FilterUtility {
 		if (tok == null) {
 			throw new TokenizerException();
 		}
-		String term = tok.toString();
-		if (term == null) {
+		char []termBuff = tok.getTermBuffer();
+		if (termBuff == null) {
 			throw new TokenizerException();
 		}
+		String term = new String();
 		List<Character> words = new LinkedList<Character>();
-		for (char word: term.toCharArray()) {
+		for (char word: termBuff) {
 			words.add(word);
 		}
 		Iterator<Character> iter = words.iterator();
@@ -237,7 +239,6 @@ public class FilterUtility {
 		}
 		
 		// Apply the result on term
-		term = new String();
 		for (char word: words) {
 			term += word;
 		}
@@ -277,9 +278,9 @@ public class FilterUtility {
 	}
 	
 	/**
-	 * 
-	 * @param tok
-	 * @return
+	 * Symbol filter utility
+	 * @param tok token to be updated
+	 * @return filtered term
 	 * @throws TokenizerException 
 	 */
 	public static String updateSymbol(Token tok) 

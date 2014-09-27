@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
@@ -24,16 +26,17 @@ public class TermIndexWriter implements performIndexWriterLogic {
 	protected BSBITreeMap m_termIndex;
 	protected IndexDictionary m_termDict;
 	protected IndexDictionary m_fileDict;
-	
+	protected String m_indexPath;
 	protected int m_tempIndexNum = 0;
-	
+
 	final protected int m_maxMappingSize;
 
-	public TermIndexWriter(IndexDictionary fileDict) {
+	public TermIndexWriter(IndexDictionary fileDict, String indexPath) {
 		m_termIndex = new BSBITreeMap();
 		m_termDict = new IndexDictionary();
 		m_fileDict = fileDict;
 		m_maxMappingSize = 10000000;
+		m_indexPath = indexPath;
 	}
 
 	private TokenStream createTermStream(Document d, FieldNames type) {
@@ -55,8 +58,9 @@ public class TermIndexWriter implements performIndexWriterLogic {
 	private void createTempIndex() {
 		FileOutputStream fileOut;
 		try {
-			fileOut = new FileOutputStream("tempIndex" + m_tempIndexNum
-					+ ".index");
+			Path indexPath = Paths.get(m_indexPath, "tempIndex"
+					+ m_tempIndexNum + ".index");
+			fileOut = new FileOutputStream(indexPath.toString());
 
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(m_termIndex);
@@ -130,16 +134,16 @@ public class TermIndexWriter implements performIndexWriterLogic {
 
 		while (tstream.hasNext()) {
 			Token term = tstream.next();
-			
+
 			// look up term or add it to dictionary
 			int termID = m_termDict.elementToID(term.toString());
-			
-			// check if the temporary term index contains it 
+
+			// check if the temporary term index contains it
 			if (!m_termIndex.containsKey(termID)) {
 				// if not, add it and initialize its priority queue
 				m_termIndex.put(termID, new BSBIPriorityQueue());
 			}
-			
+
 			// now add the fileID to the posting for the given term
 			m_termIndex.get(termID).add(
 					m_fileDict.elementToID(d.getField(FieldNames.FILEID)[0]));
@@ -171,9 +175,10 @@ public class TermIndexWriter implements performIndexWriterLogic {
 		ArrayList<ObjectInputStream> files = new ArrayList<ObjectInputStream>();
 		// open pieces of each file
 		for (int i = 0; i < numIndexes; i++) {
-
+			Path indexPath = Paths.get(m_indexPath, "tempIndex"
+					+ m_tempIndexNum + ".index");
 			files.add(new ObjectInputStream(new BufferedInputStream(
-					new FileInputStream("tempIndex" + i + ".index"))));
+					new FileInputStream(indexPath.toString()))));
 		}
 
 		// read from each file into our new term index
@@ -208,10 +213,10 @@ public class TermIndexWriter implements performIndexWriterLogic {
 		boolean allFilesRead = true;
 
 		/*
-		 * Loop until all files have been read and all postings
-		 * have been merged.
+		 * Loop until all files have been read and all postings have been
+		 * merged.
 		 */
-		
+
 		/*
 		 * Initialize the number of objects in each file
 		 */
@@ -219,36 +224,35 @@ public class TermIndexWriter implements performIndexWriterLogic {
 			numObjsInFile[i] = files.get(i).readInt();
 			currentNumObjsReadFromFile[i] = 0;
 		}
-		
+
 		while (true) {
 			/*
-			 * This array keeps track of what indices have the current
-			 * lowest element.
+			 * This array keeps track of what indices have the current lowest
+			 * element.
 			 */
 			ArrayList<Integer> lowestElements = new ArrayList<Integer>();
 			/*
 			 * This integer keeps track of what the lowest element actually is
 			 */
 			Integer lowestElement = Integer.MAX_VALUE;
-			
+
 			/*
-			 * Loop logic:
-			 * For each temporary index check if the value of ifeArr is null.
-			 * This tells us whether the pseudo priority queue ifeArr
+			 * Loop logic: For each temporary index check if the value of ifeArr
+			 * is null. This tells us whether the pseudo priority queue ifeArr
 			 * used the previous posting for that index and is ready for a new
 			 * one. If it's null and there are no more postings just continue
 			 * the loop, i.e. go to the next index. If this happens for all
-			 * indexes then allFilesRead will remain true telling us we can
-			 * exit the outer while loop.
+			 * indexes then allFilesRead will remain true telling us we can exit
+			 * the outer while loop.
 			 * 
 			 * Supposing that ifeArr has at least one non-null value, lowest
-			 * element will be set. Whenever lowest element is encountered
-			 * we keep track of what the index we encountered the lowest element
+			 * element will be set. Whenever lowest element is encountered we
+			 * keep track of what the index we encountered the lowest element
 			 * at, e.g. the lowest term ID.
 			 * 
-			 * We'll use this term ID after the loop to determine what
-			 * postings can be merged. The indices we're saving gives us
-			 * access to each term with the same lowest ID.
+			 * We'll use this term ID after the loop to determine what postings
+			 * can be merged. The indices we're saving gives us access to each
+			 * term with the same lowest ID.
 			 */
 			for (int i = 0; i < numIndexes; i++) {
 				if (ifeArr[i] == null) {
@@ -269,11 +273,11 @@ public class TermIndexWriter implements performIndexWriterLogic {
 					lowestElements.add(i);
 				}
 			}
-			
+
 			/*
-			 * Now, for each index in the lowestElements array combine/merge
-			 * all postings. Note that duplicates of fileIDs are the way
-			 * we store term frequency and should not be removed.
+			 * Now, for each index in the lowestElements array combine/merge all
+			 * postings. Note that duplicates of fileIDs are the way we store
+			 * term frequency and should not be removed.
 			 */
 			for (Integer i : lowestElements) {
 				if (!m_termIndex.containsKey(ifeArr[i].getTermID())) {
@@ -285,14 +289,14 @@ public class TermIndexWriter implements performIndexWriterLogic {
 						ifeArr[i].getFileIDs());
 				ifeArr[i] = null;
 			}
-			/* If the number of values in our in-memory term index is enough
+			/*
+			 * If the number of values in our in-memory term index is enough
 			 * then we need to flush to disk.
-			 * */ 
+			 */
 			if (m_termIndex.values().size() > m_maxMappingSize) {
 				// write to disk
 				appendCreateTermIndex();
 			}
-			
 
 			if (allFilesRead) {
 				break;
@@ -306,13 +310,13 @@ public class TermIndexWriter implements performIndexWriterLogic {
 			File file = new File("tempIndex" + i + ".index");
 			file.delete();
 		}
-		
+
 		// Make sure we flush any remaining data
 		appendCreateTermIndex();
-		
+
 		// Reset our internal count of temporary indexes
 		m_tempIndexNum = 0;
-		
+
 		// Finally, write the term data
 		writeTermDictionary();
 

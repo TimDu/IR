@@ -13,6 +13,7 @@ import java.util.Map;
 public class IndexReader {
 	protected String m_indexDir;
 	private IndexType m_type;
+	private TermIndexReader tir;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory from which the index is to be read.
@@ -22,6 +23,7 @@ public class IndexReader {
 	 */
 	public IndexReader(String indexDir, IndexType type) {
 		//TODO
+		tir = new TermIndexReader(indexDir);
 		m_indexDir = indexDir;
 		m_type = type;
 	}

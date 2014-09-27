@@ -21,7 +21,7 @@ public class IndexWriter {
 	protected CategoryIndexWriter m_ciw;
 	protected PlaceIndexWriter m_piw;
 	protected AuthorIndexWriter m_aiw;
-
+	
 	
 
 	/**
@@ -33,6 +33,7 @@ public class IndexWriter {
 	public IndexWriter(String indexDir) {
 		m_indexDir = indexDir;
 		m_fileDict = new IndexDictionary();
+		m_tiw = new TermIndexWriter(m_fileDict, indexDir);
 		// TODO: Make sure we're correctly setting up our path directory!!!
 
 	}

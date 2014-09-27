@@ -3,12 +3,12 @@ package edu.buffalo.cse.irf14.index;
 import java.util.List;
 import java.util.Map;
 
-public class TermIndexReader implements IndexReaderInterface {
+public class PlaceIndexReader implements IndexReaderInterface {
 
-	public TermIndexReader(String indexDir) {
-		//super(indexDir, IndexType.TERM);
+	public PlaceIndexReader(String indexDir) {
+		//super(indexDir, IndexType.PLACE);
+		// TODO Auto-generated constructor stub
 	}
-
 	/* (non-Javadoc)
 	 * @see edu.buffalo.cse.irf14.index.IndexReaderInterface#getTotalKeyTerms()
 	 */
@@ -29,14 +29,8 @@ public class TermIndexReader implements IndexReaderInterface {
 		return 0;
 	}
 
-	/**
-	 * Gives a mapping between a file name and the number of occurrences a term
-	 * had within that file assumes
-	 * 
-	 * PRECONDITIONS: Expects that the term and postings files are opened.
-	 * 
-	 * 
-	 * @return The total number of terms
+	/* (non-Javadoc)
+	 * @see edu.buffalo.cse.irf14.index.IndexReaderInterface#getPostings(java.lang.String)
 	 */
 	@Override
 	public Map<String, Integer> getPostings(String term) {
@@ -60,8 +54,6 @@ public class TermIndexReader implements IndexReaderInterface {
 	public Map<String, Integer> query(String... terms) {
 		// TODO Auto-generated method stub
 		return null;
-	} 
-
-	 
+	}	
 
 }

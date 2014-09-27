@@ -6,15 +6,25 @@ package edu.buffalo.cse.irf14.analysis;
 import edu.buffalo.cse.irf14.document.FieldNames;
 
 /**
+ * NOTE: Chained analyzer implementations here is not thread-safe
  * @author nikhillo This factory class is responsible for instantiating
  *         "chained" {@link Analyzer} instances
  */
 public class AnalyzerFactory {
 
 	private static AnalyzerFactory instance = null;
+	private AuthorAnalyzer author;
+	private CategoryAnalyzer category;
+	private PlaceAnalyzer place;
+	private TermAnalyzer term;
+	private NewsDateAnalyzer newsDate;
 
 	private AnalyzerFactory() {
-
+		author = new AuthorAnalyzer();
+		category = new CategoryAnalyzer();
+		place = new PlaceAnalyzer();
+		term = new TermAnalyzer();
+		newsDate = new NewsDateAnalyzer();
 	}
 
 	/**
@@ -82,105 +92,37 @@ public class AnalyzerFactory {
 	}
 	
 	protected Analyzer getCategoryAnalyzer(TokenStream stream) {
-		return null;
+		category.setStream(stream);
+		return category;
 	}
 
 	protected Analyzer getTitleAnalyzer(TokenStream stream) {
-		return null;
+		term.setStream(stream);
+		return term;
 	}
 
 	protected Analyzer getAuthorAnalyzer(TokenStream stream) {
-		return null;
+		author.setStream(stream);
+		return author;
 	}
 
 	protected Analyzer getAuthorOrgAnalyzer(TokenStream stream) {
-		return null;
+		author.setStream(stream);
+		return author;
 	}
 
 	protected Analyzer getPlaceAnalyzer(TokenStream stream) {
-		return null;
+		place.setStream(stream);
+		return place;
 	}
 
 	protected Analyzer getNewsDateAnalyzer(TokenStream stream) {
-		return null;
+		newsDate.setStream(stream);
+		return newsDate;
 	}
 
 	protected Analyzer getContentAnalyzer(TokenStream stream) {
-		// May need multiple passes of certain filters depending on corpus
-
-		try {
-			runAccentRule(stream);
-			// cap must be run after accent
-			runCapRule(stream);
-			// date could be run before accent
-			runDateRule(stream);
-			// expand smybols
-			runSymbolRule(stream);
-			// should run stopword after the symbol rule
-			runStopWordRule(stream);
-			// remove special characters can seemingly 
-			// be run in parallel with anything after date
-			runSpecialCharRule(stream);
-			// stemmer should be run last
-			runStemmerRule(stream);
-
-		} catch (TokenizerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return new NumericRule(stream);
-	}
-	
-	protected void runAccentRule(TokenStream stream) throws TokenizerException
-	{
-		AccentRule acr = new AccentRule(stream);
-		while (acr.increment()) {
-		}
-		// just to make sure my aliasing logic is correct
-		assert (stream == acr.getStream());
-	}
-	
-	 
-	protected void runCapRule(TokenStream stream) throws TokenizerException
-	{
-		CapitalizationRule cpr = new CapitalizationRule(stream);
-		while (cpr.increment()) {
-		}
-	}
-	protected void runStopWordRule(TokenStream stream) throws TokenizerException
-	{
-		StopWordRule swr = new StopWordRule(stream);
-		while (swr.increment()) {
-		}
-	}
-	
-	protected void runDateRule(TokenStream stream) throws TokenizerException
-	{
-		DateRule dr = new DateRule(stream);
-		while (dr.increment()) {
-		}
-	}
-	
-
-	protected void runSpecialCharRule(TokenStream stream) throws TokenizerException
-	{
-		SpecialCharRule scr = new SpecialCharRule(stream);
-		while (scr.increment()) {
-		}
-	}
-	
-	protected void runStemmerRule(TokenStream stream) throws TokenizerException
-	{
-		StemmerRule stmr = new StemmerRule(stream);
-		while (stmr.increment()) {
-		}
-	}
-	
-	protected void runSymbolRule(TokenStream stream) throws TokenizerException
-	{
-		SymbolRule symr = new SymbolRule(stream);
-		while (symr.increment()) {
-		}
+		term.setStream(stream);
+		return term;
 	}
 }

@@ -1,12 +1,16 @@
 package edu.buffalo.cse.irf14.index;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class TermIndexReader implements IndexReaderInterface {
-
+	protected String m_indexDir; 
+	protected TermIndexFileReader tifr;
 	public TermIndexReader(String indexDir) {
-		//super(indexDir, IndexType.TERM);
+		m_indexDir = indexDir;
+		tifr = new TermIndexFileReader(indexDir);
 	}
 
 	/* (non-Javadoc)
@@ -31,7 +35,7 @@ public class TermIndexReader implements IndexReaderInterface {
 
 	/**
 	 * Gives a mapping between a file name and the number of occurrences a term
-	 * had within that file assumes
+	 * had within that file 
 	 * 
 	 * PRECONDITIONS: Expects that the term and postings files are opened.
 	 * 
@@ -41,6 +45,18 @@ public class TermIndexReader implements IndexReaderInterface {
 	@Override
 	public Map<String, Integer> getPostings(String term) {
 		// TODO Auto-generated method stub
+		int termID = 0;
+		try {
+			PriorityQueue<Integer> pqi = tifr.getPostings(termID);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			assert(false);
+		}
+		
+		
+		
+		
 		return null;
 	}
 

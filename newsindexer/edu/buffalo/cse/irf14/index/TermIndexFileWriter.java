@@ -92,7 +92,8 @@ public class TermIndexFileWriter {
 			RandomAccessFile raf = new RandomAccessFile(indexPath.toFile(), "rw");
 			raf.seek(0);
 			assert(raf.readInt() > m_currentInternalIndexNumber);
-			raf.seek(4 + 4*m_currentInternalIndexNumber);
+			
+			raf.seek((Long.SIZE /8)*m_currentInternalIndexNumber);
 			raf.writeLong(m_currentFileSize);
 			raf.close();
 			fileOut = new BufferedOutputStream(new FileOutputStream(
@@ -128,7 +129,7 @@ public class TermIndexFileWriter {
 	protected void appendLong(ObjectOutputStream out, Long input) throws IOException
 	{
 		
-		m_currentFileSize += Long.SIZE;
+		m_currentFileSize += (Long.SIZE/8);
 		out.writeLong(input);
 	}
 	 

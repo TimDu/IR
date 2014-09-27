@@ -4,38 +4,28 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import edu.buffalo.cse.irf14.analysis.CategoryAnalyzer;
+import edu.buffalo.cse.irf14.analysis.NewsDateAnalyzer;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
 
-public class CategoryAnalyzerTest {
+public class NewsDateAnalyzerTest {
 
-	// Test Symbol, Dates, Capitalization, Stemmer chain
+	// Symbol, SpecialChars, Date, Number
 	@Test
 	public void test() throws TokenizerException {
-		String test = "Need-test-Feb/2/2014";
-		String result = "need test 20140202";
-		String test1 = "___";
+		String test = "March-3";
+		String result = "19000303";
 		
 		TokenStream stream = new Tokenizer().consume(test);
-		CategoryAnalyzer analyzer = new CategoryAnalyzer();
+		NewsDateAnalyzer analyzer = new NewsDateAnalyzer();
 		analyzer.setStream(stream);
 		while (analyzer.increment()) {}
 		stream = analyzer.getStream();
 		stream.reset();
 		while (stream.hasNext()) {
-			System.out.println(stream.next().toString());
+			System.out.println(stream.next());
 			assertEquals(result, stream.getCurrent().toString());
 		}
-		
-		stream = new Tokenizer().consume(test1);
-		analyzer = new CategoryAnalyzer();
-		analyzer.setStream(stream);
-		while (analyzer.increment()) {}
-		stream = analyzer.getStream();
-		stream.reset();
-		assertNull(stream.next());
 	}
-
 }

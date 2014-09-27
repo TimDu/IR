@@ -18,3 +18,6 @@
 /CategoryAnalyzerTest.class
 /Issue4.class
 /TermAnalyzerTest.class
+/AuthorAnalyzerTest.class
+/PlaceAnalyzerTest.class
+/NewsDateAnalyzerTest.class

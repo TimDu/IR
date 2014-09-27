@@ -39,3 +39,6 @@
 /FilterUtility.class
 /TitleAnalyzer.class
 /TermAnalyzer.class
+/AuthorAnalyzer.class
+/PlaceAnalyzer.class
+/NewsDateAnalyzer.class

@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.TermAnalyzer;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
@@ -33,7 +32,7 @@ public class TermAnalyzerTest {
 		while (analyzer.increment()) {}
 		stream = analyzer.getStream();
 		stream.reset();
-		while (stream.hasNext()) {//stream.next();
+		while (stream.hasNext()) {
 			System.out.println(stream.next().toString());
 			//assertEquals(result, stream.next().toString());
 		}

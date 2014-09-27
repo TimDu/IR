@@ -195,7 +195,9 @@ public class FilterUtility {
 		
 		while (index > -1) {
 			if (index > 0 && index < (words.size() - 1)) {
-				if ((!Character.isDigit(words.get(index - 1)) ||
+				if (((!Character.isDigit(words.get(index - 1)) &&
+						!Character
+						.isAlphabetic(words.get(index - 1))) ||
 						!Character.isDigit(words.get(index + 1))) &&
 						!(words.get(index - 1) == ' ' &&
 								Character.isAlphabetic(words

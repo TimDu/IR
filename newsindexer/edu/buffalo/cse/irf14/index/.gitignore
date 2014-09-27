@@ -11,3 +11,11 @@
 /PlaceIndexWriter.class
 /TermIndexWriter.class
 /performIndexWriterLogic.class
+/AuthorIndexReader.class
+/CategoryIndexReader.class
+/IndexGlobalVariables.class
+/IndexReaderInterface.class
+/PlaceIndexReader.class
+/TermIndexFileReader.class
+/TermIndexFileWriter.class
+/TermIndexReader.class

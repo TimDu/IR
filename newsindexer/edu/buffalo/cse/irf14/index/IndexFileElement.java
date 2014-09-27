@@ -34,7 +34,6 @@ public class IndexFileElement implements Serializable {
 
 	private void readObject(ObjectInputStream o) throws IOException,
 			ClassNotFoundException {
-		// this should be a write only class
 		termID = o.readInt();
 		fileIDs = (BSBIPriorityQueue) o.readObject();
 	}

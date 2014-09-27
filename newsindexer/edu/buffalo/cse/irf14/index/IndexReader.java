@@ -48,7 +48,6 @@ public class IndexReader {
 	 * @return The total number of terms
 	 */
 	public int getTotalKeyTerms() {
-		//TODO : YOU MUST IMPLEMENT THIS
 		return iri.getTotalKeyTerms();
 	}
 	
@@ -58,7 +57,6 @@ public class IndexReader {
 	 * @return The total number of terms
 	 */
 	public int getTotalValueTerms() {
-		//TODO: YOU MUST IMPLEMENT THIS
 		return iri.getTotalValueTerms();
 	}
 	
@@ -71,7 +69,6 @@ public class IndexReader {
 	 * number of occurrences as values if the given term was found, null otherwise.
 	 */
 	public Map<String, Integer> getPostings(String term) {
-		//TODO:YOU MUST IMPLEMENT THIS
 		return iri.getPostings(term);
 	}
 	
@@ -83,7 +80,6 @@ public class IndexReader {
 	 * null for invalid k values
 	 */
 	public List<String> getTopK(int k) {
-		//TODO YOU MUST IMPLEMENT THIS
 		return iri.getTopK(k);
 	}
 	
@@ -98,7 +94,6 @@ public class IndexReader {
 	 * BONUS ONLY
 	 */
 	public Map<String, Integer> query(String...terms) {
-		//TODO : BONUS ONLY
 		return iri.query(terms);
 	}
 }

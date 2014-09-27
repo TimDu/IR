@@ -17,7 +17,6 @@ public class BSBIPriorityQueue extends PriorityQueue<Integer> implements
 
 	private void writeObject(ObjectOutputStream o) throws IOException {
 		o.writeInt(size());
-		Integer previous = Integer.MAX_VALUE;
 		 
 		for (Integer entry : this) {
 			o.writeInt((int)entry);

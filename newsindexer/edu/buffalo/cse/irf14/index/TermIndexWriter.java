@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -27,7 +28,9 @@ public class TermIndexWriter implements performIndexWriterLogic {
 	protected IndexDictionary m_termDict;
 	protected IndexDictionary m_fileDict;
 	protected String m_indexPath;
+	protected TermIndexFileWriter tif;
 	protected int m_tempIndexNum = 0;
+	protected int m_currentInternalIndexNumber = 0;
 
 	final protected int m_maxMappingSize;
 
@@ -37,6 +40,7 @@ public class TermIndexWriter implements performIndexWriterLogic {
 		m_fileDict = fileDict;
 		m_maxMappingSize = 10000000;
 		m_indexPath = indexPath;
+		tif = new TermIndexFileWriter(indexPath);
 	}
 
 	private TokenStream createTermStream(Document d, FieldNames type) {
@@ -74,30 +78,7 @@ public class TermIndexWriter implements performIndexWriterLogic {
 			e.printStackTrace();
 		}
 	}
-
-	private void appendCreateTermIndex() {
-		BufferedOutputStream fileOut;
-		try {
-			// TODO: Create pointers to various offsets within the file
-			// a monolithic file is no good if we can't efficiently
-			// access it's elements.
-			fileOut = new BufferedOutputStream(new FileOutputStream(
-					IndexGlobalVariables.termIndexFileName, true));
-			;
-
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(m_termIndex);
-			out.close();
-			fileOut.close();
-			m_termIndex = new BSBITreeMap();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			assert (false);
-			e.printStackTrace();
-		}
-
-	}
-
+	
 	private void writeTermDictionary() throws IOException {
 		BufferedOutputStream fileOut;
 
@@ -159,8 +140,12 @@ public class TermIndexWriter implements performIndexWriterLogic {
 
 	@Override
 	public void finishIndexing() throws ClassNotFoundException, IOException {
+		// make sure that we flush any remaining temporary terms to disk
 		createTempIndex();
+
 		final int numIndexes = m_tempIndexNum;
+		// Make sure to call this to setup the term index file structure
+		tif.createTermIndex(numIndexes);
 		/*
 		 * Idea from our online textbook (Manning, Raghavan, Schutze) Blocked
 		 * Based Sort Indexing: To do the merging, we open all block files
@@ -295,7 +280,8 @@ public class TermIndexWriter implements performIndexWriterLogic {
 			 */
 			if (m_termIndex.values().size() > m_maxMappingSize) {
 				// write to disk
-				appendCreateTermIndex();
+				tif.appendTermIndex(m_termIndex);
+				m_termIndex = new BSBITreeMap();
 			}
 
 			if (allFilesRead) {
@@ -306,13 +292,16 @@ public class TermIndexWriter implements performIndexWriterLogic {
 		}
 
 		// Clean up, get rid of all those temporary files.
+
 		for (int i = 0; i < numIndexes; i++) {
-			File file = new File("tempIndex" + i + ".index");
+			Path indexPath = Paths.get(m_indexPath, "tempIndex" + i + ".index");
+			File file = new File(indexPath.toString());
 			file.delete();
 		}
 
 		// Make sure we flush any remaining data
-		appendCreateTermIndex();
+		tif.appendTermIndex(m_termIndex);
+		m_termIndex = new BSBITreeMap();
 
 		// Reset our internal count of temporary indexes
 		m_tempIndexNum = 0;

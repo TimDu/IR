@@ -13,7 +13,7 @@ import java.util.Map;
 public class IndexReader {
 	protected String m_indexDir;
 	private IndexType m_type;
-	private TermIndexReader tir;
+	private IndexReaderInterface iri;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory from which the index is to be read.
@@ -23,7 +23,21 @@ public class IndexReader {
 	 */
 	public IndexReader(String indexDir, IndexType type) {
 		//TODO
-		tir = new TermIndexReader(indexDir);
+		switch(type)
+		{
+		case TERM:
+			iri = new TermIndexReader(indexDir);
+			break;
+		case PLACE:
+			iri = new PlaceIndexReader(indexDir);
+			break;
+		case CATEGORY:
+			iri = new CategoryIndexReader(indexDir);
+			break;
+		case AUTHOR:
+			iri = new AuthorIndexReader(indexDir);
+			break;
+		}
 		m_indexDir = indexDir;
 		m_type = type;
 	}
@@ -35,7 +49,7 @@ public class IndexReader {
 	 */
 	public int getTotalKeyTerms() {
 		//TODO : YOU MUST IMPLEMENT THIS
-		return -1;
+		return iri.getTotalKeyTerms();
 	}
 	
 	/**
@@ -45,7 +59,7 @@ public class IndexReader {
 	 */
 	public int getTotalValueTerms() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return -1;
+		return iri.getTotalValueTerms();
 	}
 	
 	/**
@@ -58,7 +72,7 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> getPostings(String term) {
 		//TODO:YOU MUST IMPLEMENT THIS
-		return null;
+		return iri.getPostings(term);
 	}
 	
 	/**
@@ -70,7 +84,7 @@ public class IndexReader {
 	 */
 	public List<String> getTopK(int k) {
 		//TODO YOU MUST IMPLEMENT THIS
-		return null;
+		return iri.getTopK(k);
 	}
 	
 	/**
@@ -85,6 +99,6 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> query(String...terms) {
 		//TODO : BONUS ONLY
-		return null;
+		return iri.query(terms);
 	}
 }

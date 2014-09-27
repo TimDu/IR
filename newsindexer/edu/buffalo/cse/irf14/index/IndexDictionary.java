@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 public class IndexDictionary implements Serializable {
@@ -11,10 +12,10 @@ public class IndexDictionary implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -7639663631649418945L;
-	protected TreeMap<String, Integer> m_elementDict;
+	protected HashMap<String, Integer> m_elementDict;
 
 	public IndexDictionary() {
-		m_elementDict = new TreeMap<String, Integer>();
+		m_elementDict = new HashMap<String, Integer>();
 	}
 
 	public int elementToID(String term) {
@@ -34,7 +35,7 @@ public class IndexDictionary implements Serializable {
 	@SuppressWarnings("unchecked")
 	private void readObject(ObjectInputStream o) throws IOException,
 			ClassNotFoundException {
-		m_elementDict = (TreeMap<String, Integer>) o.readObject();
+		m_elementDict = (HashMap<String, Integer>) o.readObject();
 
 	}
 

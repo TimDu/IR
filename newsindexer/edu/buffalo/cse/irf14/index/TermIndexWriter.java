@@ -47,6 +47,10 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		TokenStream tstream = new TokenStream();
 		try {
 			String[] arr = d.getField(type);
+			if(arr == null)
+			{
+				return tstream;
+			}
 			for (String s : arr) {
 				tstream.append(tknizer.consume(s));
 			}
@@ -62,7 +66,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		try {
 			Path indexPath = Paths.get(m_indexPath, "tempIndex"
 					+ m_tempIndexNum + ".index");
-			FileOutputStream fos =new FileOutputStream(indexPath.toString());
+			FileOutputStream fos = new FileOutputStream(indexPath.toString());
 			fileOut = new BufferedOutputStream(fos);
 			m_termIndex.writeObject(fileOut);
 			fileOut.close();
@@ -74,11 +78,16 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void writeTermDictionary() throws IOException {
 		BufferedOutputStream fileOut;
-		Path indexPath = Paths.get(m_indexPath, IndexGlobalVariables.termDicFileName);
-		FileOutputStream fos =new FileOutputStream(indexPath.toString(), true);
+		Path indexPath = Paths.get(m_indexPath,
+				IndexGlobalVariables.termDicFileName);
+		if(indexPath.toFile().exists())
+		{
+			indexPath.toFile().delete();
+		}
+		FileOutputStream fos = new FileOutputStream(indexPath.toString(), true);
 		fileOut = new BufferedOutputStream(fos);
 
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -90,26 +99,45 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	}
 
 	@Override
-	public void performIndexLogic(Document d,  FieldNames fn) throws IndexerException {
+	public void performIndexLogic(Document d, FieldNames fn)
+			throws IndexerException {
 
 		TokenStream tstream = createTermStream(d, FieldNames.CONTENT);
-		if (tstream == null) {
+		TokenStream dateTstream = createTermStream(d, FieldNames.NEWSDATE);
+		if (tstream == null || dateTstream == null) {
 			throw new IndexerException();
 		}
+		
 		AnalyzerFactory af = AnalyzerFactory.getInstance();
 		Analyzer analyzer = af.getAnalyzerForField(FieldNames.CONTENT, tstream);
+		Analyzer dateAnalyzer = af.getAnalyzerForField(FieldNames.NEWSDATE,
+				dateTstream);
 		try {
-			while (analyzer.increment()) {
-
+			if(tstream.hasNext()){
+				while (analyzer.increment()) {
+				}
+			}
+			if(dateTstream.hasNext())
+			{
+				while (dateAnalyzer.increment()) {
+				}
 			}
 		} catch (TokenizerException e) {
 			e.printStackTrace();
-			return;
+			throw new IndexerException();
 		}
 		tstream = analyzer.getStream();
+		dateTstream = dateAnalyzer.getStream();
 		tstream.reset();
-		while (tstream.hasNext()) {
-			Token term = tstream.next();
+		dateTstream.reset();
+		UpdateIndexAndDictionary(tstream, d.getField(FieldNames.FILEID)[0]);
+		UpdateIndexAndDictionary(dateTstream, d.getField(FieldNames.FILEID)[0]);
+	}
+	
+	protected void UpdateIndexAndDictionary(TokenStream input, String fileID)
+	{
+		while (input.hasNext()) {
+			Token term = input.next();
 
 			// look up term or add it to dictionary
 			int termID = m_termDict.AddGetElementToID(term.toString());
@@ -122,7 +150,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 
 			// now add the fileID to the posting for the given term
 			m_termIndex.get(termID).add(
-					m_fileDict.elementToID(d.getField(FieldNames.FILEID)[0]));
+					m_fileDict.elementToID(fileID));
 
 			// if we're above the number of mappings, write to disk
 			if (m_termIndex.values().size() > m_maxMappingSize) {
@@ -130,7 +158,6 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 				createTempIndex();
 			}
 		}
-
 	}
 
 	@Override
@@ -155,15 +182,13 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		ArrayList<BufferedInputStream> files = new ArrayList<BufferedInputStream>();
 		// open pieces of each file
 		for (int i = 0; i < numIndexes; i++) {
-			Path indexPath = Paths.get(m_indexPath, "tempIndex"
-					+ i + ".index");
-			if(!indexPath.toFile().exists())
-			{
-				assert(false);
+			Path indexPath = Paths.get(m_indexPath, "tempIndex" + i + ".index");
+			if (!indexPath.toFile().exists()) {
+				assert (false);
 			}
 			try {
-				files.add(new BufferedInputStream(
-						new FileInputStream(indexPath.toString())));
+				files.add(new BufferedInputStream(new FileInputStream(indexPath
+						.toString())));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				throw new IndexerException();

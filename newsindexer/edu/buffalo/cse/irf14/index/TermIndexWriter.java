@@ -93,7 +93,8 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	}
 
 	@Override
-	public void performIndexLogic(Document d,  FieldNames fn) {
+	public void performIndexLogic(Document d,  FieldNames fn) 
+			throws TokenizerException {
 
 		TokenStream tstream = createTermStream(d, FieldNames.CONTENT);
 		if (tstream == null) {
@@ -102,15 +103,11 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		}
 		AnalyzerFactory af = AnalyzerFactory.getInstance();
 		Analyzer analyzer = af.getAnalyzerForField(FieldNames.CONTENT, tstream);
-		try {
-			while (analyzer.increment()) {
 
-			}
-		} catch (TokenizerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
+		while (analyzer.increment()) {
+
 		}
+
 		tstream = analyzer.getStream();
 		tstream.reset();
 		while (tstream.hasNext()) {

@@ -65,4 +65,10 @@ public class TopListings {
 		}
 	}
 
+	/**
+	 * Clear contents
+	 */
+	public void clear() {
+		m_termSortedCount.clear();
+	}
 }

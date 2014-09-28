@@ -1,15 +1,12 @@
 package edu.buffalo.cse.irf14.index;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+ 
 
-public class IndexFileElement implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7272069394787379864L;
+public class IndexFileElement {
+	
 	protected int termID;
 	protected BSBIPriorityQueue fileIDs;
 	
@@ -27,15 +24,17 @@ public class IndexFileElement implements Serializable {
 		fileIDs = new BSBIPriorityQueue();
 	}
 
-	private void writeObject(ObjectOutputStream o) throws IOException {
-		o.writeInt((int) termID);
-		o.writeObject(fileIDs);
+	public void writeObject(BufferedOutputStream o) throws IOException {
+		o.write(IndexerUtilityFunction.getByteArray(termID));
+		fileIDs.writeObject(o);
 	}
 
-	private void readObject(ObjectInputStream o) throws IOException,
+	public void readObject(BufferedInputStream o) throws IOException,
 			ClassNotFoundException {
-		termID = o.readInt();
-		fileIDs = (BSBIPriorityQueue) o.readObject();
+		byte[] rInt = new byte[4];
+		o.read(rInt);
+		termID = IndexerUtilityFunction.getInteger(rInt);
+		fileIDs.readObject(o);
 	}
 
  

@@ -1,39 +1,29 @@
 package edu.buffalo.cse.irf14.index;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
- 
-import java.io.Serializable;
 import java.util.PriorityQueue;
 
-public class BSBIPriorityQueue extends PriorityQueue<Integer> implements
-		Serializable {
+public class BSBIPriorityQueue extends PriorityQueue<Integer> {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8275067776179374453L;
-
-	private void writeObject(ObjectOutputStream o) throws IOException {
-		o.writeInt(size());
-		 
+	public void writeObject(BufferedOutputStream o) throws IOException {		 
+		o.write(IndexerUtilityFunction.getByteArray(size()));
 		for (Integer entry : this) {
-			o.writeInt((int)entry);
-
+			o.write(IndexerUtilityFunction.getByteArray((int) entry));
 		}
 	}
 
-	private void readObject(ObjectInputStream o) throws IOException,
+	public void readObject(BufferedInputStream o) throws IOException,
 			ClassNotFoundException {
-		// this should be a write only class
-		int numFiles = o.readInt();
-		for(int i = 0; i < numFiles; i++)
-		{
-			add(o.readInt());
+		byte[] rInt = new byte[4];
+		o.read(rInt);
+		int numFiles = IndexerUtilityFunction.getInteger(rInt);
+		for (int i = 0; i < numFiles; i++) {
+			o.read(rInt);
+			add(IndexerUtilityFunction.getInteger(rInt));
 		}
-		
+
 	}
 
-	 
 }

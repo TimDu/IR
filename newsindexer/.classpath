@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path=""/>
+	<classpathentry excluding="training/|training/acq/|training/alum/|training/barley/|training/bop/|training/carcass/|training/cocoa/|training/coconut/|training/coffee/|training/copper/|training/corn/|training/cotton/|training/cpi/|training/cpu/|training/crude/|training/dfl/|training/dlr/|training/dmk/|training/earn/|training/fuel/|training/gas/|training/gnp/|training/gold/|training/grain/|training/groundnut/|training/heat/|training/hog/|training/housing/|training/income/|training/interest/|training/ipi/|training/jet/|training/jobs/|training/lead/|training/lei/|training/livestock/|training/lumber/|training/naphtha/|training/nickel/|training/nkr/|training/nzdlr/|training/oat/|training/oilseed/|training/orange/|training/palladium/|training/palmkernel/|training/platinum/|training/potato/|training/propane/|training/rand/|training/rapeseed/|training/reserves/|training/retail/|training/rice/|training/rubber/|training/rye/|training/ship/|training/silver/|training/sorghum/|__MACOSX/" kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path=""/>

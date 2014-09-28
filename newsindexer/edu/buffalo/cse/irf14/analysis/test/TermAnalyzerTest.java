@@ -1,7 +1,5 @@
 package edu.buffalo.cse.irf14.analysis.test;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import edu.buffalo.cse.irf14.analysis.TermAnalyzer;

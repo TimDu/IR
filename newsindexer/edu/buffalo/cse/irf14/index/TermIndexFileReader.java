@@ -1,6 +1,5 @@
 package edu.buffalo.cse.irf14.index;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
@@ -41,13 +40,16 @@ public class TermIndexFileReader {
 
 		assert (indexPath.toFile().exists());
 		RandomAccessFile raf = new RandomAccessFile(indexPath.toFile(), "rw");
+		
 		m_termID = termID;
 		// algorithm for getting a particular posting
 		// 1. Find the chunk containing the term ID
 		long offset = FindChunkOffset(raf, indexPath);
 
 		// 2. Search within the chunk containing the term ID for the posting
-		return FindTermInChunk(raf, offset);
+		 
+		 
+		return FindTermInChunk(raf, offset); 
 	}
 
 	private long FindChunkOffset(RandomAccessFile raf, Path indexPath)
@@ -65,16 +67,17 @@ public class TermIndexFileReader {
 		raf.seek(0);
 
 		// Repeat until the chunk that bounds the term id is found.
-		long offset = RecurseFindChunk(raf, 0, m_maxEntries);
+		long offset = RecurseFindChunk(raf, 0, m_maxEntries - 1);
 
-		raf.close();
+		 
 
 		return offset;
 	}
 
 	private long RecurseFindChunk(RandomAccessFile raf, int firstChunk,
 			int lastChunk) throws IOException {
-
+		
+		
 		// if the input term id is greater than the last go to the chunk
 		// in between the middle and the last, e.g. (N/2 + N)/2
 		//
@@ -85,6 +88,10 @@ public class TermIndexFileReader {
 		int middleChunk = (firstChunk + lastChunk) / 2;
 		raf.seek(4 + middleChunk * (Long.SIZE / 8));
 		long minOffset = raf.readLong();
+		if(firstChunk == lastChunk)
+		{
+			return minOffset;
+		}
 		long maxOffset = raf.readLong();
 		raf.seek(minOffset);
 		// get the number of terms, throw away value
@@ -129,7 +136,7 @@ public class TermIndexFileReader {
 				raf.skipBytes(numFileIDs * 4);
 			}
 		}
-
+		raf.close();
 		return retVal;
 	}
 

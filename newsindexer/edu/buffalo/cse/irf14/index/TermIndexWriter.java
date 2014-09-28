@@ -6,9 +6,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+
 import java.io.ObjectOutputStream;
-import java.io.RandomAccessFile;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import edu.buffalo.cse.irf14.document.FieldNames;
 public class TermIndexWriter implements performIndexWriterLogic {
 
 	protected BSBITreeMap m_termIndex;
-	protected IndexDictionary m_termDict;
+	protected TermIndexDictionary m_termDict;
 	protected IndexDictionary m_fileDict;
 	protected String m_indexPath;
 	protected TermIndexFileWriter tif;
@@ -36,7 +36,7 @@ public class TermIndexWriter implements performIndexWriterLogic {
 
 	public TermIndexWriter(IndexDictionary fileDict, String indexPath) {
 		m_termIndex = new BSBITreeMap();
-		m_termDict = new IndexDictionary();
+		m_termDict = new TermIndexDictionary();
 		m_fileDict = fileDict;
 		m_maxMappingSize = 10000000;
 		m_indexPath = indexPath;
@@ -60,16 +60,15 @@ public class TermIndexWriter implements performIndexWriterLogic {
 	}
 
 	private void createTempIndex() {
-		FileOutputStream fileOut;
+		BufferedOutputStream fileOut;
 		try {
 			Path indexPath = Paths.get(m_indexPath, "tempIndex"
 					+ m_tempIndexNum + ".index");
-			fileOut = new FileOutputStream(indexPath.toString());
-
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(m_termIndex);
-			out.close();
+			FileOutputStream fos =new FileOutputStream(indexPath.toString());
+			fileOut = new BufferedOutputStream(fos);
+			m_termIndex.writeObject(fileOut);
 			fileOut.close();
+			fos.close();
 			m_tempIndexNum++;
 			m_termIndex = new BSBITreeMap();
 		} catch (IOException e) {
@@ -81,14 +80,15 @@ public class TermIndexWriter implements performIndexWriterLogic {
 	
 	private void writeTermDictionary() throws IOException {
 		BufferedOutputStream fileOut;
-
-		fileOut = new BufferedOutputStream(new FileOutputStream(
-				IndexGlobalVariables.termDicFileName, true));
+		Path indexPath = Paths.get(m_indexPath, IndexGlobalVariables.termDicFileName);
+		FileOutputStream fos =new FileOutputStream(indexPath.toString(), true);
+		fileOut = new BufferedOutputStream(fos);
 
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		out.writeObject(m_termDict);
 		out.close();
 		fileOut.close();
+		fos.close();
 
 	}
 
@@ -112,12 +112,12 @@ public class TermIndexWriter implements performIndexWriterLogic {
 			return;
 		}
 		tstream = analyzer.getStream();
-
+		tstream.reset();
 		while (tstream.hasNext()) {
 			Token term = tstream.next();
 
 			// look up term or add it to dictionary
-			int termID = m_termDict.elementToID(term.toString());
+			int termID = m_termDict.AddGetElementToID(term.toString());
 
 			// check if the temporary term index contains it
 			if (!m_termIndex.containsKey(termID)) {
@@ -157,13 +157,17 @@ public class TermIndexWriter implements performIndexWriterLogic {
 		 * and the merged list is written back to disk. Each read buffer is
 		 * refilled from its file when necessary
 		 */
-		ArrayList<ObjectInputStream> files = new ArrayList<ObjectInputStream>();
+		ArrayList<BufferedInputStream> files = new ArrayList<BufferedInputStream>();
 		// open pieces of each file
 		for (int i = 0; i < numIndexes; i++) {
 			Path indexPath = Paths.get(m_indexPath, "tempIndex"
-					+ m_tempIndexNum + ".index");
-			files.add(new ObjectInputStream(new BufferedInputStream(
-					new FileInputStream(indexPath.toString()))));
+					+ i + ".index");
+			if(!indexPath.toFile().exists())
+			{
+				assert(false);
+			}
+			files.add(new BufferedInputStream(
+					new FileInputStream(indexPath.toString())));
 		}
 
 		// read from each file into our new term index
@@ -206,7 +210,9 @@ public class TermIndexWriter implements performIndexWriterLogic {
 		 * Initialize the number of objects in each file
 		 */
 		for (int i = 0; i < numIndexes; i++) {
-			numObjsInFile[i] = files.get(i).readInt();
+			byte[] rInt = new byte[4];
+			files.get(i).read(rInt);
+			numObjsInFile[i] = IndexerUtilityFunction.getInteger(rInt);
 			currentNumObjsReadFromFile[i] = 0;
 		}
 
@@ -242,8 +248,8 @@ public class TermIndexWriter implements performIndexWriterLogic {
 			for (int i = 0; i < numIndexes; i++) {
 				if (ifeArr[i] == null) {
 					if (currentNumObjsReadFromFile[i] < numObjsInFile[i]) {
-						ifeArr[i] = (IndexFileElement) files.get(i)
-								.readObject();
+						ifeArr[i] = new IndexFileElement();
+						ifeArr[i].readObject(files.get(i));
 						currentNumObjsReadFromFile[i]++;
 					} else {
 						continue;
@@ -294,8 +300,9 @@ public class TermIndexWriter implements performIndexWriterLogic {
 		// Clean up, get rid of all those temporary files.
 
 		for (int i = 0; i < numIndexes; i++) {
+			files.get(i).close();
 			Path indexPath = Paths.get(m_indexPath, "tempIndex" + i + ".index");
-			File file = new File(indexPath.toString());
+			File file = indexPath.toFile();
 			file.delete();
 		}
 

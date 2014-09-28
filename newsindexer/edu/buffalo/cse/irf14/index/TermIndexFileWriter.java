@@ -58,17 +58,17 @@ public class TermIndexFileWriter {
 			}
 			fileOut = new BufferedOutputStream(new FileOutputStream(
 					indexPath.toString(), true));
-
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			 
+			 
 			// These will be our offsets, we need to write them in the beginning,
 			// one for each index.
-			appendInteger(out, numIndexes);
+			appendInteger(fileOut, numIndexes);
 			
 			for(int i = 0; i < numIndexes; i++)
 			{
-				appendLong(out, 0L);
+				appendLong(fileOut, 0L);
 			}
-			out.close();
+			 
 			fileOut.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -93,17 +93,15 @@ public class TermIndexFileWriter {
 			raf.seek(0);
 			assert(raf.readInt() > m_currentInternalIndexNumber);
 			
-			raf.seek((Long.SIZE /8)*m_currentInternalIndexNumber);
+			raf.seek((Integer.SIZE/8) + (Long.SIZE /8)*m_currentInternalIndexNumber);
 			raf.writeLong(m_currentFileSize);
 			raf.close();
 			fileOut = new BufferedOutputStream(new FileOutputStream(
-					indexPath.toString(), true));
-
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+					indexPath.toString(), true)); 
 			
-			appendIndexChunk(out, termIndexChunk);
+			appendIndexChunk(fileOut, termIndexChunk);
 			
-			out.close();
+			 
 			fileOut.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -114,23 +112,23 @@ public class TermIndexFileWriter {
 		m_currentInternalIndexNumber++;
 	}
 	
-	protected void appendIndexChunk(ObjectOutputStream out, BSBITreeMap termIndexChunk) throws IOException
+	protected void appendIndexChunk(BufferedOutputStream out, BSBITreeMap termIndexChunk) throws IOException
 	{
 		m_currentFileSize += termIndexChunk.getDiskSize();
-		out.writeObject(termIndexChunk);
+		termIndexChunk.writeObject(out);
 	}
 	
-	protected void appendInteger(ObjectOutputStream out, int input) throws IOException
+	protected void appendInteger(BufferedOutputStream out, int input) throws IOException
 	{
 		m_currentFileSize += 4;
-		out.writeInt(0);
+		out.write(IndexerUtilityFunction.getByteArray(input));
 	}
 	
-	protected void appendLong(ObjectOutputStream out, Long input) throws IOException
+	protected void appendLong(BufferedOutputStream out, Long input) throws IOException
 	{
 		
 		m_currentFileSize += (Long.SIZE/8);
-		out.writeLong(input);
+		out.write(IndexerUtilityFunction.getByteArray(input));
 	}
 	 
 

@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class IndexReader {
 	protected String m_indexDir;
-	private IndexType m_type;
+	
 	private IndexReaderInterface iri;
 	/**
 	 * Default constructor
@@ -39,7 +39,7 @@ public class IndexReader {
 			break;
 		}
 		m_indexDir = indexDir;
-		m_type = type;
+		
 	}
 	
 	/**
@@ -80,6 +80,10 @@ public class IndexReader {
 	 * null for invalid k values
 	 */
 	public List<String> getTopK(int k) {
+		if(k <= 0)
+		{
+			return null;
+		}
 		return iri.getTopK(k);
 	}
 	

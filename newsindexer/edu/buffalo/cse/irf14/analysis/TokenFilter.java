@@ -20,7 +20,6 @@ public abstract class TokenFilter implements Analyzer {
 	 * @param stream : The given TokenStream instance
 	 */
 	public TokenFilter(TokenStream stream) {
-		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		this.stream = stream;
 	}
 }

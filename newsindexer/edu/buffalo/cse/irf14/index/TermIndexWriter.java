@@ -4,11 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.io.ObjectOutputStream;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -53,7 +52,6 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			}
 
 		} catch (TokenizerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return tstream;
@@ -72,7 +70,6 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			m_tempIndexNum++;
 			m_termIndex = new BSBITreeMap();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			assert (false);
 			e.printStackTrace();
 		}
@@ -93,19 +90,19 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	}
 
 	@Override
-	public void performIndexLogic(Document d,  FieldNames fn) 
-			throws TokenizerException {
-
+	public void performIndexLogic(Document d,  FieldNames fn) throws IndexerException {
 		TokenStream tstream = createTermStream(d, FieldNames.CONTENT);
 		if (tstream == null) {
-			// TODO: Figure out error handling
-			return;
+			throw new IndexerException();
 		}
 		AnalyzerFactory af = AnalyzerFactory.getInstance();
 		Analyzer analyzer = af.getAnalyzerForField(FieldNames.CONTENT, tstream);
-
-		while (analyzer.increment()) {
-
+		try {
+			while (analyzer.increment()) {
+			}
+		} catch (TokenizerException e) {
+			e.printStackTrace();
+			throw new IndexerException();
 		}
 
 		tstream = analyzer.getStream();
@@ -136,7 +133,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	}
 
 	@Override
-	public void finishIndexing() throws ClassNotFoundException, IOException {
+	public void finishIndexing() throws IndexerException {
 		// make sure that we flush any remaining temporary terms to disk
 		createTempIndex();
 
@@ -163,8 +160,13 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			{
 				assert(false);
 			}
-			files.add(new BufferedInputStream(
-					new FileInputStream(indexPath.toString())));
+			try {
+				files.add(new BufferedInputStream(
+						new FileInputStream(indexPath.toString())));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				throw new IndexerException();
+			}
 		}
 
 		// read from each file into our new term index
@@ -194,8 +196,6 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		 *********************************************************/
 		Integer[] currentNumObjsReadFromFile = new Integer[numIndexes];
 
-		// TODO: Need to make sure that the logic regarding this all
-		// files read is correct, may be difficult to fully test
 		boolean allFilesRead = true;
 
 		/*
@@ -208,7 +208,12 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		 */
 		for (int i = 0; i < numIndexes; i++) {
 			byte[] rInt = new byte[4];
-			files.get(i).read(rInt);
+			try {
+				files.get(i).read(rInt);
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new IndexerException();
+			}
 			numObjsInFile[i] = IndexerUtilityFunction.getInteger(rInt);
 			currentNumObjsReadFromFile[i] = 0;
 		}
@@ -246,7 +251,12 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 				if (ifeArr[i] == null) {
 					if (currentNumObjsReadFromFile[i] < numObjsInFile[i]) {
 						ifeArr[i] = new IndexFileElement();
-						ifeArr[i].readObject(files.get(i));
+						try {
+							ifeArr[i].readObject(files.get(i));
+						} catch (ClassNotFoundException | IOException e) {
+							e.printStackTrace();
+							throw new IndexerException();
+						}
 						currentNumObjsReadFromFile[i]++;
 					} else {
 						continue;
@@ -297,7 +307,12 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		// Clean up, get rid of all those temporary files.
 
 		for (int i = 0; i < numIndexes; i++) {
-			files.get(i).close();
+			try {
+				files.get(i).close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new IndexerException();
+			}
 			Path indexPath = Paths.get(m_indexPath, "tempIndex" + i + ".index");
 			File file = indexPath.toFile();
 			file.delete();
@@ -311,7 +326,12 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		m_tempIndexNum = 0;
 
 		// Finally, write the term data
-		writeTermDictionary();
+		try {
+			writeTermDictionary();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new IndexerException();
+		}
 
 	}
 }

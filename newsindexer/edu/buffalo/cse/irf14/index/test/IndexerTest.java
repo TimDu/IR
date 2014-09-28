@@ -120,7 +120,6 @@ public class IndexerTest {
 			stream.reset();
 			return stream.next().toString();
 		} catch (TokenizerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

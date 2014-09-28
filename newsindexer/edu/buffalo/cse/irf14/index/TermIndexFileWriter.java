@@ -33,7 +33,6 @@ public class TermIndexFileWriter {
 	protected boolean m_bCreated;
 	
 	public TermIndexFileWriter(String indexPath) {
-		// TODO Auto-generated constructor stub
 		m_indexPath = indexPath;
 		m_currentInternalIndexNumber = 0;
 		m_currentFileSize = 0L;
@@ -46,9 +45,6 @@ public class TermIndexFileWriter {
 		m_currentFileSize = 0L;
 		m_bCreated = true;
 		try {
-			// TODO: Create pointers to various offsets within the file
-			// a monolithic file is no good if we can't efficiently
-			// access it's elements.
 			Path indexPath = Paths.get(m_indexPath,
 					IndexGlobalVariables.termIndexFileName);
 			
@@ -71,7 +67,7 @@ public class TermIndexFileWriter {
 			 
 			fileOut.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			assert (false);
 			e.printStackTrace();
 		}
@@ -81,9 +77,6 @@ public class TermIndexFileWriter {
 		BufferedOutputStream fileOut;
 		assert(m_bCreated);
 		try {
-			// TODO: Create pointers to various offsets within the file
-			// a monolithic file is no good if we can't efficiently
-			// access it's elements.
 			Path indexPath = Paths.get(m_indexPath,
 					IndexGlobalVariables.termIndexFileName);
 			
@@ -104,7 +97,6 @@ public class TermIndexFileWriter {
 			 
 			fileOut.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			assert (false);
 			e.printStackTrace();
 		}

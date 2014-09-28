@@ -38,8 +38,6 @@ public class IndexWriter {
 		m_indexDir = indexDir;
 		m_fileDict = new IndexDictionary();
 		m_tiw = new TermIndexWriter(m_fileDict, indexDir);
-		// TODO: Make sure we're correctly setting up our path directory!!!
-
 	}
 
 	/**
@@ -59,16 +57,10 @@ public class IndexWriter {
 		 * TokenFilterFactory classes while implementing these methods.
 		 */
 
-		try {
-			m_tiw.performIndexLogic(d, FieldNames.CONTENT);
+		m_tiw.performIndexLogic(d, FieldNames.CONTENT);
 		//m_piw.performIndexLogic(d);
 		//m_ciw.performIndexLogic(d);
 		//m_aiw.performIndexLogic(d);
-		} catch (TokenizerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 
 	/**
@@ -92,14 +84,11 @@ public class IndexWriter {
 			out.close();
 			fileOut.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			throw new IndexerException();
+		}   catch (IOException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IndexerException();
 		}
 
 	}

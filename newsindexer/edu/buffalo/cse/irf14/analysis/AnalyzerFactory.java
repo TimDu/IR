@@ -38,7 +38,6 @@ public class AnalyzerFactory {
 	 * @return An instance of the factory
 	 */
 	public static AnalyzerFactory getInstance() {
-		// TODO: YOU NEED TO IMPLEMENT THIS METHOD
 		if (instance == null) {
 			instance = new AnalyzerFactory();
 		}
@@ -59,7 +58,6 @@ public class AnalyzerFactory {
 	 *         {@link FieldNames} null otherwise
 	 */
 	public Analyzer getAnalyzerForField(FieldNames name, TokenStream stream) {
-		// TODO : YOU NEED TO IMPLEMENT THIS METHOD
 
 		/*
 		 * Need to be careful here, must be considerate of what filters we apply

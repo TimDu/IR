@@ -7,7 +7,6 @@ public class CategoryIndexReader implements IndexReaderInterface {
 
 	public CategoryIndexReader(String indexDir) {
 		//super(indexDir, IndexType.CATEGORY);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

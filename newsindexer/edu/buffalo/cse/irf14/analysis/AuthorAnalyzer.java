@@ -21,7 +21,6 @@ public class AuthorAnalyzer implements Analyzer {
 	
 	@Override
 	public boolean increment() throws TokenizerException {
-		// TODO Auto-generated method stub
 		if (stream == null) {
 			throw new TokenizerException();
 		}
@@ -76,7 +75,6 @@ public class AuthorAnalyzer implements Analyzer {
 
 	@Override
 	public TokenStream getStream() {
-		// TODO Auto-generated method stub
 		return stream;
 	}
 }

@@ -43,7 +43,6 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	@Override
 	public boolean hasNext() {
-		// TODO YOU MUST IMPLEMENT THIS		
 		return index < (tokenList.size() - 1);
 	}
 
@@ -56,7 +55,6 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	@Override
 	public Token next() {
-		// TODO YOU MUST IMPLEMENT THIS
 		Token next = null;
 		isRemoved = true;
 		
@@ -79,7 +77,6 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	@Override
 	public void remove() {
-		// TODO YOU MUST IMPLEMENT THIS
 		if(index >= 0 && index < tokenList.size())
 		{
 			if (!isRemoved) {
@@ -95,7 +92,6 @@ public class TokenStream implements Iterator<Token>{
 	 * reset() must always return true.
 	 */
 	public void reset() {
-		//TODO : YOU MUST IMPLEMENT THIS
 		index = -1;
 	}
 	
@@ -109,7 +105,6 @@ public class TokenStream implements Iterator<Token>{
 	 * @param stream : The stream to be appended
 	 */
 	public void append(TokenStream stream) {
-		//TODO : YOU MUST IMPLEMENT THIS
 		if (stream != null) {
 			tokenList.addAll(stream.tokenList);
 		}
@@ -124,7 +119,6 @@ public class TokenStream implements Iterator<Token>{
 	 * has been reached or the current Token was removed
 	 */
 	public Token getCurrent() {
-		//TODO: YOU MUST IMPLEMENT THIS
 		if(isRemoved || index < 0 || index >= tokenList.size())
 		{
 			return null;

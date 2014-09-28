@@ -17,7 +17,6 @@ public class StemmerRule extends TokenFilter {
 
 	@Override
 	public TokenStream getStream() {
-		// TODO Auto-generated method stub
 		return stream;
 	}
 

@@ -21,20 +21,17 @@ public class TermIndexDictionary extends IndexDictionary implements
 	protected TopListings m_termSortedCount;
 
 	public TermIndexDictionary() {
-		// TODO Auto-generated constructor stub
 		m_termCount = new HashMap<Integer, Integer>();
 		m_termSortedCount = null;
 	}
 
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
 		return super.size();
 	}
 
 	@Override
 	public boolean exists(String element) {
-		// TODO Auto-generated method stub
 		return super.exists(element);
 	}
 
@@ -56,7 +53,6 @@ public class TermIndexDictionary extends IndexDictionary implements
 	}
 
 	public int AddGetElementToID(String element) {
-		// TODO Auto-generated method stub
 		int id = super.elementToID(element);
 		increaseTermOccurence(id);
 		return id;
@@ -64,7 +60,6 @@ public class TermIndexDictionary extends IndexDictionary implements
 
 	@Override
 	public String getElementfromID(int id) {
-		// TODO Auto-generated method stub
 		return super.getElementfromID(id);
 	}
 

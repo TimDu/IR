@@ -7,7 +7,6 @@ public class AuthorIndexReader implements IndexReaderInterface {
 
 	public AuthorIndexReader(String indexDir) {
 		//super(indexDir, IndexType.AUTHOR);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)

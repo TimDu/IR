@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -42,7 +43,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 	
 	@Override
 	public void performIndexLogic(Document d,  FieldNames fn) 
-			throws TokenizerException {
+			throws IndexerException {
 		// TODO Auto-generated method stub
 		Analyzer analyzer;
 		TokenStream stream;
@@ -53,7 +54,11 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 			input += var + "=";
 		}
 		// Instantiate token stream
-		stream = new Tokenizer("=").consume(input);
+		try {
+			stream = new Tokenizer("=").consume(input);
+		} catch (TokenizerException e) {
+			throw new IndexerException();
+		}
 		
 		if (fn.equals(FieldNames.AUTHOR)) {
 			analyzer = AnalyzerFactory.getInstance()
@@ -66,7 +71,11 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 			return;
 		}
 		// Analyzing authors
-		while (analyzer.increment()) {}
+		try {
+			while (analyzer.increment()) {}
+		} catch (TokenizerException e) {
+			throw new IndexerException();
+		}
 		stream = analyzer.getStream();
 		stream.reset();
 		
@@ -88,7 +97,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 	}
 
 	@Override
-	public void finishIndexing() throws ClassNotFoundException, IOException {
+	public void finishIndexing() throws IndexerException {
 		// TODO Auto-generated method stub
 		ArrayList<BufferedInputStream> chuncks =
 				new ArrayList<BufferedInputStream>();
@@ -103,18 +112,32 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		for (int i = 0; i < tempFileCount; ++i) {
 			path = Paths.get(indexPath, "tempIndex" + i, ".index");
 			if (path.toFile().exists()) {
-				input = new BufferedInputStream(
-						new FileInputStream(path.toString()));
+				try {
+					input = new BufferedInputStream(
+							new FileInputStream(path.toString()));
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					throw new IndexerException();
+				}
 				chuncks.add(input);
 			}
 		}
 		
 		// BSBI merging
-		BSBI.merge(chuncks, tempFileCount, indexFileWriter, MAX_MEM_ENTRY);
+		try {
+			BSBI.merge(chuncks, tempFileCount, indexFileWriter, MAX_MEM_ENTRY);
+		} catch (ClassNotFoundException | IOException e) {
+			throw new IndexerException();
+		}
 		
 		// Clean up, get rid of all those temporary files.
 		for (int i = 0; i < tempFileCount; i++) {
-			chuncks.get(i).close();
+			try {
+				chuncks.get(i).close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new IndexerException();
+			}
 			Path indexPath = Paths.get(
 					this.indexPath, "tempIndex" + i + ".index");
 			File file = indexPath.toFile();
@@ -129,7 +152,11 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		tempFileCount = 0;
 
 		// Finally, write the term data
-		writeAuthorDictionary();
+		try {
+			writeAuthorDictionary();
+		} catch (IOException e) {
+			throw new IndexerException();
+		}
 	}
 	
 	/**
@@ -183,3 +210,4 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		}
 	}
 }
+

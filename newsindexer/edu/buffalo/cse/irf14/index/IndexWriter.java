@@ -3,6 +3,7 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 
@@ -57,10 +58,10 @@ public class IndexWriter {
 		 */
 
 		m_tiw.performIndexLogic(d, FieldNames.CONTENT);
+		m_tiw.performIndexLogic(d, FieldNames.NEWSDATE);
 		//m_piw.performIndexLogic(d);
 		//m_ciw.performIndexLogic(d);
 		//m_aiw.performIndexLogic(d);
-
 	}
 
 	/**

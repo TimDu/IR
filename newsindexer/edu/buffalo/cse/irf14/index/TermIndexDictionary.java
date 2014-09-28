@@ -94,4 +94,14 @@ public class TermIndexDictionary extends IndexDictionary implements
 		}
 		return topTerms;
 	}
+	
+	/**
+	 * Clear contents from memory
+	 */
+	public void clear() {
+		m_termCount.clear();
+		m_elementDict.clear();
+		m_idDict.clear();
+		m_termSortedCount.clear();
+	}
 }

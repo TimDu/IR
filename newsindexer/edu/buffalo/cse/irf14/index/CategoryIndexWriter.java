@@ -1,4 +1,5 @@
 package edu.buffalo.cse.irf14.index;
+
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 

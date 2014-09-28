@@ -62,7 +62,8 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		try {
 			Path indexPath = Paths.get(m_indexPath, "tempIndex"
 					+ m_tempIndexNum + ".index");
-			FileOutputStream fos =new FileOutputStream(indexPath.toString());
+			System.out.println(indexPath.toString());
+			FileOutputStream fos = new FileOutputStream(indexPath.toString());
 			fileOut = new BufferedOutputStream(fos);
 			m_termIndex.writeObject(fileOut);
 			fileOut.close();

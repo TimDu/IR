@@ -3,8 +3,9 @@ package edu.buffalo.cse.irf14.index;
 import java.io.IOException;
 
 import edu.buffalo.cse.irf14.document.Document;
+import edu.buffalo.cse.irf14.document.FieldNames;
 
-public class CategoryIndexWriter implements performIndexWriterLogic {
+public class CategoryIndexWriter implements PerformIndexWriterLogic {
 
 	IndexDictionary m_fdict;
 	
@@ -13,7 +14,7 @@ public class CategoryIndexWriter implements performIndexWriterLogic {
 	}
 	
 	@Override
-	public void performIndexLogic(Document d) {
+	public void performIndexLogic(Document d,  FieldNames fn) {
 		// TODO Auto-generated method stub
 
 	}

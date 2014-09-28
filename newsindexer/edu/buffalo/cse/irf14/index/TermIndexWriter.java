@@ -22,7 +22,7 @@ import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 
-public class TermIndexWriter implements performIndexWriterLogic {
+public class TermIndexWriter implements PerformIndexWriterLogic {
 
 	protected BSBITreeMap m_termIndex;
 	protected TermIndexDictionary m_termDict;
@@ -93,7 +93,7 @@ public class TermIndexWriter implements performIndexWriterLogic {
 	}
 
 	@Override
-	public void performIndexLogic(Document d) {
+	public void performIndexLogic(Document d,  FieldNames fn) {
 
 		TokenStream tstream = createTermStream(d, FieldNames.CONTENT);
 		if (tstream == null) {

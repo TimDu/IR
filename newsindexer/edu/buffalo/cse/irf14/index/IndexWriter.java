@@ -4,6 +4,7 @@
 package edu.buffalo.cse.irf14.index;
 
 import edu.buffalo.cse.irf14.document.Document;
+import edu.buffalo.cse.irf14.document.FieldNames;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -57,7 +58,7 @@ public class IndexWriter {
 		 * TokenFilterFactory classes while implementing these methods.
 		 */
 
-		m_tiw.performIndexLogic(d);
+		m_tiw.performIndexLogic(d, FieldNames.CONTENT);
 		//m_piw.performIndexLogic(d);
 		//m_ciw.performIndexLogic(d);
 		//m_aiw.performIndexLogic(d);

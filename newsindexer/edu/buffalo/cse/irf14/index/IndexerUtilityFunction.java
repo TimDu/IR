@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 public class IndexerUtilityFunction {
 
 	public IndexerUtilityFunction() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	static byte[] getByteArray(Integer input)

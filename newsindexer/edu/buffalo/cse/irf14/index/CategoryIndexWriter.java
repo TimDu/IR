@@ -1,7 +1,4 @@
 package edu.buffalo.cse.irf14.index;
-
-import java.io.IOException;
-
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 
@@ -14,13 +11,13 @@ public class CategoryIndexWriter implements PerformIndexWriterLogic {
 	}
 	
 	@Override
-	public void performIndexLogic(Document d,  FieldNames fn) {
+	public void performIndexLogic(Document d,  FieldNames fn) throws IndexerException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void finishIndexing() throws ClassNotFoundException, IOException {
+	public void finishIndexing() throws IndexerException {
 		// TODO Auto-generated method stub
 
 	}

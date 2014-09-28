@@ -28,7 +28,6 @@ public class TermIndexFileReader {
 	protected long m_termID;
 
 	public TermIndexFileReader(String indexPath) {
-		// TODO Auto-generated constructor stub
 		m_indexPath = indexPath;
 		m_maxEntries = 0;
 		m_offsetValue = 0L;
@@ -139,8 +138,4 @@ public class TermIndexFileReader {
 		raf.close();
 		return retVal;
 	}
-
-	// TODO: need to make a separate descending list of k terms with the largest
-	// number of associated file postings
-
 }

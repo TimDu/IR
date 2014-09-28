@@ -94,7 +94,6 @@ public class Token {
 	 *            The token array to be merged
 	 */
 	protected void merge(Token...tokens) {
-		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		if (tokens != null) {
 			for (Token token: tokens) {
 				termText += " " + token.getTermText();
@@ -116,7 +115,6 @@ public class Token {
 	 */
 	@Override
 	public String toString() {
-		// TODO: YOU MUST IMPLEMENT THIS METHOD
 		return termText;
 	}
 }

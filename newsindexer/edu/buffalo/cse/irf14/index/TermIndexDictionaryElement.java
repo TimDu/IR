@@ -6,7 +6,6 @@ public class TermIndexDictionaryElement  {
 	protected int m_occurrences;
 
 	public TermIndexDictionaryElement(int termID, int occurrences) {
-		// TODO Auto-generated constructor stub
 		m_termID = termID;
 		m_occurrences = occurrences;
 	}

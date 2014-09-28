@@ -13,7 +13,6 @@ public class NumericRule extends TokenFilter {
 	
 	@Override
 	public boolean increment() throws TokenizerException {
-		// TODO Auto-generated method stub
 		Token tok = stream.next();
 		String term = FilterUtility.updateNumber(tok);
 
@@ -30,7 +29,6 @@ public class NumericRule extends TokenFilter {
 
 	@Override
 	public TokenStream getStream() {
-		// TODO Auto-generated method stub
 		return stream;
 	}
 

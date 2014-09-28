@@ -26,7 +26,6 @@ public class Parser {
 	 * @throws ParserException In case any error occurs during parsing
 	 */
 	public static Document parse(String filename) throws ParserException {
-		// TODO YOU MUST IMPLEMENT THIS
 		if (filename == null) {
 			throw new ParserException();
 		}

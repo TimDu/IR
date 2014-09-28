@@ -28,7 +28,6 @@ public class TokenFilterFactory {
 	 * @return An instance of the factory
 	 */
 	public static TokenFilterFactory getInstance() {
-		// TODO : YOU MUST IMPLEMENT THIS METHOD
 		if (instance == null) {
 			instance = new TokenFilterFactory();
 		}
@@ -47,7 +46,6 @@ public class TokenFilterFactory {
 	 * @return The built {@link TokenFilter} instance
 	 */
 	public TokenFilter getFilterByType(TokenFilterType type, TokenStream stream) {
-		// TODO : YOU MUST IMPLEMENT THIS METHOD
 		// SYMBOL, DATE, NUMERIC, CAPITALIZATION, STOPWORD, STEMMER, ACCENT,
 		// SPECIALCHARS
 

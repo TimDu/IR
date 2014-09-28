@@ -22,7 +22,6 @@ public class IndexReader {
 	 * @param type The {@link IndexType} to read from
 	 */
 	public IndexReader(String indexDir, IndexType type) {
-		//TODO
 		switch(type)
 		{
 		case TERM:

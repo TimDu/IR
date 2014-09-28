@@ -31,11 +31,11 @@ public class TermIndexReader implements IndexReaderInterface {
 			OpenTermDictionary();	
 			OpenFileDictionary();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 			assert (false);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 			assert (false);
 		}
@@ -125,7 +125,7 @@ public class TermIndexReader implements IndexReaderInterface {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 			assert (false);
 		}
@@ -152,7 +152,7 @@ public class TermIndexReader implements IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> query(String... terms) {
-		// TODO Auto-generated method stub
+		// TODO Need to implement for extra credit
 		return null;
 	}
 

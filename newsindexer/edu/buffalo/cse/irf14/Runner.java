@@ -21,7 +21,6 @@ public class Runner {
 	 * 
 	 */
 	public Runner() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -54,7 +53,6 @@ public class Runner {
 						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
 						writer.addDocument(d);
 					} catch (ParserException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} 
 					
@@ -64,7 +62,7 @@ public class Runner {
 			
 			writer.close();
 		} catch (IndexerException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 	}

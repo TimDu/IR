@@ -15,7 +15,6 @@ public class Tokenizer {
 	 * Default constructor. Assumes tokens are whitespace delimited
 	 */
 	public Tokenizer() {
-		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		delimiter = new String(" ");
 	}
 	
@@ -24,7 +23,6 @@ public class Tokenizer {
 	 * @param delim : The delimiter to be used
 	 */
 	public Tokenizer(String delim) {
-		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		delimiter = delim;
 		delimiter = delimiter.replace("\\", "\\\\");
 	}
@@ -44,7 +42,6 @@ public class Tokenizer {
 	 * tokenization
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
-		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		if (str == null || str.length() <= 0) {
 			throw new TokenizerException();
 		}

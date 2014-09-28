@@ -23,8 +23,8 @@ public class IndexWriter {
 	protected IndexDictionary m_fileDict;
 	protected TermIndexWriter m_tiw;
 	protected CategoryIndexWriter m_ciw;
-	protected PlaceIndexWriter m_piw;
-	protected AuthorIndexWriter m_aiw;
+	protected AuthorIndexWriter m_piw;
+	protected PlaceIndexWriter m_aiw;
 	
 	
 

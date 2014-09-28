@@ -25,7 +25,7 @@ public class BSBITreeMap extends TreeMap<Integer, BSBIPriorityQueue> implements
 		// size * 4 = the number of values for each priority queue * 4 
 		// as each value is an integer
 		// + 4 because we're also writing the number of key's out as well
-		return 4 * size() + size*4 + 4;
+		return 4 * size() + size * 4 + 4;
 	}
 
 	public void writeObject(ObjectOutputStream o) throws IOException {

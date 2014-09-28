@@ -29,7 +29,7 @@ public class TermIndexFileWriter {
 	
 	protected String m_indexPath;
 	protected Integer m_currentInternalIndexNumber;
-	protected Long m_currentFileSize;
+	protected long m_currentFileSize;
 	protected boolean m_bCreated;
 	
 	public TermIndexFileWriter(String indexPath) {
@@ -92,7 +92,7 @@ public class TermIndexFileWriter {
 			RandomAccessFile raf = new RandomAccessFile(indexPath.toFile(), "rw");
 			raf.seek(0);
 			assert(raf.readInt() > m_currentInternalIndexNumber);
-			raf.seek(4 + 4*m_currentInternalIndexNumber);
+			raf.seek(4 + 8 * m_currentInternalIndexNumber);//raf.seek(4 + 4*m_currentInternalIndexNumber);
 			raf.writeLong(m_currentFileSize);
 			raf.close();
 			fileOut = new BufferedOutputStream(new FileOutputStream(
@@ -122,13 +122,13 @@ public class TermIndexFileWriter {
 	protected void appendInteger(ObjectOutputStream out, int input) throws IOException
 	{
 		m_currentFileSize += 4;
-		out.writeInt(0);
+		out.writeInt(input);
 	}
 	
 	protected void appendLong(ObjectOutputStream out, Long input) throws IOException
 	{
 		
-		m_currentFileSize += Long.SIZE;
+		m_currentFileSize += 8;//Long.SIZE is the number of bits
 		out.writeLong(input);
 	}
 	 

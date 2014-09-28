@@ -93,15 +93,15 @@ public class TermIndexWriter implements performIndexWriterLogic {
 	}
 
 	@Override
-	public void performIndexLogic(Document d) {
+	public void performIndexLogic(Document d, FieldNames field) {
 
-		TokenStream tstream = createTermStream(d, FieldNames.CONTENT);
+		TokenStream tstream = createTermStream(d, field);
 		if (tstream == null) {
 			// TODO: Figure out error handling
 			return;
 		}
 		AnalyzerFactory af = AnalyzerFactory.getInstance();
-		Analyzer analyzer = af.getAnalyzerForField(FieldNames.CONTENT, tstream);
+		Analyzer analyzer = af.getAnalyzerForField(field, tstream);
 		try {
 			while (analyzer.increment()) {
 
@@ -130,7 +130,7 @@ public class TermIndexWriter implements performIndexWriterLogic {
 					m_fileDict.elementToID(d.getField(FieldNames.FILEID)[0]));
 
 			// if we're above the number of mappings, write to disk
-			if (m_termIndex.values().size() > m_maxMappingSize) {
+			if (m_termIndex.size() > m_maxMappingSize) {
 				// write to disk
 				createTempIndex();
 			}

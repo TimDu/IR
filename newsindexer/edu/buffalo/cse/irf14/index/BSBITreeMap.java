@@ -10,6 +10,11 @@ import java.util.TreeMap;
 public class BSBITreeMap extends TreeMap<Integer, BSBIPriorityQueue> {
  
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6251322687648398649L;
+
 	public int getDiskSize() {
 		int size = 0;
 		for (Map.Entry<Integer, BSBIPriorityQueue> entry : entrySet()) {

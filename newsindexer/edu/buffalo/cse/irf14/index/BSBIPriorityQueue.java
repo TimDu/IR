@@ -7,6 +7,11 @@ import java.util.PriorityQueue;
 
 public class BSBIPriorityQueue extends PriorityQueue<Integer> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4523912505130300498L;
+
 	public void writeObject(BufferedOutputStream o) throws IOException {		 
 		o.write(IndexerUtilityFunction.getByteArray(size()));
 		for (Integer entry : this) {

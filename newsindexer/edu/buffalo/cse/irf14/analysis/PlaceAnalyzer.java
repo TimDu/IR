@@ -1,7 +1,7 @@
 package edu.buffalo.cse.irf14.analysis;
 
 /**
- * Chained filter for Place field.
+ * Chained filter for Place field in front of the report.
  * Considered filters:<br>
  * Symbol, Accents, SpecialChars, Capitalization.
  */
@@ -73,8 +73,30 @@ public class PlaceAnalyzer implements Analyzer {
 		return stream.hasNext();
 	}
 
+	/**
+	 * It is assumes that there is only one place in
+	 * place field, so merge all separated tokens here.
+	 */
 	@Override
 	public TokenStream getStream() {
+		String temp = null;
+		Token tok = null;
+		Token prevTok = null;
+		
+		stream.reset();
+		while (stream.hasNext()) {
+			tok = stream.next();
+			temp = tok.toString();
+			temp = temp.substring(0, 1).toUpperCase() + temp.substring(1);
+			tok.setTermText(temp);
+			if (prevTok != null) {
+				prevTok.merge(tok);
+				stream.remove();
+			} else {
+				prevTok = tok;
+			}
+		}
+		
 		return stream;
 	}
 

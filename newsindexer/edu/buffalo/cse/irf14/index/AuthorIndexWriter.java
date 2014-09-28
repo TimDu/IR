@@ -44,7 +44,6 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 	@Override
 	public void performIndexLogic(Document d,  FieldNames fn) 
 			throws IndexerException {
-		// TODO Auto-generated method stub
 		Analyzer analyzer;
 		TokenStream stream;
 		String input = new String();
@@ -98,7 +97,6 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 
 	@Override
 	public void finishIndexing() throws IndexerException {
-		// TODO Auto-generated method stub
 		ArrayList<BufferedInputStream> chuncks =
 				new ArrayList<BufferedInputStream>();
 		BufferedInputStream input;
@@ -110,13 +108,12 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 		indexFileWriter.createTermIndex(tempFileCount);
 		// Read temporary files
 		for (int i = 0; i < tempFileCount; ++i) {
-			path = Paths.get(indexPath, "tempIndex" + i, ".index");
+			path = Paths.get(indexPath, "tempAuthorIndex" + i + ".index");
 			if (path.toFile().exists()) {
 				try {
 					input = new BufferedInputStream(
 							new FileInputStream(path.toString()));
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					throw new IndexerException();
 				}
 				chuncks.add(input);
@@ -139,7 +136,7 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 				throw new IndexerException();
 			}
 			Path indexPath = Paths.get(
-					this.indexPath, "tempIndex" + i + ".index");
+					this.indexPath, "tempAuthorIndex" + i + ".index");
 			File file = indexPath.toFile();
 			file.delete();
 		}
@@ -195,7 +192,7 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 		
 		try {
 			Path path = Paths.get(indexPath,
-					"tempIndex" + tempFileCount, ".index");
+					"tempAuthorIndex" + tempFileCount + ".index");
 			out = new BufferedOutputStream(
 					new FileOutputStream(path.toString()));
 			// Write index to temporary file

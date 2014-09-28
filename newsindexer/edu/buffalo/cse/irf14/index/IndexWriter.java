@@ -58,6 +58,7 @@ public class IndexWriter {
 		 */
 
 		m_tiw.performIndexLogic(d, FieldNames.CONTENT);
+		m_tiw.performIndexLogic(d, FieldNames.NEWSDATE);
 		//m_piw.performIndexLogic(d);
 		//m_ciw.performIndexLogic(d);
 		//m_aiw.performIndexLogic(d);

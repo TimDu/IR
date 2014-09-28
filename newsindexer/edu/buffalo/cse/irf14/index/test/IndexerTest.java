@@ -42,6 +42,7 @@ public class IndexerTest {
 	public final static void setupIndex() throws IndexerException {
 		String[] strs = {"new home sales top sales forecasts", "home sales rise in july", 
 				"increase in home sales in july", "july new home sales rise"};
+		String[] dates = {"March 5", "August 3", "December 12", "August 3"};
 		int len = strs.length;
 		Document d;
 		String dir = System.getProperty("INDEX.DIR");
@@ -50,6 +51,7 @@ public class IndexerTest {
 			d = new Document();
 			d.setField(FieldNames.FILEID, "0000"+(i+1));
 			d.setField(FieldNames.CONTENT, strs[i]);
+			d.setField(FieldNames.NEWSDATE, dates[i]);
 			writer.addDocument(d);
 		}
 		
@@ -66,7 +68,7 @@ public class IndexerTest {
 	 */
 	@Test
 	public final void testGetTotalKeyTerms() {
-		assertEquals(8.0d, reader.getTotalKeyTerms(), 1); //12.5% error tolerated
+		assertEquals(12.0d, reader.getTotalKeyTerms(), 1); //12.5% error tolerated
 	}
 
 	/**
@@ -101,9 +103,37 @@ public class IndexerTest {
 		assertTrue(map.containsKey("00001"));
 		assertEquals(1, map.get("00001"), 0);
 		
+		query = getAnalyzedDate("August 3");
+		map = reader.getPostings(query);
+		assertEquals(2, map.size(), 0);
+		assertTrue(map.containsKey("00002"));
+		assertTrue(map.containsKey("00004"));
+		
 		query = getAnalyzedTerm("null");
 		map = reader.getPostings(query);
 		assertNull(map);
+		
+		
+	
+	}
+	
+	private static String getAnalyzedDate(String string) {
+		Tokenizer tknizer = new Tokenizer();
+		AnalyzerFactory fact = AnalyzerFactory.getInstance();
+		try {
+			TokenStream stream = tknizer.consume(string);
+			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.NEWSDATE, stream);
+			
+			while (analyzer.increment()) {
+				
+			}
+			
+			stream.reset();
+			return stream.next().toString();
+		} catch (TokenizerException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private static String getAnalyzedTerm(String string) {

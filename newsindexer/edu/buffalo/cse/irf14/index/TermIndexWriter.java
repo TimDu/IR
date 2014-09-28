@@ -92,12 +92,12 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 
 	@Override
 	public void performIndexLogic(Document d,  FieldNames fn) throws IndexerException {
-		TokenStream tstream = createTermStream(d, FieldNames.CONTENT);
+		TokenStream tstream = createTermStream(d, fn);
 		if (tstream == null) {
 			throw new IndexerException();
 		}
 		AnalyzerFactory af = AnalyzerFactory.getInstance();
-		Analyzer analyzer = af.getAnalyzerForField(FieldNames.CONTENT, tstream);
+		Analyzer analyzer = af.getAnalyzerForField(fn, tstream);
 		try {
 			while (analyzer.increment()) {
 			}

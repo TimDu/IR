@@ -1,13 +1,15 @@
 package edu.buffalo.cse.irf14.index;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
@@ -22,8 +24,9 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 	// Counts total number of temporary files stored on disk
 	private int tempFileCount = 0;
 	private String indexPath;
-	private TermIndexDictionary termIDDict;
-	private IndexDictionary docIDDict;
+	private TermIndexDictionary termDict;
+	private IndexDictionary docDict;
+	private TermIndexFileWriter indexFileWriter;
 	// Partial index list stored in memory
 	private BSBITreeMap indexList;
 	
@@ -31,8 +34,9 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 	
 	public PlaceIndexWriter(IndexDictionary fdict, String indexPath) {
 		this.indexPath = indexPath;
-		termIDDict = new TermIndexDictionary();
-		docIDDict = fdict;
+		termDict = new TermIndexDictionary();
+		docDict = fdict;
+		indexFileWriter = new TermIndexFileWriter(indexPath);
 		indexList = new BSBITreeMap();
 	}
 	
@@ -43,7 +47,6 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		Analyzer analyzer;
 		TokenStream stream;
 		String input = new String();
-		List<Integer> termIDs = new LinkedList<Integer>();
 
 		// Concatenate field variables into one string
 		for (String var: d.getField(fn)) {
@@ -69,12 +72,12 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		
 		// Edit term dictionary
 		while (stream.hasNext()) {
-			int id = termIDDict.AddGetElementToID(stream.next().toString());
+			int id = termDict.AddGetElementToID(stream.next().toString());
 			
 			if (!indexList.containsKey(id)) {
 				indexList.put(id, new BSBIPriorityQueue());
 			}
-			indexList.get(id).add(docIDDict.elementToID(
+			indexList.get(id).add(docDict.elementToID(
 					d.getField(FieldNames.FILEID)[0]));
 			
 			// Edit index list
@@ -87,7 +90,46 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 	@Override
 	public void finishIndexing() throws ClassNotFoundException, IOException {
 		// TODO Auto-generated method stub
+		ArrayList<BufferedInputStream> chuncks =
+				new ArrayList<BufferedInputStream>();
+		BufferedInputStream input;
+		Path path;
 
+		// Flush remained index on memory
+		createTempIndex();
+		// Initiate index file
+		indexFileWriter.createTermIndex(tempFileCount);
+		// Read temporary files
+		for (int i = 0; i < tempFileCount; ++i) {
+			path = Paths.get(indexPath, "tempIndex" + i, ".index");
+			if (path.toFile().exists()) {
+				input = new BufferedInputStream(
+						new FileInputStream(path.toString()));
+				chuncks.add(input);
+			}
+		}
+		
+		// BSBI merging
+		BSBI.merge(chuncks, tempFileCount, indexFileWriter, MAX_MEM_ENTRY);
+		
+		// Clean up, get rid of all those temporary files.
+		for (int i = 0; i < tempFileCount; i++) {
+			chuncks.get(i).close();
+			Path indexPath = Paths.get(
+					this.indexPath, "tempIndex" + i + ".index");
+			File file = indexPath.toFile();
+			file.delete();
+		}
+
+		// Make sure we flush any remaining data
+		indexFileWriter.appendTermIndex(indexList);
+		indexList.clear();
+
+		// Reset our internal count of temporary indexes
+		tempFileCount = 0;
+
+		// Finally, write the term data
+		writeAuthorDictionary();
 	}
 	
 	/**
@@ -105,9 +147,9 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 			ObjectOutputStream out = new ObjectOutputStream(buffOut);
 			
 			// Write index to dictionary file
-			out.writeObject(termIDDict);
+			out.writeObject(termDict);
 			// clear step
-			termIDDict.clear();
+			termDict.clear();
 			buffOut.close();
 			out.close();
 		} catch (IOException e) {

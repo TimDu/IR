@@ -5,6 +5,11 @@ import java.util.Map;
 
 public class PlaceIndexReader implements IndexReaderInterface {
 
+	protected String indexDir;
+	protected TermIndexFileReader reader;
+	protected TermIndexDictionary termDict;
+	protected IndexDictionary docDict;
+	
 	public PlaceIndexReader(String indexDir) {
 		//super(indexDir, IndexType.PLACE);
 		// TODO Auto-generated constructor stub

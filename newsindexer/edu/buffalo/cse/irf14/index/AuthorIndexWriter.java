@@ -89,7 +89,8 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 
 		// Edit term dictionary
 		while (stream.hasNext()) {
-			int id = termDict.AddGetElementToID(stream.next().toString());
+			String authorName = stream.next().toString();
+			int id = termDict.AddGetElementToID(authorName);
 
 			if (!indexList.containsKey(id)) {
 				indexList.put(id, new BSBIPriorityQueue());

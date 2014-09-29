@@ -43,6 +43,7 @@ public class IndexerTest {
 	
 	@BeforeClass
 	public final static void setupIndex() throws IndexerException {
+		// TODO: Make sure index directory gets cleaned
 		String[] strs = {"new home sales top sales forecasts", "home sales rise in july", 
 				"increase in home sales in july", "july new home sales rise"};
 		String[] dates = {"March 5", "August 3", "December 12", "August 3"};
@@ -51,7 +52,7 @@ public class IndexerTest {
 		String[] authorOrg = {"The New York Times",	"Chicago Sun-Times",
 				"USA Today"};
 		String[] categories = {"palm-oil", "cocoa", "alum", "I-cattle"};
-		//String[] places = {"Paris", "LA", "Washington", "Washington"};
+		//String[] places = {"Paris", "Los Angeles", "Washington", "Washington"};
 		int len = strs.length;
 		Document d;
 		String dir = System.getProperty("INDEX.DIR");
@@ -87,7 +88,7 @@ public class IndexerTest {
 	 */
 	@Test
 	public final void testGetTotalKeyTerms() {
-		assertEquals(9, authorReader.getTotalKeyTerms(), 0);
+		assertEquals(7, authorReader.getTotalKeyTerms(), 0);
 		// 11
 		assertEquals(11.0d, termReader.getTotalKeyTerms(), 1); //12.5% error tolerated
 	}
@@ -97,7 +98,7 @@ public class IndexerTest {
 	 */
 	@Test
 	public final void testGetTotalValueTerms() {
-		assertEquals(3, authorReader.getTotalValueTerms(), 0);
+		assertEquals(4, authorReader.getTotalValueTerms(), 0);
 		assertEquals(4.0d, termReader.getTotalValueTerms(), 0); //there's just four docs
 	}
 
@@ -191,12 +192,22 @@ public class IndexerTest {
 		Tokenizer tknizer = new Tokenizer();
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		try {
-			TokenStream stream = tknizer.consume(string);
+			TokenStream stream;
+			if(fn.equals(FieldNames.AUTHOR) || fn.equals(FieldNames.AUTHORORG) || fn.equals(FieldNames.PLACE) )
+			{
+				stream = new Tokenizer("=").consume(string);
+			}
+			else
+			{
+				stream = tknizer.consume(string);
+			}
 			Analyzer analyzer = fact.getAnalyzerForField(fn, stream);
 			
 			while (analyzer.increment()) {
 				
 			}
+			
+			stream = analyzer.getStream();
 			
 			stream.reset();
 			return stream.next().toString();

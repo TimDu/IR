@@ -188,6 +188,10 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		try {
 			Path path = Paths.get(indexPath,
 					"tempPlaceIndex" + tempFileCount + ".index");
+			if(path.toFile().exists())
+			{
+				path.toFile().delete();
+			}
 			out = new BufferedOutputStream(
 					new FileOutputStream(path.toString()));
 			// Write index to temporary file

@@ -176,6 +176,10 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 		try {
 			Path path = Paths.get(indexPath,
 					IndexGlobalVariables.authorDicFileName);
+			if(path.toFile().exists())
+			{
+				path.toFile().delete();
+			}
 			buffOut = new BufferedOutputStream(new FileOutputStream(
 					path.toString()));
 			ObjectOutputStream out = new ObjectOutputStream(buffOut);

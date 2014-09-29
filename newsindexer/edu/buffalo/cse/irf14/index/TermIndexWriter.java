@@ -84,6 +84,10 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	private void writeTermDictionary() throws IOException {
 		BufferedOutputStream fileOut;
 		Path indexPath = Paths.get(m_indexPath, m_dictName);
+		if(indexPath.toFile().exists())
+		{
+			indexPath.toFile().delete();
+		}
 		FileOutputStream fos =new FileOutputStream(indexPath.toString(), true);
 		fileOut = new BufferedOutputStream(fos);
 

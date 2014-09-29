@@ -129,10 +129,10 @@ public class IndexerTest {
 		assertEquals(1, map.get("00001"), 0);
 		
 		
-//		query = getAnalyzedPlace("Paris");
-//		map = placeReader.getPostings(query);
-//		assertEquals(1, map.size(), 0);
-//		assertTrue(map.containsKey("00001"));
+		query = getAnalyzer("Paris", FieldNames.PLACE);
+		map = placeReader.getPostings(query);
+		assertEquals(1, map.size(), 0);
+		assertTrue(map.containsKey("00001"));
 		
 		query = getAnalyzer("cocoa", FieldNames.CATEGORY);
 		map = categoryReader.getPostings(query);

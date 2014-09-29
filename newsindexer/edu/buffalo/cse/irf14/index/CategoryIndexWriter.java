@@ -171,6 +171,10 @@ public class CategoryIndexWriter implements PerformIndexWriterLogic {
 		try {
 			Path path = Paths.get(indexPath,
 					IndexGlobalVariables.categoryDicFileName);
+			if(path.toFile().exists())
+			{
+				path.toFile().delete();
+			}
 			buffOut = new BufferedOutputStream(new FileOutputStream(
 					path.toString()));
 			ObjectOutputStream out = new ObjectOutputStream(buffOut);

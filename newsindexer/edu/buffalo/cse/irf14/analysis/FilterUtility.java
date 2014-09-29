@@ -267,14 +267,8 @@ public class FilterUtility {
 		// Stem logic
 		Stemmer stem = new Stemmer();
 
-		for (char c : term.toLowerCase().toCharArray()) {
-			if(!Character.isAlphabetic(c))
-			{
-				return;
-			}
-			stem.add(c);
-		}
 		
+		stem.add(term);
 		stem.stem();
 		tok.setTermText(stem.toString());
 	}
@@ -345,6 +339,7 @@ public class FilterUtility {
 				if (segs[i].isEmpty()) continue;
 				char thisLast = segs[i]
 						.charAt(segs[i].length() - 1);
+				if(segs[i + 1].isEmpty()) continue;
 				char nextFirst = segs[i + 1].charAt(0);
 				
 				if (isNumber(thisLast) &&

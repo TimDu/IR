@@ -12,6 +12,7 @@ public class SpecialCharRule extends TokenFilter{
 	@Override
 	public boolean increment() throws TokenizerException {
 		Token tok = stream.next();
+		if(tok == null) return stream.hasNext();
 		String term = FilterUtility.updateSpecialChar(tok);
 		
 		if (term.isEmpty()) {

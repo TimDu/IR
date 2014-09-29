@@ -18,6 +18,7 @@ public class SymbolRule extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		Token tok = stream.next();
+		if(tok == null) return stream.hasNext();
 		String term = FilterUtility.updateSymbol(tok);
 	
 		if (term.isEmpty()) {

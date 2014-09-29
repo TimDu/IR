@@ -39,7 +39,7 @@ public class Runner {
 		
 		Document d = null;
 		IndexWriter writer = new IndexWriter(indexDir);
-		
+		long startTime = System.currentTimeMillis();
 		try {
 			for (String cat : catDirectories) {
 				dir = new File(ipDir+ File.separator+ cat);
@@ -51,9 +51,7 @@ public class Runner {
 				for (String f : files) {
 					try {
 						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
-						System.out.println("Parsed: " + f);
 						writer.addDocument(d);
-						System.out.println("Added: " + f);
 					} catch (ParserException e) {
 						e.printStackTrace();
 					} 
@@ -67,6 +65,9 @@ public class Runner {
 
 			e.printStackTrace();
 		}
+		long stopTime = System.currentTimeMillis();
+		System.out.println("Done!");
+		System.out.println("Elapsed time was " + (stopTime - startTime) + " miliseconds.");
 	}
 
 }

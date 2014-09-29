@@ -54,6 +54,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		try {
 			
 			for (String s : arr) {
+				if(s.isEmpty()) continue;
 				tstream.append(tknizer.consume(s));
 			}
 

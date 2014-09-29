@@ -37,7 +37,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		this.indexPath = indexPath;
 		termDict = new TermIndexDictionary();
 		docDict = fdict;
-		indexFileWriter = new TermIndexFileWriter(indexPath);
+		indexFileWriter = new TermIndexFileWriter(indexPath, IndexGlobalVariables.placeIndexFileName);
 		indexList = new BSBITreeMap();
 	}
 

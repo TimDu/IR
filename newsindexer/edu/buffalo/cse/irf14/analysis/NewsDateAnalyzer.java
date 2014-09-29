@@ -42,7 +42,7 @@ public class NewsDateAnalyzer implements Analyzer {
 		} else {
 			tok.setTermText(term);
 		}
-		System.out.println(tok.toString());
+		
 		// Date filter
 		FilterUtility.updateDate(tok, stream);
 		

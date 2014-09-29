@@ -23,8 +23,8 @@ public class IndexWriter {
 	protected IndexDictionary m_fileDict;
 	protected TermIndexWriter m_tiw;
 	protected CategoryIndexWriter m_ciw;
-	protected AuthorIndexWriter m_piw;
-	protected PlaceIndexWriter m_aiw;
+	protected AuthorIndexWriter m_aiw;
+	protected PlaceIndexWriter m_piw;
 	
 	
 
@@ -38,6 +38,10 @@ public class IndexWriter {
 		m_indexDir = indexDir;
 		m_fileDict = new IndexDictionary();
 		m_tiw = new TermIndexWriter(m_fileDict, indexDir);
+		m_ciw = new CategoryIndexWriter(m_fileDict, indexDir);
+		m_aiw = new AuthorIndexWriter(m_fileDict, indexDir);
+		//m_piw = new PlaceIndexWriter(m_fileDict, indexDir);
+		
 	}
 
 	/**
@@ -60,8 +64,9 @@ public class IndexWriter {
 		m_tiw.performIndexLogic(d, FieldNames.CONTENT);
 		m_tiw.performIndexLogic(d, FieldNames.NEWSDATE);
 		//m_piw.performIndexLogic(d);
-		//m_ciw.performIndexLogic(d);
-		//m_aiw.performIndexLogic(d);
+		m_ciw.performIndexLogic(d, FieldNames.CATEGORY);
+		m_aiw.performIndexLogic(d, FieldNames.AUTHOR);
+		m_aiw.performIndexLogic(d, FieldNames.AUTHORORG);
 	}
 
 	/**
@@ -75,8 +80,8 @@ public class IndexWriter {
 		try {
 			m_tiw.finishIndexing();
 //			m_piw.finishIndexing();
-//			m_ciw.finishIndexing();
-//			m_aiw.finishIndexing();
+			m_ciw.finishIndexing();
+			m_aiw.finishIndexing();
 			Path indexPath = Paths.get(m_indexDir, IndexGlobalVariables.fileDicFileName);
 			FileOutputStream fileOut = new FileOutputStream(indexPath.toString());
 

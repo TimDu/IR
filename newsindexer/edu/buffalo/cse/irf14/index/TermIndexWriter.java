@@ -27,19 +27,24 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	protected TermIndexDictionary m_termDict;
 	protected IndexDictionary m_fileDict;
 	protected String m_indexPath;
+	protected String m_indexName;
+	protected String m_dictName;
 	protected TermIndexFileWriter tif;
 	protected int m_tempIndexNum = 0;
 	protected int m_currentInternalIndexNumber = 0;
 
 	final protected int m_maxMappingSize;
 
-	public TermIndexWriter(IndexDictionary fileDict, String indexPath) {
+	public TermIndexWriter(IndexDictionary fileDict, 
+			String indexPath) {
 		m_termIndex = new BSBITreeMap();
 		m_termDict = new TermIndexDictionary();
 		m_fileDict = fileDict;
 		m_maxMappingSize = 10000000;
 		m_indexPath = indexPath;
-		tif = new TermIndexFileWriter(indexPath);
+		m_indexName = IndexGlobalVariables.termIndexFileName;
+		m_dictName = IndexGlobalVariables.termDicFileName;
+		tif = new TermIndexFileWriter(indexPath, m_indexName);
 	}
 
 	private TokenStream createTermStream(Document d, FieldNames type) {
@@ -62,7 +67,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		try {
 			Path indexPath = Paths.get(m_indexPath, "tempIndex"
 					+ m_tempIndexNum + ".index");
-			System.out.println(indexPath.toString());
+			
 			FileOutputStream fos = new FileOutputStream(indexPath.toString());
 			fileOut = new BufferedOutputStream(fos);
 			m_termIndex.writeObject(fileOut);
@@ -78,7 +83,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	
 	private void writeTermDictionary() throws IOException {
 		BufferedOutputStream fileOut;
-		Path indexPath = Paths.get(m_indexPath, IndexGlobalVariables.termDicFileName);
+		Path indexPath = Paths.get(m_indexPath, m_dictName);
 		FileOutputStream fos =new FileOutputStream(indexPath.toString(), true);
 		fileOut = new BufferedOutputStream(fos);
 

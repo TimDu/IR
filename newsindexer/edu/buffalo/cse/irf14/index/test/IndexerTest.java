@@ -36,8 +36,10 @@ import edu.buffalo.cse.irf14.index.IndexerException;
  *
  */
 public class IndexerTest {
-	private IndexReader reader;
-	private IndexReader readerAuth;
+	private IndexReader termReader;
+	private IndexReader placeReader;
+	private IndexReader authorReader;
+	private IndexReader categoryReader;
 	
 	@BeforeClass
 	public final static void setupIndex() throws IndexerException {
@@ -48,6 +50,8 @@ public class IndexerTest {
 				"Louis L'Amour", "Ry身tar身 Shiba"};
 		String[] authorOrg = {"The New York Times",	"Chicago Sun-Times",
 				"USA Today"};
+		String[] categories = {"palm-oil", "cocoa", "alum", "I-cattle"};
+		//String[] places = {"Paris", "LA", "Washington", "Washington"};
 		int len = strs.length;
 		Document d;
 		String dir = System.getProperty("INDEX.DIR");
@@ -61,6 +65,8 @@ public class IndexerTest {
 			if (i < len - 1) {
 				d.setField(FieldNames.AUTHORORG, authorOrg[i]);
 			}
+			//d.setField(FieldNames.PLACE, places[i]);
+			d.setField(FieldNames.CATEGORY, categories[i]);
 			
 			writer.addDocument(d);
 		}
@@ -70,8 +76,10 @@ public class IndexerTest {
 
 	@Before
 	public final void before() {
-		reader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.TERM);
-		readerAuth = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.AUTHOR);
+		termReader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.TERM);
+		//placeReader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.PLACE);
+		authorReader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.AUTHOR);
+		categoryReader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.CATEGORY);
 	}
 	
 	/**
@@ -79,8 +87,9 @@ public class IndexerTest {
 	 */
 	@Test
 	public final void testGetTotalKeyTerms() {
-		assertEquals(12.0d, reader.getTotalKeyTerms(), 1); //12.5% error tolerated
-		assertEquals(9, readerAuth.getTotalKeyTerms(), 0);
+		assertEquals(9, authorReader.getTotalKeyTerms(), 0);
+		// 11
+		assertEquals(11.0d, termReader.getTotalKeyTerms(), 1); //12.5% error tolerated
 	}
 
 	/**
@@ -88,8 +97,8 @@ public class IndexerTest {
 	 */
 	@Test
 	public final void testGetTotalValueTerms() {
-		assertEquals(4.0d, reader.getTotalValueTerms(), 0); //there's just four docs
-		assertEquals(3, readerAuth.getTotalValueTerms(), 0);
+		assertEquals(3, authorReader.getTotalValueTerms(), 0);
+		assertEquals(4.0d, termReader.getTotalValueTerms(), 0); //there's just four docs
 	}
 
 	/**
@@ -97,8 +106,8 @@ public class IndexerTest {
 	 */
 	@Test
 	public final void testGetPostings() {
-		String query = getAnalyzedTerm("home");
-		Map<String, Integer> map = reader.getPostings(query);
+		String query = getAnalyzer("home", FieldNames.CONTENT);
+		Map<String, Integer> map = termReader.getPostings(query);
 		assertNotNull(map);
 		assertEquals(4, map.size(), 0);
 		assertTrue(map.containsKey("00001"));
@@ -110,76 +119,80 @@ public class IndexerTest {
 		assertTrue(map.containsKey("00004"));
 		assertEquals(1, map.get("00004"), 0);
 		
-		query = getAnalyzedTerm("forecasts");
-		map = reader.getPostings(query);
+		query = getAnalyzer("forecasts", FieldNames.CONTENT);
+		map = termReader.getPostings(query);
+		// 1 == 1, 1 == 0, 1== 2, 
+		// 1 == 1 +/- delta
 		assertEquals(1, map.size(), 0);
 		assertTrue(map.containsKey("00001"));
 		assertEquals(1, map.get("00001"), 0);
 		
-		query = getAnalyzedDate("August 3");
-		map = reader.getPostings(query);
+		
+//		query = getAnalyzedPlace("Paris");
+//		map = placeReader.getPostings(query);
+//		assertEquals(1, map.size(), 0);
+//		assertTrue(map.containsKey("00001"));
+		
+		query = getAnalyzer("cocoa", FieldNames.CATEGORY);
+		map = categoryReader.getPostings(query);
+		assertNotNull(map);
+		assertEquals(1, map.size(), 0);
+		assertTrue(map.containsKey("00002"));
+		
+		
+		query = getAnalyzer("August 3", FieldNames.NEWSDATE);
+		map = termReader.getPostings(query);
 		assertEquals(2, map.size(), 0);
 		assertTrue(map.containsKey("00002"));
 		assertTrue(map.containsKey("00004"));
 		
-		query = getAnalyzedTerm("null");
-		map = reader.getPostings(query);
+		
+		query = getAnalyzer("null", FieldNames.CONTENT);
+		map = termReader.getPostings(query);
+		assertNull(map);
+		query = getAnalyzer("null", FieldNames.NEWSDATE);
+		map = termReader.getPostings(query);
+		assertNull(map);
+		query = getAnalyzer("null", FieldNames.CATEGORY);
+		map = categoryReader.getPostings(query);
 		assertNull(map);
 		
 		// Author Query
-		query = getAnalyzedTerm("J. K. Rowling");
-		map = readerAuth.getPostings(query);
+		query = getAnalyzer("J. K. Rowling", FieldNames.AUTHOR);
+		map = authorReader.getPostings(query);
 		assertEquals(1, map.size(), 0);
 		assertTrue(map.containsKey("00001"));
-		query = getAnalyzedTerm("Horatio Alger, Jr.");
-		map = readerAuth.getPostings(query);
+		query = getAnalyzer("Horatio Alger, Jr.", FieldNames.AUTHOR);
+		map = authorReader.getPostings(query);
 		assertEquals(1, map.size(), 0);
 		assertTrue(map.containsKey("00002"));
-		query = getAnalyzedTerm("Ry身tar身 Shiba");
-		map = readerAuth.getPostings(query);
+		query = getAnalyzer("Ry身tar身 Shiba", FieldNames.AUTHOR);
+		map = authorReader.getPostings(query);
 		assertEquals(1, map.size(), 0);
 		assertTrue(map.containsKey("00004"));
 	
 		// AuthorOrg Query
-		query = getAnalyzedTerm("The New York Times");
-		map = readerAuth.getPostings(query);
+		query = getAnalyzer("The New York Times", FieldNames.AUTHORORG);
+		map = authorReader.getPostings(query);
 		assertEquals(1, map.size(), 0);
 		assertTrue(map.containsKey("00001"));
-		query = getAnalyzedTerm("Chicago Sun-Times");
-		map = readerAuth.getPostings(query);
+		query = getAnalyzer("Chicago Sun-Times", FieldNames.AUTHORORG);
+		map = authorReader.getPostings(query);
 		assertEquals(1, map.size(), 0);
 		assertTrue(map.containsKey("00002"));
-		query = getAnalyzedTerm("USA Today");
-		map = readerAuth.getPostings(query);
+		query = getAnalyzer("USA Today", FieldNames.AUTHORORG);
+		map = authorReader.getPostings(query);
 		assertEquals(1, map.size(), 0);
 		assertTrue(map.containsKey("00003"));
 	}
 	
-	private static String getAnalyzedDate(String string) {
-		Tokenizer tknizer = new Tokenizer();
-		AnalyzerFactory fact = AnalyzerFactory.getInstance();
-		try {
-			TokenStream stream = tknizer.consume(string);
-			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.NEWSDATE, stream);
-			
-			while (analyzer.increment()) {
-				
-			}
-			
-			stream.reset();
-			return stream.next().toString();
-		} catch (TokenizerException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
-	private static String getAnalyzedTerm(String string) {
+	private static String getAnalyzer(String string, FieldNames fn) {
 		Tokenizer tknizer = new Tokenizer();
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		try {
 			TokenStream stream = tknizer.consume(string);
-			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, stream);
+			Analyzer analyzer = fact.getAnalyzerForField(fn, stream);
 			
 			while (analyzer.increment()) {
 				
@@ -203,11 +216,11 @@ public class IndexerTest {
 		String[] vals = {"sales", "home", "july"};
 		
 		for (int i = 0; i < 3; i++) {
-			vals[i] = getAnalyzedTerm(vals[i]);
+			vals[i] = getAnalyzer(vals[i], FieldNames.CONTENT);
 		}
 		
 		for (int i = 0; i < 3; i++) {
-			topK = reader.getTopK(i + 1);
+			topK = termReader.getTopK(i + 1);
 			assertNotNull(topK);
 			assertEquals(i + 1, topK.size(), 0);
 			
@@ -217,8 +230,8 @@ public class IndexerTest {
 		}
 		
 		//negative case
-		assertNull(reader.getTopK(-1));
-		assertNull(reader.getTopK(0));
+		assertNull(termReader.getTopK(-1));
+		assertNull(termReader.getTopK(0));
 	}
 
 	/**
@@ -231,7 +244,7 @@ public class IndexerTest {
 		
 		
 		for (int i = 0; i <len; i++) {
-			queryTerms[i] = getAnalyzedTerm(queryTerms[i]);
+			queryTerms[i] = getAnalyzer(queryTerms[i], FieldNames.CONTENT);
 		}
 		
 		/*
@@ -244,7 +257,7 @@ public class IndexerTest {
 		String key;
 		int value;
 		for (int i = 0; i < len; i++) {
-			results = reader.query(Arrays.copyOfRange(queryTerms, 0, i + 1));
+			results = termReader.query(Arrays.copyOfRange(queryTerms, 0, i + 1));
 			expected = (HashMap<String, Integer>) intersect(Arrays.copyOfRange(invIdx, 0, i+1));
 			
 			if (expected.isEmpty()) {

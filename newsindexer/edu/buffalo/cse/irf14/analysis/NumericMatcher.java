@@ -30,7 +30,7 @@ public class NumericMatcher {
 
 			list.add(temp);
 		}
-		//System.out.println(list.size());
+
 		return list.isEmpty() ? null :
 			list.toArray(new String[list.size()]);
 	}

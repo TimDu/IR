@@ -26,16 +26,20 @@ public class TermIndexFileReader {
 	protected int m_maxEntries;
 	protected long m_offsetValue;
 	protected long m_termID;
+	protected String m_indexFileName;
+	
 
-	public TermIndexFileReader(String indexPath) {
+	public TermIndexFileReader(String indexPath, String indexFileName) {
 		m_indexPath = indexPath;
+		m_indexFileName = indexFileName;
+		
 		m_maxEntries = 0;
 		m_offsetValue = 0L;
 	}
 
 	public PriorityQueue<Integer> getPostings(int termID) throws IOException {
 		Path indexPath = Paths.get(m_indexPath,
-				IndexGlobalVariables.termIndexFileName);
+				m_indexFileName);
 
 		assert (indexPath.toFile().exists());
 		RandomAccessFile raf = new RandomAccessFile(indexPath.toFile(), "rw");

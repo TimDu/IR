@@ -102,6 +102,9 @@ public class TermIndexDictionary extends IndexDictionary implements
 		m_termCount.clear();
 		m_elementDict.clear();
 		m_idDict.clear();
-		m_termSortedCount.clear();
+		if(m_termSortedCount != null)
+		{
+			m_termSortedCount.clear();
+		}
 	}
 }

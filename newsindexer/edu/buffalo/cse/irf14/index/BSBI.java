@@ -8,7 +8,7 @@ public class BSBI {
 
 	// Probably integrate all BSBI related variables into this one?
 	
-	public static void merge(ArrayList<BufferedInputStream> files,
+	public static BSBITreeMap merge(ArrayList<BufferedInputStream> files,
 			int numIndexes, TermIndexFileWriter tif, int m_maxMappingSize) 
 					throws IOException, ClassNotFoundException {
 		BSBITreeMap m_termIndex = new BSBITreeMap();
@@ -139,5 +139,7 @@ public class BSBI {
 			// reset values to initial conditions, we want true/true
 			allFilesRead = true;
 		}
+		
+		return m_termIndex;
 	}
 }

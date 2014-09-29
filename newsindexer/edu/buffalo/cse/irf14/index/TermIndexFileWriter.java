@@ -28,15 +28,17 @@ public class TermIndexFileWriter {
 	 */
 	
 	protected String m_indexPath;
+	protected String m_indexFileName;
 	protected Integer m_currentInternalIndexNumber;
 	protected Long m_currentFileSize;
 	protected boolean m_bCreated;
 	
-	public TermIndexFileWriter(String indexPath) {
+	public TermIndexFileWriter(String indexPath, String indexFileName) {
 		m_indexPath = indexPath;
 		m_currentInternalIndexNumber = 0;
 		m_currentFileSize = 0L;
 		m_bCreated = false;
+		m_indexFileName = indexFileName;
 	}
 	
 	public void createTermIndex(int numIndexes) {
@@ -46,7 +48,7 @@ public class TermIndexFileWriter {
 		m_bCreated = true;
 		try {
 			Path indexPath = Paths.get(m_indexPath,
-					IndexGlobalVariables.termIndexFileName);
+					m_indexFileName);
 			
 			// remove any previous copies
 			if (indexPath.toFile().exists()) {
@@ -78,7 +80,7 @@ public class TermIndexFileWriter {
 		assert(m_bCreated);
 		try {
 			Path indexPath = Paths.get(m_indexPath,
-					IndexGlobalVariables.termIndexFileName);
+					m_indexFileName);
 			
 			assert(indexPath.toFile().exists());
 			

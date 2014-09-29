@@ -11,19 +11,25 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
  
-public class TermIndexReader implements IndexReaderInterface {
+public class IndexFileReader implements IndexReaderInterface {
 	protected String m_indexDir;
+	protected String m_indexName;
+	protected String m_dictName;
 	protected TermIndexFileReader tifr;
 	protected TermIndexDictionary m_termDict;
 	protected IndexDictionary m_fileDict;
 
-	public TermIndexReader(String indexDir) {
+	public IndexFileReader(String indexDir, 
+			String indexName,
+			String dictName) {
 		m_indexDir = indexDir;
+		m_indexName = indexName;
+		m_dictName = dictName;
 		setup();
 	}
 
 	protected void setup() {
-		tifr = new TermIndexFileReader(m_indexDir);
+		tifr = new TermIndexFileReader(m_indexDir, m_indexName);
 		m_termDict = new TermIndexDictionary();
 		m_fileDict = new IndexDictionary();
 
@@ -56,9 +62,10 @@ public class TermIndexReader implements IndexReaderInterface {
 	
 	protected void OpenTermDictionary() throws IOException, ClassNotFoundException
 	{
+		
 		BufferedInputStream fileIn = new BufferedInputStream(
 				new FileInputStream(Paths.get(m_indexDir,
-						IndexGlobalVariables.termDicFileName).toString()));
+						m_dictName).toString()));
 		ObjectInputStream instream = new ObjectInputStream(fileIn);
 		m_termDict = (TermIndexDictionary) instream.readObject();
 

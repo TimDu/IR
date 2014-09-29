@@ -30,65 +30,74 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 	private TermIndexFileWriter indexFileWriter;
 	// Partial index list stored in memory
 	private BSBITreeMap indexList;
-	
+
 	final private int MAX_MEM_ENTRY = 100000;
-	
+
 	public AuthorIndexWriter(IndexDictionary fdict, String indexPath) {
 		this.indexPath = indexPath;
 		termDict = new TermIndexDictionary();
 		docDict = fdict;
-		indexFileWriter = new TermIndexFileWriter(indexPath);
+		indexFileWriter = new TermIndexFileWriter(indexPath,
+				IndexGlobalVariables.authorIndexFileName);
 		indexList = new BSBITreeMap();
 	}
-	
+
 	@Override
-	public void performIndexLogic(Document d,  FieldNames fn) 
+	public void performIndexLogic(Document d, FieldNames fn)
 			throws IndexerException {
 		// TODO Auto-generated method stub
 		Analyzer analyzer;
 		TokenStream stream;
 		String input = new String();
-
-		// Concatenate field variables into one string
-		for (String var: d.getField(fn)) {
-			input += var + "=";
+		// check to make sure that we actually have something to index
+		// author organization may be blank.
+		if(d.getField(fn) == null || d.getField(fn).length == 0)
+		{
+			return;
 		}
-		// Instantiate token stream
+		// Concatenate field variables into one string
 		try {
+			for (String var : d.getField(fn)) {
+				input += var + "=";
+			}
+			// Instantiate token stream
+
 			stream = new Tokenizer("=").consume(input);
-		} catch (TokenizerException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
 			throw new IndexerException();
 		}
-		
+
 		if (fn.equals(FieldNames.AUTHOR)) {
-			analyzer = AnalyzerFactory.getInstance()
-					.getAnalyzerForField(FieldNames.AUTHOR, stream);
+			analyzer = AnalyzerFactory.getInstance().getAnalyzerForField(
+					FieldNames.AUTHOR, stream);
 		} else if (fn.equals(FieldNames.AUTHORORG)) {
-			analyzer = AnalyzerFactory.getInstance()
-					.getAnalyzerForField(FieldNames.AUTHORORG, stream);
+			analyzer = AnalyzerFactory.getInstance().getAnalyzerForField(
+					FieldNames.AUTHORORG, stream);
 		} else {
 			// Wrong usage on this class!
 			return;
 		}
 		// Analyzing authors
 		try {
-			while (analyzer.increment()) {}
+			while (analyzer.increment()) {
+			}
 		} catch (TokenizerException e) {
 			throw new IndexerException();
 		}
 		stream = analyzer.getStream();
 		stream.reset();
-		
+
 		// Edit term dictionary
 		while (stream.hasNext()) {
 			int id = termDict.AddGetElementToID(stream.next().toString());
-			
+
 			if (!indexList.containsKey(id)) {
 				indexList.put(id, new BSBIPriorityQueue());
 			}
-			indexList.get(id).add(docDict.elementToID(
-					d.getField(FieldNames.FILEID)[0]));
-			
+			indexList.get(id).add(
+					docDict.elementToID(d.getField(FieldNames.FILEID)[0]));
+
 			// Edit index list
 			if (indexList.size() > MAX_MEM_ENTRY) {
 				createTempIndex();
@@ -99,8 +108,7 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 	@Override
 	public void finishIndexing() throws IndexerException {
 		// TODO Auto-generated method stub
-		ArrayList<BufferedInputStream> chuncks =
-				new ArrayList<BufferedInputStream>();
+		ArrayList<BufferedInputStream> chuncks = new ArrayList<BufferedInputStream>();
 		BufferedInputStream input;
 		Path path;
 
@@ -110,11 +118,11 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 		indexFileWriter.createTermIndex(tempFileCount);
 		// Read temporary files
 		for (int i = 0; i < tempFileCount; ++i) {
-			path = Paths.get(indexPath, "tempIndex" + i, ".index");
+			path = Paths.get(indexPath, "tempIndex" + i + ".index");
 			if (path.toFile().exists()) {
 				try {
-					input = new BufferedInputStream(
-							new FileInputStream(path.toString()));
+					input = new BufferedInputStream(new FileInputStream(
+							path.toString()));
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					throw new IndexerException();
@@ -122,14 +130,14 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 				chuncks.add(input);
 			}
 		}
-		
+
 		// BSBI merging
 		try {
 			BSBI.merge(chuncks, tempFileCount, indexFileWriter, MAX_MEM_ENTRY);
 		} catch (ClassNotFoundException | IOException e) {
 			throw new IndexerException();
 		}
-		
+
 		// Clean up, get rid of all those temporary files.
 		for (int i = 0; i < tempFileCount; i++) {
 			try {
@@ -138,8 +146,8 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 				e.printStackTrace();
 				throw new IndexerException();
 			}
-			Path indexPath = Paths.get(
-					this.indexPath, "tempIndex" + i + ".index");
+			Path indexPath = Paths.get(this.indexPath, "tempIndex" + i
+					+ ".index");
 			File file = indexPath.toFile();
 			file.delete();
 		}
@@ -158,21 +166,22 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 			throw new IndexerException();
 		}
 	}
-	
+
 	/**
 	 * Write author-authorID dictionary to disk
+	 * 
 	 * @throws IOException
 	 */
 	private void writeAuthorDictionary() throws IOException {
 		BufferedOutputStream buffOut;
-		
+
 		try {
-			Path path = Paths.get(
-					indexPath, IndexGlobalVariables.authorDicFileName);
-			buffOut = new BufferedOutputStream(
-					new FileOutputStream(path.toString()));
+			Path path = Paths.get(indexPath,
+					IndexGlobalVariables.authorDicFileName);
+			buffOut = new BufferedOutputStream(new FileOutputStream(
+					path.toString()));
 			ObjectOutputStream out = new ObjectOutputStream(buffOut);
-			
+
 			// Write index to dictionary file
 			out.writeObject(termDict);
 			// clear step
@@ -180,22 +189,21 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 			buffOut.close();
 			out.close();
 		} catch (IOException e) {
-			assert(false);
+			assert (false);
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Create a temporary file and move index data in memory
-	 * to this file.
+	 * Create a temporary file and move index data in memory to this file.
 	 * 
 	 */
 	private void createTempIndex() {
 		BufferedOutputStream out;
-		
+
 		try {
-			Path path = Paths.get(indexPath,
-					"tempIndex" + tempFileCount, ".index");
+			Path path = Paths.get(indexPath, "tempIndex" + tempFileCount + 
+					".index");
 			out = new BufferedOutputStream(
 					new FileOutputStream(path.toString()));
 			// Write index to temporary file
@@ -205,9 +213,8 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 			indexList.clear();
 			out.close();
 		} catch (IOException e) {
-			assert(false);
+			assert (false);
 			e.printStackTrace();
 		}
 	}
 }
-

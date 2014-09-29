@@ -51,16 +51,19 @@ import java.util.Vector;
 
 public class Stemmer {
 	private Vector<Character> b;
+	StemOld so;
 	private int i, /* offset into b */
 	i_end, /* offset to end of stemmed word */
 	j, k;
 	private static final int INC = 50;
-
+	boolean badStem = true;
+	private String OldString;
 	/* unit of size whereby b is increased */
 	public Stemmer() {
 		b = new Vector<Character>(INC);
 		i = 0;
 		i_end = 0;
+		so = new StemOld();
 	}
 
 	/**
@@ -70,9 +73,18 @@ public class Stemmer {
 
 	public void add(String input)
 	{
+		so = new StemOld();
+		OldString = input;
+		i = input.length();
+		badStem = false;
 		char[] temp = input.toLowerCase().toCharArray();
 		for(int i = 0; i < input.length(); i++) {
+			if(!Character.isLetter(temp[i]))
+			{
+				badStem = true;
+			}
 		    b.add(temp[i]);
+		    so.add(temp[i]);
 		}
 	}
 
@@ -89,9 +101,12 @@ public class Stemmer {
 	 * getResultLength (which is generally more efficient.)
 	 */
 	public String toString() {
+		 
+		//return so.toString();
+		
 		String retVal = "";
-		for (Character c : b)
-			retVal += c;
+		for (int i = 0; i < i_end; i++)
+			retVal += b.get(i);
 		return retVal;
 	}
 
@@ -544,6 +559,14 @@ public class Stemmer {
 	 * getResultLength()/getResultBuffer() or toString().
 	 */
 	public void stem() {
+//		if(!badStem)
+//		{
+//			 
+//			so.stem();
+//			 
+//			
+//		}
+		try{
 		k = i - 1;
 		if (k > 1) {
 			step1();
@@ -555,5 +578,10 @@ public class Stemmer {
 		}
 		i_end = k + 1;
 		i = 0;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

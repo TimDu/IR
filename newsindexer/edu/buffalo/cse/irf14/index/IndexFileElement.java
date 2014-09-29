@@ -33,6 +33,8 @@ public class IndexFileElement {
 			ClassNotFoundException {
 		byte[] rInt = new byte[4];
 		o.read(rInt);
+		 
+		
 		termID = IndexerUtilityFunction.getInteger(rInt);
 		fileIDs.readObject(o);
 	}

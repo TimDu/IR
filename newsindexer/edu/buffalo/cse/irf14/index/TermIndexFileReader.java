@@ -124,11 +124,25 @@ public class TermIndexFileReader {
 		// id's match, if not, seek 4*#FileIDs bytes to get to the next term.
 		// Rinse and repeat.
 		raf.seek(offset);
+		
 		PriorityQueue<Integer> retVal = new PriorityQueue<Integer>();
 		int numTermIDs = raf.readInt();
 		int termIDread = 0;
+		
 		for (int i = 0; i < numTermIDs; i++) {
+			try{
 			termIDread = raf.readInt();
+			}
+			catch(IOException e)
+			{
+				e.printStackTrace();
+				
+				throw new IOException();
+			}
+			catch(Exception e)
+			{
+				throw new IOException();
+			}
 			int numFileIDs = raf.readInt();
 			if (termIDread == m_termID) {
 

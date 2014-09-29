@@ -55,6 +55,7 @@ public class BSBI {
 		for (int i = 0; i < numIndexes; i++) {
 			byte[] rInt = new byte[4];
 			files.get(i).read(rInt);
+			 
 			numObjsInFile[i] = IndexerUtilityFunction.getInteger(rInt);
 			currentNumObjsReadFromFile[i] = 0;
 		}

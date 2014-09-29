@@ -30,12 +30,7 @@ public class StopWordsRuleTest extends TFRuleBaseTest{
 					runTest(TokenFilterType.STOPWORD, "valid sentence"));
 		} catch (TokenizerException e) {
 			fail("Exception thrown when not expected!");
-		}
-		catch (AssertionError e)
-		{
-			e.printStackTrace();
-			System.out.println(e.getMessage());
-		}
+		} 
 		System.out.println("Pass!");
 	}
 }

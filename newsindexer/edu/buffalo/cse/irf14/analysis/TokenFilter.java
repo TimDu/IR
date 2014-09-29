@@ -22,4 +22,18 @@ public abstract class TokenFilter implements Analyzer {
 	public TokenFilter(TokenStream stream) {
 		this.stream = stream;
 	}
+	
+	// function courtesy of 
+	//http://stackoverflow.com/questions/5238491/check-if-string-contains-only-letters
+	public boolean isAlpha(String name) {
+	    char[] chars = name.toCharArray();
+
+	    for (char c : chars) {
+	        if(!Character.isLetter(c)) {
+	            return false;
+	        }
+	    }
+
+	    return true;
+	}
 }

@@ -74,6 +74,8 @@ public class Parser {
 							for (int i = 0; i < author.length; ++i) {
 								author[i] = author[i].trim();
 							}
+							author[author.length - 1] = author[author.length - 1]
+									.replace("</AUTHOR>", "").trim();
 							authors.addAll(Arrays.asList(author));
 
 							// Saves author organization

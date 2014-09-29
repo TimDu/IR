@@ -40,7 +40,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		m_termIndex = new BSBITreeMap();
 		m_termDict = new TermIndexDictionary();
 		m_fileDict = fileDict;
-		m_maxMappingSize = 10000000;
+		m_maxMappingSize = 100000;
 		m_indexPath = indexPath;
 		m_indexName = IndexGlobalVariables.termIndexFileName;
 		m_dictName = IndexGlobalVariables.termDicFileName;
@@ -222,6 +222,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			byte[] rInt = new byte[4];
 			try {
 				files.get(i).read(rInt);
+				 
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new IndexerException();
@@ -229,7 +230,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			numObjsInFile[i] = IndexerUtilityFunction.getInteger(rInt);
 			currentNumObjsReadFromFile[i] = 0;
 		}
-
+		Integer priorLowestElement = -1;
 		while (true) {
 			/*
 			 * This array keeps track of what indices have the current lowest
@@ -282,8 +283,10 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 				} else if (lowestElement == ifeArr[i].getTermID()) {
 					lowestElements.add(i);
 				}
+				
 			}
-
+			assert(priorLowestElement < lowestElement);
+			priorLowestElement = lowestElement;
 			/*
 			 * Now, for each index in the lowestElements array combine/merge all
 			 * postings. Note that duplicates of fileIDs are the way we store

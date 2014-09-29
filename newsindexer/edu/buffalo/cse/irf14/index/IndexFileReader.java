@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,6 +161,51 @@ public class IndexFileReader implements IndexReaderInterface {
 	@Override
 	public Map<String, Integer> query(String... terms) {
 		// TODO Need to implement for extra credit
+		/*int []termIDs = new int[terms.length];
+		Map<String, Integer> retVal = new HashMap<String, Integer>();
+		PriorityQueue<Integer> shortestQueue = null;
+		PriorityQueue<Integer> result = new PriorityQueue<Integer>();
+
+		// Get term IDs
+		for (int i = 0; i < terms.length; ++i) {
+			termIDs[i] = m_termDict.elementToID(terms[i]);
+		}
+		
+		List<PriorityQueue<Integer>> postingLists =
+				new ArrayList<PriorityQueue<Integer>>();
+		for (int i = 0; i < terms.length; ++i) {
+			PriorityQueue<Integer> posting = tifr.getPostings(termIDs[i]);
+			postingLists.add(posting);
+			if (shortestQueue == null) {
+				shortestQueue = posting;
+			} else if (shortestQueue.size() > posting.size()) {
+				shortestQueue = posting;
+			}
+		}
+		for(Integer j: shortestQueue)
+		{
+			for (PriorityQueue<Integer> ls: postingLists) {
+				if(ls != shortestQueue) {
+					for (Integer index: shortestQueue) {
+						//if ( ) {
+							
+						//}
+					}
+					break;
+				}
+			}
+			
+			String fileName = m_fileDict.getElementfromID(j);
+			if(retVal.containsKey(fileName))
+			{
+				retVal.put(fileName, retVal.get(fileName) + 1);
+			}
+			else
+			{
+				retVal.put(fileName, 1);
+			}
+		}
+		*/
 		return null;
 	}
 

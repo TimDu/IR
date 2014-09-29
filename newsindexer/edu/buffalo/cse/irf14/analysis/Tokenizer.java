@@ -49,15 +49,23 @@ public class Tokenizer {
 		Token []tokens = new Token[terms.length];
 		Sentence contSentence = new Sentence();
 		boolean newSentence = true;
+		boolean isSecondTerm = false;
 		
 		for (int i = 0; i < terms.length; ++i) {
 			tokens[i] = new Token();
 			tokens[i].setTermText(terms[i]);
 			tokens[i].setSentenceContainer(contSentence);
+			
+			if (isSecondTerm) {
+				
+				isSecondTerm = false;
+			}
+			
 			if(newSentence)
 			{
 				contSentence.setFirstToken(tokens[i]);
 				newSentence = false;
+				isSecondTerm = true;
 			}
 			
 			if(terms[i].toUpperCase() != terms[i])
@@ -76,12 +84,14 @@ public class Tokenizer {
 				contSentence.setLastToken(tokens[i]);
 				contSentence = new Sentence();
 				newSentence = true;
+				isSecondTerm = false;
 			}
 			else if(i + 1 == terms.length)
 			{
 				contSentence.setLastToken(tokens[i]);
 				contSentence = new Sentence();
 				newSentence = true;
+				isSecondTerm = false;
 			}
 		}
 		

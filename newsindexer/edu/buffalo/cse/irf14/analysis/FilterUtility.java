@@ -101,7 +101,7 @@ public class FilterUtility {
 		{
 			tok.setTermText(term.toLowerCase());
 		}
-		else if(tok == tok.getSentenceContainer().getFirstToken())
+		else if((tok == tok.getSentenceContainer().getFirstToken()))
 		{
 			tok.setTermText(term.toLowerCase());
 		}

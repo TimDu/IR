@@ -3,12 +3,15 @@ package edu.buffalo.cse.irf14.analysis;
 public class Sentence {
 	
 	private boolean allCaps;
+	private boolean isSecondUpper;
 	private Token firstToken;
+	private Token secondToken;
 	private Token lastToken;
 	
 	public Sentence()
 	{
-		allCaps = false;
+		allCaps = true;
+		isSecondUpper = false;
 	}
 	
 	public void setAllCaps(boolean input)
@@ -24,6 +27,16 @@ public class Sentence {
 	public void setFirstToken(Token input)
 	{
 		firstToken = input;
+	}
+	
+	public void setSecondToken(Token input) {
+		secondToken = input;
+	}
+	
+	// Test if the initial letter in the second token
+	// is upper case.
+	public boolean isSecondUpper() {
+		return isSecondUpper;
 	}
 	
 	public Token getFirstToken()

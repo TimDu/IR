@@ -37,12 +37,17 @@ import edu.buffalo.cse.irf14.index.IndexerException;
  */
 public class IndexerTest {
 	private IndexReader reader;
+	private IndexReader readerAuth;
 	
 	@BeforeClass
 	public final static void setupIndex() throws IndexerException {
 		String[] strs = {"new home sales top sales forecasts", "home sales rise in july", 
 				"increase in home sales in july", "july new home sales rise"};
 		String[] dates = {"March 5", "August 3", "December 12", "August 3"};
+		String[] authors = {"J. K. Rowling", "Horatio Alger, Jr.",
+				"Louis L'Amour", "Ry身tar身 Shiba"};
+		String[] authorOrg = {"The New York Times",	"Chicago Sun-Times",
+				"USA Today"};
 		int len = strs.length;
 		Document d;
 		String dir = System.getProperty("INDEX.DIR");
@@ -52,6 +57,11 @@ public class IndexerTest {
 			d.setField(FieldNames.FILEID, "0000"+(i+1));
 			d.setField(FieldNames.CONTENT, strs[i]);
 			d.setField(FieldNames.NEWSDATE, dates[i]);
+			d.setField(FieldNames.AUTHOR, authors[i]);
+			if (i < len - 1) {
+				d.setField(FieldNames.AUTHORORG, authorOrg[i]);
+			}
+			
 			writer.addDocument(d);
 		}
 		
@@ -61,6 +71,7 @@ public class IndexerTest {
 	@Before
 	public final void before() {
 		reader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.TERM);
+		readerAuth = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.AUTHOR);
 	}
 	
 	/**
@@ -69,6 +80,7 @@ public class IndexerTest {
 	@Test
 	public final void testGetTotalKeyTerms() {
 		assertEquals(12.0d, reader.getTotalKeyTerms(), 1); //12.5% error tolerated
+		assertEquals(9, readerAuth.getTotalKeyTerms(), 0);
 	}
 
 	/**
@@ -77,6 +89,7 @@ public class IndexerTest {
 	@Test
 	public final void testGetTotalValueTerms() {
 		assertEquals(4.0d, reader.getTotalValueTerms(), 0); //there's just four docs
+		assertEquals(3, readerAuth.getTotalValueTerms(), 0);
 	}
 
 	/**
@@ -113,8 +126,33 @@ public class IndexerTest {
 		map = reader.getPostings(query);
 		assertNull(map);
 		
-		
+		// Author Query
+		query = getAnalyzedTerm("J. K. Rowling");
+		map = readerAuth.getPostings(query);
+		assertEquals(1, map.size(), 0);
+		assertTrue(map.containsKey("00001"));
+		query = getAnalyzedTerm("Horatio Alger, Jr.");
+		map = readerAuth.getPostings(query);
+		assertEquals(1, map.size(), 0);
+		assertTrue(map.containsKey("00002"));
+		query = getAnalyzedTerm("Ry身tar身 Shiba");
+		map = readerAuth.getPostings(query);
+		assertEquals(1, map.size(), 0);
+		assertTrue(map.containsKey("00004"));
 	
+		// AuthorOrg Query
+		query = getAnalyzedTerm("The New York Times");
+		map = readerAuth.getPostings(query);
+		assertEquals(1, map.size(), 0);
+		assertTrue(map.containsKey("00001"));
+		query = getAnalyzedTerm("Chicago Sun-Times");
+		map = readerAuth.getPostings(query);
+		assertEquals(1, map.size(), 0);
+		assertTrue(map.containsKey("00002"));
+		query = getAnalyzedTerm("USA Today");
+		map = readerAuth.getPostings(query);
+		assertEquals(1, map.size(), 0);
+		assertTrue(map.containsKey("00003"));
 	}
 	
 	private static String getAnalyzedDate(String string) {

@@ -118,7 +118,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		
 		// BSBI merging
 		try {
-			BSBI.merge(chuncks, tempFileCount, indexFileWriter, MAX_MEM_ENTRY);
+			indexList = BSBI.merge(chuncks, tempFileCount, indexFileWriter, MAX_MEM_ENTRY);
 		} catch (ClassNotFoundException | IOException e) {
 			throw new IndexerException();
 		}

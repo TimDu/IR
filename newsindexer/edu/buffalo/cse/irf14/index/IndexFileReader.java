@@ -161,7 +161,7 @@ public class IndexFileReader implements IndexReaderInterface {
 	@Override
 	public Map<String, Integer> query(String... terms) {
 		// TODO Need to implement for extra credit
-		/*int []termIDs = new int[terms.length];
+		int []termIDs = new int[terms.length];
 		Map<String, Integer> retVal = new HashMap<String, Integer>();
 		PriorityQueue<Integer> shortestQueue = null;
 		PriorityQueue<Integer> result = new PriorityQueue<Integer>();
@@ -174,7 +174,13 @@ public class IndexFileReader implements IndexReaderInterface {
 		List<PriorityQueue<Integer>> postingLists =
 				new ArrayList<PriorityQueue<Integer>>();
 		for (int i = 0; i < terms.length; ++i) {
-			PriorityQueue<Integer> posting = tifr.getPostings(termIDs[i]);
+			PriorityQueue<Integer> posting;
+			try {
+				posting = tifr.getPostings(termIDs[i]);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
 			postingLists.add(posting);
 			if (shortestQueue == null) {
 				shortestQueue = posting;
@@ -182,20 +188,51 @@ public class IndexFileReader implements IndexReaderInterface {
 				shortestQueue = posting;
 			}
 		}
-		for(Integer j: shortestQueue)
-		{
 			for (PriorityQueue<Integer> ls: postingLists) {
 				if(ls != shortestQueue) {
-					for (Integer index: shortestQueue) {
-						//if ( ) {
-							
-						//}
+					if (result.isEmpty()) {
+						Integer comp = ls.poll();
+						for (Integer index: shortestQueue) {
+							while (comp != null) {
+								if (comp > index) {
+									break;
+								} else if (comp == index) {
+									result.add(comp);
+								}
+								comp = ls.poll();
+							}
+							if (comp == null) {
+								break;
+							}
+						}
+					} else {
+						// Use result queue once we constructed it
+						PriorityQueue<Integer> tempQueue =
+								new PriorityQueue<Integer>();
+						Integer comp = ls.poll();
+						for (Integer index: result) {
+							while (comp != null) {
+								if (comp > index) {
+									break;
+								} else if (comp == index) {
+									tempQueue.add(comp);
+								}
+								comp = ls.poll();
+							}
+							if (comp == null) {
+								break;
+							}
+						}
+						result = tempQueue;
+						if (result.isEmpty()) {
+							break;
+						}
 					}
-					break;
 				}
 			}
-			
-			String fileName = m_fileDict.getElementfromID(j);
+		
+		for (int id: result) {
+			String fileName = m_fileDict.getElementfromID(id);
 			if(retVal.containsKey(fileName))
 			{
 				retVal.put(fileName, retVal.get(fileName) + 1);
@@ -205,8 +242,8 @@ public class IndexFileReader implements IndexReaderInterface {
 				retVal.put(fileName, 1);
 			}
 		}
-		*/
-		return null;
+		
+		return retVal;
 	}
 
 }

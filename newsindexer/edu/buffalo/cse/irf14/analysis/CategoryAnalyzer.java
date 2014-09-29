@@ -26,6 +26,7 @@ public class CategoryAnalyzer implements Analyzer {
 		}
 		
 		Token tok = stream.next();
+		if(tok == null) return stream.hasNext();
 		String term = FilterUtility.updateSymbol(tok);
 		
 		// Symbol filter handler

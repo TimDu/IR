@@ -16,7 +16,7 @@ public class AccentRule extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		Token tok = stream.next();
-		
+		if(tok == null) return stream.hasNext();
 		FilterUtility.updateAccent(tok);
 	    
 		return stream.hasNext();

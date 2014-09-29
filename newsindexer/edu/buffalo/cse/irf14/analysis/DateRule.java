@@ -24,6 +24,7 @@ public class DateRule extends TokenFilter {
 		 * so on and so forth. 
 		 */
 		Token tok = stream.next();
+		if(tok == null) return stream.hasNext();
 		FilterUtility.updateDate(tok, stream);
 		
 		return stream.hasNext();

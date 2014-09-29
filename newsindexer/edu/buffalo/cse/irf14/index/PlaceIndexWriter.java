@@ -48,7 +48,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		Analyzer analyzer;
 		TokenStream stream;
 		String input = new String();
-
+		
 		// Concatenate field variables into one string
 		for (String var : d.getField(fn)) {
 			input += var + "=";

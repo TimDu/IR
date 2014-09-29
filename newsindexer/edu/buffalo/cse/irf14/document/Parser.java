@@ -99,22 +99,28 @@ public class Parser {
 						} else {
 							String[] seg = line.split("-");
 							String[] meta = seg[0].split(",");
-							if (meta.length > 1) {
-								doc.setField(FieldNames.PLACE, seg[0]
-										.substring(0, seg[0].lastIndexOf(","))
-										.trim());
-								doc.setField(FieldNames.NEWSDATE,
-										meta[meta.length - 1].trim());
-							} else {
-								meta[0] = meta[0].trim();
-								try {
-									new SimpleDateFormat("MMM d",
-											Locale.ENGLISH).parse(meta[0]);
-									// This is a news date
-									doc.setField(FieldNames.NEWSDATE, meta[0]);
-								} catch (ParseException e) {
-									// This is a place
-									doc.setField(FieldNames.PLACE, meta[0]);
+							if (seg.length != 0 && !seg[0].isEmpty()) {
+
+								if (meta.length > 1) {
+									doc.setField(
+											FieldNames.PLACE,
+											seg[0].substring(0,
+													seg[0].lastIndexOf(","))
+													.trim());
+									doc.setField(FieldNames.NEWSDATE,
+											meta[meta.length - 1].trim());
+								} else {
+									meta[0] = meta[0].trim();
+									try {
+										new SimpleDateFormat("MMM d",
+												Locale.ENGLISH).parse(meta[0]);
+										// This is a news date
+										doc.setField(FieldNames.NEWSDATE,
+												meta[0]);
+									} catch (ParseException e) {
+										// This is a place
+										doc.setField(FieldNames.PLACE, meta[0]);
+									}
 								}
 							}
 						}
@@ -129,7 +135,7 @@ public class Parser {
 								}
 								startContent = true;
 							}
-							 
+
 						} else {
 							content += " " + line;
 						}

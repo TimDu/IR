@@ -11,7 +11,7 @@ public class CapitalizationRule extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		Token tok = stream.next();
-		
+		if(tok == null) return stream.hasNext();
 		if (FilterUtility
 				.updateCapitalization(tok)) {
 

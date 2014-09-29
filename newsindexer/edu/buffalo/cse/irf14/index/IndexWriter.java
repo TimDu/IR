@@ -40,7 +40,7 @@ public class IndexWriter {
 		m_tiw = new TermIndexWriter(m_fileDict, indexDir);
 		m_ciw = new CategoryIndexWriter(m_fileDict, indexDir);
 		m_aiw = new AuthorIndexWriter(m_fileDict, indexDir);
-		//m_piw = new PlaceIndexWriter(m_fileDict, indexDir);
+		m_piw = new PlaceIndexWriter(m_fileDict, indexDir);
 		
 	}
 
@@ -63,7 +63,7 @@ public class IndexWriter {
 
 		m_tiw.performIndexLogic(d, FieldNames.CONTENT);
 		m_tiw.performIndexLogic(d, FieldNames.NEWSDATE);
-		//m_piw.performIndexLogic(d);
+		m_piw.performIndexLogic(d, FieldNames.PLACE);
 		m_ciw.performIndexLogic(d, FieldNames.CATEGORY);
 		m_aiw.performIndexLogic(d, FieldNames.AUTHOR);
 		m_aiw.performIndexLogic(d, FieldNames.AUTHORORG);
@@ -79,7 +79,7 @@ public class IndexWriter {
 	public void close() throws IndexerException {
 		try {
 			m_tiw.finishIndexing();
-//			m_piw.finishIndexing();
+			m_piw.finishIndexing();
 			m_ciw.finishIndexing();
 			m_aiw.finishIndexing();
 			Path indexPath = Paths.get(m_indexDir, IndexGlobalVariables.fileDicFileName);

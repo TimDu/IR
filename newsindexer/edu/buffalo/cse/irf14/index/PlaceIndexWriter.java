@@ -104,7 +104,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		indexFileWriter.createTermIndex(tempFileCount);
 		// Read temporary files
 		for (int i = 0; i < tempFileCount; ++i) {
-			path = Paths.get(indexPath, "tempPlaceIndex" + i, ".index");
+			path = Paths.get(indexPath, "tempPlaceIndex" + i + ".index");
 			if (path.toFile().exists()) {
 				try {
 					input = new BufferedInputStream(
@@ -146,7 +146,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 
 		// Finally, write the term data
 		try {
-			writeAuthorDictionary();
+			writePlaceDictionary();
 		} catch (IOException e) {
 			throw new IndexerException();
 		}
@@ -156,12 +156,12 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 	 * Write author-authorID dictionary to disk
 	 * @throws IOException
 	 */
-	private void writeAuthorDictionary() throws IOException {
+	private void writePlaceDictionary() throws IOException {
 		BufferedOutputStream buffOut;
 		
 		try {
 			Path path = Paths.get(
-					indexPath, IndexGlobalVariables.authorDicFileName);
+					indexPath, IndexGlobalVariables.placeDicFileName);
 			buffOut = new BufferedOutputStream(
 					new FileOutputStream(path.toString()));
 			ObjectOutputStream out = new ObjectOutputStream(buffOut);
@@ -187,7 +187,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 		
 		try {
 			Path path = Paths.get(indexPath,
-					"tempPlaceIndex" + tempFileCount, ".index");
+					"tempPlaceIndex" + tempFileCount + ".index");
 			out = new BufferedOutputStream(
 					new FileOutputStream(path.toString()));
 			// Write index to temporary file

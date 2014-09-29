@@ -52,7 +52,7 @@ public class IndexerTest {
 		String[] authorOrg = {"The New York Times",	"Chicago Sun-Times",
 				"USA Today"};
 		String[] categories = {"palm-oil", "cocoa", "alum", "I-cattle"};
-		//String[] places = {"Paris", "Los Angeles", "Washington", "Washington"};
+		String[] places = {"Paris", "Los Angeles", "Washington", "Washington"};
 		int len = strs.length;
 		Document d;
 		String dir = System.getProperty("INDEX.DIR");
@@ -66,7 +66,7 @@ public class IndexerTest {
 			if (i < len - 1) {
 				d.setField(FieldNames.AUTHORORG, authorOrg[i]);
 			}
-			//d.setField(FieldNames.PLACE, places[i]);
+			d.setField(FieldNames.PLACE, places[i]);
 			d.setField(FieldNames.CATEGORY, categories[i]);
 			
 			writer.addDocument(d);
@@ -78,7 +78,7 @@ public class IndexerTest {
 	@Before
 	public final void before() {
 		termReader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.TERM);
-		//placeReader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.PLACE);
+		placeReader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.PLACE);
 		authorReader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.AUTHOR);
 		categoryReader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.CATEGORY);
 	}
@@ -185,6 +185,10 @@ public class IndexerTest {
 		map = authorReader.getPostings(query);
 		assertEquals(1, map.size(), 0);
 		assertTrue(map.containsKey("00003"));
+		
+		query = getAnalyzer("Los Angeles", FieldNames.PLACE);
+		map = placeReader.getPostings(query);
+		assertEquals(1, map.size(), 0);
 	}
 	
 

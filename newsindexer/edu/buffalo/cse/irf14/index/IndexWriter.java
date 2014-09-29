@@ -25,8 +25,6 @@ public class IndexWriter {
 	protected CategoryIndexWriter m_ciw;
 	protected AuthorIndexWriter m_aiw;
 	protected PlaceIndexWriter m_piw;
-	
-	
 
 	/**
 	 * Default constructor
@@ -41,7 +39,7 @@ public class IndexWriter {
 		m_ciw = new CategoryIndexWriter(m_fileDict, indexDir);
 		m_aiw = new AuthorIndexWriter(m_fileDict, indexDir);
 		m_piw = new PlaceIndexWriter(m_fileDict, indexDir);
-		
+
 	}
 
 	/**
@@ -62,11 +60,19 @@ public class IndexWriter {
 		 */
 
 		m_tiw.performIndexLogic(d, FieldNames.CONTENT);
-		m_tiw.performIndexLogic(d, FieldNames.NEWSDATE);
-		m_piw.performIndexLogic(d, FieldNames.PLACE);
+		if (d.getField(FieldNames.NEWSDATE) != null) {
+			m_tiw.performIndexLogic(d, FieldNames.NEWSDATE);
+		}
+		if (d.getField(FieldNames.PLACE) != null) {
+			m_piw.performIndexLogic(d, FieldNames.PLACE);
+		}
 		m_ciw.performIndexLogic(d, FieldNames.CATEGORY);
-		m_aiw.performIndexLogic(d, FieldNames.AUTHOR);
-		m_aiw.performIndexLogic(d, FieldNames.AUTHORORG);
+		if (d.getField(FieldNames.AUTHOR) != null) {
+			m_aiw.performIndexLogic(d, FieldNames.AUTHOR);
+		}
+		if (d.getField(FieldNames.AUTHORORG) != null) {
+			m_aiw.performIndexLogic(d, FieldNames.AUTHORORG);
+		}
 	}
 
 	/**
@@ -82,8 +88,10 @@ public class IndexWriter {
 			m_piw.finishIndexing();
 			m_ciw.finishIndexing();
 			m_aiw.finishIndexing();
-			Path indexPath = Paths.get(m_indexDir, IndexGlobalVariables.fileDicFileName);
-			FileOutputStream fileOut = new FileOutputStream(indexPath.toString());
+			Path indexPath = Paths.get(m_indexDir,
+					IndexGlobalVariables.fileDicFileName);
+			FileOutputStream fileOut = new FileOutputStream(
+					indexPath.toString());
 
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(m_fileDict);
@@ -92,7 +100,7 @@ public class IndexWriter {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			throw new IndexerException();
-		}   catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			throw new IndexerException();
 		}

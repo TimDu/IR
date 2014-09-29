@@ -50,8 +50,9 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	private TokenStream createTermStream(Document d, FieldNames type) {
 		Tokenizer tknizer = new Tokenizer();
 		TokenStream tstream = new TokenStream();
+		String[] arr = d.getField(type);
 		try {
-			String[] arr = d.getField(type);
+			
 			for (String s : arr) {
 				tstream.append(tknizer.consume(s));
 			}

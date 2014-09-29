@@ -27,8 +27,8 @@ public class Runner {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String ipDir = args[0];
-		String indexDir = args[1];
+		String ipDir = args[1];
+		String indexDir = args[0];
 		//more? idk!
 		
 		File ipDirectory = new File(ipDir);
@@ -51,7 +51,9 @@ public class Runner {
 				for (String f : files) {
 					try {
 						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
+						System.out.println("Parsed: " + f);
 						writer.addDocument(d);
+						System.out.println("Added: " + f);
 					} catch (ParserException e) {
 						e.printStackTrace();
 					} 

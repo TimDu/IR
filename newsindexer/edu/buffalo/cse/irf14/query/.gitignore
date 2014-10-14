@@ -1,2 +1,9 @@
 /Query.class
 /QueryParser.class
+/Clause.class
+/Index.class
+/Term.class
+/QueryException.class
+/Operator.class
+/ClauseTest.class
+/QueryComponent.class

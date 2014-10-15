@@ -31,7 +31,7 @@ public class QueryParser {
 
 		try {
 			parseEngine(raw, op);
-		} catch(QueryException e) {
+		} catch(QueryParserException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -44,10 +44,10 @@ public class QueryParser {
 	 * 
 	 * @param rawQuery raw query
 	 * @return parsed query
-	 * @throws QueryException 
+	 * @throws QueryParserException 
 	 */
 	private static void parseEngine(Query rawQuery, Operator defaultOperator)
-			throws QueryException {
+			throws QueryParserException {
 		int startIndex = 0;
 		int endIndex = 0;
 		// List for recording all parentheses pairs in the most
@@ -149,14 +149,14 @@ public class QueryParser {
 						tempOP = Operator.getOperator(tempSegs[index]);
 						// Validation
 						if (tempOP == null) {
-							throw new QueryException();
+							throw new QueryParserException();
 						}
 					} else if (tempSegs.length > 0) {
 						tempOP = Operator.getOperator(
 								tempSegs[tempSegs.length - 1]);
 						// Validation
 						if (tempOP == null) {
-							throw new QueryException();
+							throw new QueryParserException();
 						}
 					} else {
 						tempOP = null;

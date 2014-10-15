@@ -7,3 +7,6 @@
 /Operator.class
 /ClauseTest.class
 /QueryComponent.class
+/QueryParseException.class
+/QueryParserException.class
+/QueryFileElement.class

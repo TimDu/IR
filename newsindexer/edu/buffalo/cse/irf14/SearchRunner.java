@@ -1,9 +1,19 @@
 package edu.buffalo.cse.irf14;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import edu.buffalo.cse.irf14.query.Query;
+import edu.buffalo.cse.irf14.query.QueryParser;
 
 /**
  * Main class to run the searcher.
@@ -13,6 +23,8 @@ import java.util.Map;
  */
 public class SearchRunner {
 	public enum ScoringModel {TFIDF, OKAPI};
+	
+	private BufferedOutputStream writer;
 	
 	/**
 	 * Default (and only public) constuctor
@@ -24,6 +36,7 @@ public class SearchRunner {
 	public SearchRunner(String indexDir, String corpusDir, 
 			char mode, PrintStream stream) {
 		//TODO: IMPLEMENT THIS METHOD
+		writer = new BufferedOutputStream(stream);
 	}
 	
 	/**
@@ -41,6 +54,45 @@ public class SearchRunner {
 	 */
 	public void query(File queryFile) {
 		//TODO: IMPLEMENT THIS METHOD
+		int numQuery = 0;
+		String result; 	// Output to be written
+		List<Query> queryList = new LinkedList<Query>();
+		List<String> queryID = new LinkedList<String>();
+		try {
+			BufferedReader reader = new BufferedReader(
+					new FileReader(queryFile));
+			String line = reader.readLine();
+			String []elements;	// ID-Query pair in query file
+			// Error Check
+			if ((line == null) || !line.startsWith("numQueries=")
+					|| (line.split("=").length != 2)) {
+				throw new IOException("Illegal query format!");
+			} else {
+				numQuery = Integer.valueOf(line.split("=")[1]);
+			}
+			// Read queries from file
+			for (; numQuery > 0; --numQuery) {
+				line = reader.readLine();
+				if (line == null) {
+					break;
+				}
+				elements = line.split(":");
+				elements[1] = elements[1].substring(
+						elements[1].indexOf("{") + 1
+						, elements[1].indexOf("}"));
+				queryID.add(elements[0]);
+				queryList.add(QueryParser.parse(elements[1], null));
+			}
+			
+			// Perform algorithm
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/**

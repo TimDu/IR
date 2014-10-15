@@ -1,6 +1,6 @@
 package edu.buffalo.cse.irf14.query;
 
-public class QueryException extends Exception {
+public class QueryParserException extends Exception {
 
 	/**
 	 * 

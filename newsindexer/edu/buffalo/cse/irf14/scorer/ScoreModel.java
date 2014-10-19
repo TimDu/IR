@@ -8,8 +8,8 @@ import java.util.List;
  * to be done in the fashion of {@code term at a time}.<br>
  * <b>Example steps:</b><br>
  * 1. Set up parameters (k1, b, k3).<br>
- * 2. Set up a collection of documents (to get document frequencies).<br>
- * 3. Set up a token (to get term frequency).<br>
+ * 2. Set up a collection of documents (to get term frequencies).<br>
+ * 3. Set up for a term (to get document frequency).<br>
  * 4. Perform algorithm once, and repeat step 3 until all<br>
  * 	  query terms are exhausted.
  * 5. Return an ranked list.<br>
@@ -18,6 +18,7 @@ import java.util.List;
 public abstract class ScoreModel {
 
 	protected long totalDocNum;
+	protected long documentFrequency;
 	protected List<Integer> docIDs;
 	protected List<Double> scores;
 	
@@ -36,6 +37,14 @@ public abstract class ScoreModel {
 		} else {
 			this.docIDs = docIDs;
 		}
+	}
+	
+	/**
+	 * Set document frequency for a term
+	 * @param docFreq document frequency
+	 */
+	public void setDocFreq(long docFreq) {
+		this.documentFrequency = docFreq;
 	}
 	
 	/**
@@ -61,7 +70,7 @@ public abstract class ScoreModel {
 	protected void setScore(int index, double score) {
 		scores.set(index, score);
 	}
-		
+
 	/**
 	 * Ranking function based on scoring result.
 	 */

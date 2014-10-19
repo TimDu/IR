@@ -35,5 +35,5 @@ public class Okapi extends ScoreModel {
 		this.docLength.add(len);
 	}
 	
-	
+	//public 
 }

@@ -68,7 +68,7 @@ public class Okapi extends ScoreModel {
 		double tempScore;
 		for (int i = 0; i < docIDs.size(); ++i) {
 			tempScore = scores.get(i);
-			tempScore += Math.log10(totalDocNum / docFreq)
+			tempScore += (Math.log10(totalDocNum) - Math.log10(docFreq))
 					* ((k1 + 1) * docTermFreqs.get(docIDs.get(i))
 					/ (k1 * (1 - b + b * (docLength.get(docIDs.get(i))
 					/ avgDocLen)) + docTermFreqs.get(docIDs.get(i))))

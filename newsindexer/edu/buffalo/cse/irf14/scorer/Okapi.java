@@ -1,6 +1,7 @@
 package edu.buffalo.cse.irf14.scorer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +44,12 @@ public class Okapi extends ScoreModel {
 		this.k1 = k1;
 		this.b = b;
 		this.k3 = k3;
+	}
+
+	@Override
+	public void setDocuments(List<Integer> docIDs) {
+		super.setDocuments(docIDs);
+		docLength.clear();
 	}
 	
 	/**

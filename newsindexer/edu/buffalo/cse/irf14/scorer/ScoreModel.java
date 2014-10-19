@@ -1,5 +1,6 @@
 package edu.buffalo.cse.irf14.scorer;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Map;
  */
 public abstract class ScoreModel {
 
+	private DecimalFormat decimal;
 	protected long totalDocNum;
 	protected long docFreq;
 	protected long queryTermFreq;
@@ -31,6 +33,7 @@ public abstract class ScoreModel {
 	protected List<Double> scores;
 	
 	public ScoreModel() {
+		decimal = new DecimalFormat("#.#####");
 		docIDs = null;
 		docTermFreqs = new HashMap<Integer, Long>(30);
 		scores = new ArrayList<Double>();
@@ -102,6 +105,19 @@ public abstract class ScoreModel {
 	}
 	
 	/**
+	 * Method that returns a document's score in formatted text.
+	 * Probably more frequent to be called for display purpose
+	 * than {@code getScore} method. 
+	 * 
+	 * @param index the score index position that is the
+	 * same as the one in document ID list
+	 * @return text score
+	 */
+	public String getTextScore(int index) {
+		return decimal.format(scores.get(index));
+	}
+	
+	/**
 	 * Method that collects ranking result.
 	 * 
 	 * @return ranked document ID list
@@ -129,8 +145,21 @@ public abstract class ScoreModel {
 	 * @return list of ranked document IDs
 	 */
 	private List<Integer> rank() {
-		sort(0, docIDs.size() - 1);		
+		sort(0, docIDs.size() - 1);
+		normalize();
+		
 		return docIDs;
+	}
+	
+	/**
+	 * Internally normalize scores in the range of [0, 1] by the
+	 * maximum score.
+	 */
+	private void normalize() {
+		double norm = scores.get(0);
+		for (int i = 0; i < scores.size(); ++i) {
+			scores.set(i, scores.get(i) / norm);
+		}
 	}
 	
 	/**

@@ -44,7 +44,7 @@ public class OkapiTest {
 			if (i < result.size() - 1) {
 				assertTrue(okapi.getScore(i) > okapi.getScore(i + 1));
 			}
-			System.out.println(result.get(i) + "\t" + okapi.getScore(i));
+			System.out.println(result.get(i) + "\t" + okapi.getTextScore(i));
 		}
 	}
 	

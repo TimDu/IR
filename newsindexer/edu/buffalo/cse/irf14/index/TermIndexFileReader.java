@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.TreeSet;
 
 public class TermIndexFileReader {
 	/*
@@ -36,8 +38,10 @@ public class TermIndexFileReader {
 		m_maxEntries = 0;
 		m_offsetValue = 0L;
 	}
+	
+	 
 
-	public PriorityQueue<Integer> getPostings(int termID) throws IOException {
+	public TreeSet<TermFrequencyPerFile> getPostings(int termID) throws IOException {
 		Path indexPath = Paths.get(m_indexPath,
 				m_indexFileName);
 
@@ -116,7 +120,7 @@ public class TermIndexFileReader {
 		return RecurseFindChunk(raf, middleChunk + 1, lastChunk);
 	}
 
-	private PriorityQueue<Integer> FindTermInChunk(RandomAccessFile raf,
+	private TreeSet<TermFrequencyPerFile> FindTermInChunk(RandomAccessFile raf,
 			long offset) throws IOException {
 		// This can be done by a linear search. Each Chunk's format is the
 		// number of terms followed by an array whose elements are the ordered
@@ -125,7 +129,7 @@ public class TermIndexFileReader {
 		// Rinse and repeat.
 		raf.seek(offset);
 		
-		PriorityQueue<Integer> retVal = new PriorityQueue<Integer>();
+		TreeSet<TermFrequencyPerFile> retVal = new TreeSet<TermFrequencyPerFile>();
 		int numTermIDs = raf.readInt();
 		int termIDread = 0;
 		
@@ -147,10 +151,11 @@ public class TermIndexFileReader {
 			if (termIDread == m_termID) {
 
 				for (int j = 0; j < numFileIDs; j++) {
-					retVal.add(raf.readInt());
+					retVal.add(new TermFrequencyPerFile(raf.readInt(), raf.readInt()));
 				}
 			} else {
-				raf.skipBytes(numFileIDs * 4);
+				// file id is paired with term frequency, two integers = 8 bytes
+				raf.skipBytes(numFileIDs * 8);
 			}
 		}
 		raf.close();

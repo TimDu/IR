@@ -149,7 +149,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			}
 
 			// now add the fileID to the posting for the given term
-			m_termIndex.get(termID).add(m_fileDict.elementToID(d));
+			m_termIndex.get(termID).add(new TermFrequencyPerFile(m_fileDict.elementToID(d)));
 
 			// if we're above the number of mappings, write to disk
 			if (m_termIndex.values().size() > m_maxMappingSize) {
@@ -306,6 +306,13 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			 * postings. Note that duplicates of fileIDs are the way we store
 			 * term frequency and should not be removed.
 			 */
+			if(!lowestElements.isEmpty())
+			{
+				if (!m_termIndex.containsKey(ifeArr[lowestElements.get(0)].getTermID())) {
+					m_termIndex.put(ifeArr[lowestElements.get(0)].getTermID(),
+							new BSBIPriorityQueue());
+				}
+			}
 			for (Integer i : lowestElements) {
 				if (!m_termIndex.containsKey(ifeArr[i].getTermID())) {
 					m_termIndex.put(ifeArr[i].getTermID(),

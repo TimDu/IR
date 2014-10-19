@@ -55,7 +55,7 @@ public class TermIndexFileWriter {
 				indexPath.toFile().delete();
 			}
 			fileOut = new BufferedOutputStream(new FileOutputStream(
-					indexPath.toString(), true));
+					indexPath.toString(), false));
 			 
 			 
 			// These will be our offsets, we need to write them in the beginning,

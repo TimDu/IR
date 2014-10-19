@@ -90,7 +90,7 @@ public class CategoryIndexWriter implements PerformIndexWriterLogic {
 				indexList.put(id, new BSBIPriorityQueue());
 			}
 			indexList.get(id).add(
-					docDict.elementToID(d));
+					new TermFrequencyPerFile(docDict.elementToID(d)));
 
 			// Edit index list
 			if (indexList.size() > MAX_MEM_ENTRY) {

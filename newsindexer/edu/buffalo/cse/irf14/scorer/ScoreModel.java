@@ -16,47 +16,24 @@ import java.util.Map;
  * 5. Perform algorithm once, and repeat step 3 until all<br>
  * 	  query terms are exhausted.
  * 6. Return an ranked list.<br>
- * <b>NOTE:</b> Input documents should be non-duplicated
+ * <b>NOTE:</b> Input documents should be non-duplicated<br>
+ * After the computation steps are finished, the ranked document
+ * ID list would be returned by getRankedList() method; scores could 
+ * be retrieved by getScore() method.
  */
 public abstract class ScoreModel {
 
 	protected long totalDocNum;
 	protected long docFreq;
-	protected Map<Integer, Long> termFreqs;
+	protected long queryTermFreq;
+	protected Map<Integer, Long> docTermFreqs;
 	protected List<Integer> docIDs;
 	protected List<Double> scores;
 	
 	public ScoreModel() {
 		docIDs = null;
-		termFreqs = new HashMap<Integer, Long>();
+		docTermFreqs = new HashMap<Integer, Long>(30);
 		scores = new ArrayList<Double>();
-	}
-	
-	/**
-	 * Set document ID collection
-	 * @param docIDs collection of document IDs
-	 */
-	public void setDocuments(List<Integer> docIDs) {
-		if (!(docIDs instanceof ArrayList)) {
-			this.docIDs = new ArrayList<Integer>(docIDs);
-		} else {
-			this.docIDs = docIDs;
-		}
-	}
-	
-	/**
-	 * Set term frequencies to all documents
-	 */
-	public void setTermFreq(int docID, long termFreq) {
-		termFreqs.put(docID, termFreq);
-	}
-	
-	/**
-	 * Set document frequency for a term
-	 * @param docFreq document frequency
-	 */
-	public void setDocFreq(long docFreq) {
-		this.docFreq = docFreq;
 	}
 	
 	/**
@@ -66,7 +43,55 @@ public abstract class ScoreModel {
 	public abstract void run();
 	
 	/**
-	 * Get a document's score.
+	 * Set document ID collection
+	 * 
+	 * @param docIDs collection of document IDs
+	 */
+	public void setDocuments(List<Integer> docIDs) {
+		if (!(docIDs instanceof ArrayList)) {
+			this.docIDs = new ArrayList<Integer>(docIDs);
+		} else {
+			this.docIDs = docIDs;
+		}
+		for (int i = 0; i < this.docIDs.size(); ++i) {
+			scores.add(0.0);
+		}
+	}
+	
+	/**
+	 * Set term frequencies to all documents
+	 * 
+	 * @param docID document IDs
+	 * @param termFreq document term frequency
+	 */
+	public void setDocTermFreq(int docID, long termFreq) {
+		docTermFreqs.put(docID, termFreq);
+	}
+	
+	/**
+	 * Set query term frequency
+	 * 
+	 * @param termFreq query term frequency
+	 */
+	public void setQueryTermFreq(long termFreq) {
+		queryTermFreq = termFreq;
+	}
+	
+	/**
+	 * Set document frequency for a term
+	 * 
+	 * @param docFreq document frequency
+	 */
+	public void setDocFreq(long docFreq) {
+		this.docFreq = docFreq;
+	}
+	
+	/**
+	 * Method that returns a document's score.
+	 * In this list, each score has the same index position 
+	 * to the one in result document ID list. This position
+	 * also indicate its ranking position if called after
+	 * {@code getRankedList} method.
 	 * 
 	 * @param index the score index position that is the
 	 * same as the one in document ID list
@@ -74,6 +99,15 @@ public abstract class ScoreModel {
 	 */
 	public double getScore(int index) {
 		return scores.get(index);
+	}
+	
+	/**
+	 * Method that collects ranking result.
+	 * 
+	 * @return ranked document ID list
+	 */
+	public List<Integer> getRankedList() {
+		return rank();
 	}
 	
 	/**
@@ -91,8 +125,10 @@ public abstract class ScoreModel {
 
 	/**
 	 * Ranking function based on scoring result.
+	 * 
+	 * @return list of ranked document IDs
 	 */
-	protected List<Integer> rank() {
+	private List<Integer> rank() {
 		sort(0, docIDs.size() - 1);		
 		return docIDs;
 	}

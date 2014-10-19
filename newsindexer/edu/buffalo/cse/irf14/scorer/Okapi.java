@@ -27,6 +27,7 @@ public class Okapi extends ScoreModel {
 	
 	/**
 	 * This step should be performed when setting up 
+	 * a term.
 	 * 
 	 * @param index
 	 * @param len
@@ -34,6 +35,10 @@ public class Okapi extends ScoreModel {
 	public void setDocLength(int index, long len) {
 		this.docLength.add(len);
 	}
-	
-	//public 
+
+	@Override
+	public void run() {
+		
+	}
+	 
 }

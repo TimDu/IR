@@ -1,29 +1,34 @@
 package edu.buffalo.cse.irf14.scorer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Generic scoring model interface. This requires works
  * to be done in the fashion of {@code term at a time}.<br>
  * <b>Example steps:</b><br>
  * 1. Set up parameters (k1, b, k3).<br>
- * 2. Set up a collection of documents (to get term frequencies).<br>
- * 3. Set up for a term (to get document frequency).<br>
- * 4. Perform algorithm once, and repeat step 3 until all<br>
+ * 2. Set up a collection of documents.<br>
+ * 3. Collect term frequencies.<br>
+ * 4. Set up for a term (to get document frequency).<br>
+ * 5. Perform algorithm once, and repeat step 3 until all<br>
  * 	  query terms are exhausted.
- * 5. Return an ranked list.<br>
- * 
+ * 6. Return an ranked list.<br>
+ * <b>NOTE:</b> Input documents should be non-duplicated
  */
 public abstract class ScoreModel {
 
 	protected long totalDocNum;
-	protected long documentFrequency;
+	protected long docFreq;
+	protected Map<Integer, Long> termFreqs;
 	protected List<Integer> docIDs;
 	protected List<Double> scores;
 	
 	public ScoreModel() {
 		docIDs = null;
+		termFreqs = new HashMap<Integer, Long>();
 		scores = new ArrayList<Double>();
 	}
 	
@@ -40,12 +45,25 @@ public abstract class ScoreModel {
 	}
 	
 	/**
+	 * Set term frequencies to all documents
+	 */
+	public void setTermFreq(int docID, long termFreq) {
+		termFreqs.put(docID, termFreq);
+	}
+	
+	/**
 	 * Set document frequency for a term
 	 * @param docFreq document frequency
 	 */
 	public void setDocFreq(long docFreq) {
-		this.documentFrequency = docFreq;
+		this.docFreq = docFreq;
 	}
+	
+	/**
+	 * Method that runs the algorithm for current query
+	 * term.
+	 */
+	public abstract void run();
 	
 	/**
 	 * Get a document's score.

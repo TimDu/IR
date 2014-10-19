@@ -1,6 +1,7 @@
 package edu.buffalo.cse.irf14.index;
 
 public class IndexGlobalVariables {
+	final static public String statsFileName = "stats.misc";
 	final static public String fileDicFileName = "file.dict";
 	final static public String termDicFileName = "term.dict";
 	final static public String placeDicFileName = "place.dict";

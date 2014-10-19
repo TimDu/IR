@@ -59,7 +59,7 @@ public class Runner {
 
 		Document d = null;
 		IndexWriter writer = new IndexWriter(indexDir);
-		boolean readonly = true;
+		boolean readonly = false;
 		if (!readonly) {
 			long startTime = System.currentTimeMillis();
 			long stopTime = System.currentTimeMillis();
@@ -142,7 +142,7 @@ public class Runner {
 		System.out.println("Patti: " + map.keySet());
 
 		// AuthorOrg Query
-		query = getAnalyzer("New York Times", FieldNames.AUTHORORG);
+		query = getAnalyzer("Reuter", FieldNames.AUTHORORG);
 		map = authorReader.getPostings(query);
 		System.out.println("Reuter: " + map.keySet());
 

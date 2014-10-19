@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +19,8 @@ public class IndexFileReader implements IndexReaderInterface {
 	protected String m_dictName;
 	protected TermIndexFileReader tifr;
 	protected TermIndexDictionary m_termDict;
-	protected IndexDictionary m_fileDict;
+	protected FileIndexDictionary m_fileDict;
+	protected double m_avgDocLength = 0;
 
 	public IndexFileReader(String indexDir, 
 			String indexName,
@@ -26,17 +28,19 @@ public class IndexFileReader implements IndexReaderInterface {
 		m_indexDir = indexDir;
 		m_indexName = indexName;
 		m_dictName = dictName;
+		
 		setup();
 	}
 
 	protected void setup() {
 		tifr = new TermIndexFileReader(m_indexDir, m_indexName);
 		m_termDict = new TermIndexDictionary();
-		m_fileDict = new IndexDictionary();
+		m_fileDict = new FileIndexDictionary();
 
 		try {
 			OpenTermDictionary();	
 			OpenFileDictionary();
+			OpenFileStats();
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -49,13 +53,25 @@ public class IndexFileReader implements IndexReaderInterface {
 
 	}
 	
+	protected void OpenFileStats() throws IOException, ClassNotFoundException
+	{
+		BufferedInputStream fileIn = new BufferedInputStream(
+				new FileInputStream(Paths.get(m_indexDir,
+						IndexGlobalVariables.statsFileName).toString()));
+		ObjectInputStream instream = new ObjectInputStream(fileIn);
+		m_avgDocLength =  instream.readDouble();
+		System.out.println("m_avgDocLength: " + m_avgDocLength);
+		instream.close();
+		fileIn.close();
+	}
+	
 	protected void OpenFileDictionary() throws IOException, ClassNotFoundException
 	{
 		BufferedInputStream fileIn = new BufferedInputStream(
 				new FileInputStream(Paths.get(m_indexDir,
 						IndexGlobalVariables.fileDicFileName).toString()));
 		ObjectInputStream instream = new ObjectInputStream(fileIn);
-		m_fileDict = (IndexDictionary) instream.readObject();
+		m_fileDict = (FileIndexDictionary) instream.readObject();
 
 		instream.close();
 		fileIn.close();

@@ -137,6 +137,7 @@ public class Parser {
 								}
 								startContent = true;
 							}
+							
 
 						} else {
 							content += " " + line;
@@ -148,7 +149,7 @@ public class Parser {
 				line = reader.readLine();
 			}
 			doc.setField(FieldNames.CONTENT, content);
-
+			doc.setField(FieldNames.LENGTH, Integer.toString(content.trim().split("\\s+").length));
 			reader.close();
 		} catch (IOException e) {
 			throw new ParserException();

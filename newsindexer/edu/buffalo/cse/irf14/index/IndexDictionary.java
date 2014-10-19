@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class IndexDictionary implements Serializable {
+public abstract class IndexDictionary implements Serializable {
 	/**
 	 * 
 	 */
@@ -37,6 +37,8 @@ public class IndexDictionary implements Serializable {
 		m_idDict.put(m_elementDict.size(), element);
 		return m_elementDict.size();
 	}
+	
+	
 
 	public String getElementfromID(int id)
 	{

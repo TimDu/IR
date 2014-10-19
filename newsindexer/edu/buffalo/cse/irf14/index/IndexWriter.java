@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 public class IndexWriter {
 	protected String m_indexDir;
 
-	protected IndexDictionary m_fileDict;
+	protected FileIndexDictionary m_fileDict;
 	protected TermIndexWriter m_tiw;
 	protected CategoryIndexWriter m_ciw;
 	protected AuthorIndexWriter m_aiw;
@@ -34,7 +34,7 @@ public class IndexWriter {
 	 */
 	public IndexWriter(String indexDir) {
 		m_indexDir = indexDir;
-		m_fileDict = new IndexDictionary();
+		m_fileDict = new FileIndexDictionary();
 		m_tiw = new TermIndexWriter(m_fileDict, indexDir);
 		m_ciw = new CategoryIndexWriter(m_fileDict, indexDir);
 		m_aiw = new AuthorIndexWriter(m_fileDict, indexDir);

@@ -26,14 +26,14 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 	private int tempFileCount = 0;
 	private String indexPath;
 	private TermIndexDictionary termDict;
-	private IndexDictionary docDict;
+	private FileIndexDictionary docDict;
 	private TermIndexFileWriter indexFileWriter;
 	// Partial index list stored in memory
 	private BSBITreeMap indexList;
 
 	final private int MAX_MEM_ENTRY = 100000;
 
-	public PlaceIndexWriter(IndexDictionary fdict, String indexPath) {
+	public PlaceIndexWriter(FileIndexDictionary fdict, String indexPath) {
 		this.indexPath = indexPath;
 		termDict = new TermIndexDictionary();
 		docDict = fdict;
@@ -85,7 +85,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 				indexList.put(id, new BSBIPriorityQueue());
 			}
 			indexList.get(id).add(
-					docDict.elementToID(d.getField(FieldNames.FILEID)[0]));
+					docDict.elementToID(d));
 
 			// Edit index list
 			if (indexList.size() > MAX_MEM_ENTRY) {

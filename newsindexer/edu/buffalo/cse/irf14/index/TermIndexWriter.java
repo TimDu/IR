@@ -8,6 +8,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,25 +28,24 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 
 	protected BSBITreeMap m_termIndex;
 	protected TermIndexDictionary m_termDict;
-	protected IndexDictionary m_fileDict;
+	protected FileIndexDictionary m_fileDict;
 	protected String m_indexPath;
 	protected String m_indexName;
 	protected String m_dictName;
 	protected TermIndexFileWriter tif;
 	protected int m_tempIndexNum = 0;
 	protected int m_currentInternalIndexNumber = 0;
-
+	protected double totalWords = 0;
 	final protected int m_maxMappingSize;
 
-	public TermIndexWriter(IndexDictionary fileDict, 
-			String indexPath) {
+	public TermIndexWriter(FileIndexDictionary fileDict, String indexPath) {
 		m_termIndex = new BSBITreeMap();
 		m_termDict = new TermIndexDictionary();
 		m_fileDict = fileDict;
 		m_maxMappingSize = 100000;
 		m_indexPath = indexPath;
 		m_indexName = IndexGlobalVariables.termIndexFileName;
-		m_dictName = IndexGlobalVariables.termDicFileName;
+		m_dictName = IndexGlobalVariables.termDicFileName; 
 		tif = new TermIndexFileWriter(indexPath, m_indexName);
 	}
 
@@ -52,9 +54,10 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		TokenStream tstream = new TokenStream();
 		String[] arr = d.getField(type);
 		try {
-			
+
 			for (String s : arr) {
-				if(s.isEmpty()) continue;
+				if (s.isEmpty())
+					continue;
 				tstream.append(tknizer.consume(s));
 			}
 
@@ -69,7 +72,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		try {
 			Path indexPath = Paths.get(m_indexPath, "tempIndex"
 					+ m_tempIndexNum + ".index");
-			
+
 			FileOutputStream fos = new FileOutputStream(indexPath.toString());
 			fileOut = new BufferedOutputStream(fos);
 			m_termIndex.writeObject(fileOut);
@@ -82,15 +85,14 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void writeTermDictionary() throws IOException {
 		BufferedOutputStream fileOut;
 		Path indexPath = Paths.get(m_indexPath, m_dictName);
-		if(indexPath.toFile().exists())
-		{
+		if (indexPath.toFile().exists()) {
 			indexPath.toFile().delete();
 		}
-		FileOutputStream fos =new FileOutputStream(indexPath.toString(), true);
+		FileOutputStream fos = new FileOutputStream(indexPath.toString(), true);
 		fileOut = new BufferedOutputStream(fos);
 
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -102,7 +104,8 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	}
 
 	@Override
-	public void performIndexLogic(Document d,  FieldNames fn) throws IndexerException {
+	public void performIndexLogic(Document d, FieldNames fn)
+			throws IndexerException {
 		TokenStream tstream = createTermStream(d, fn);
 		if (tstream == null) {
 			throw new IndexerException();
@@ -131,9 +134,22 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 				m_termIndex.put(termID, new BSBIPriorityQueue());
 			}
 
+			// only add the words if the file doesn't already exist
+			if (!m_fileDict.exists(d)) {
+				if (d.getField(FieldNames.LENGTH).length > 0) {
+
+					totalWords += Integer
+							.parseInt(d.getField(FieldNames.LENGTH)[0]);
+
+				} else {
+					System.out.println("Document "
+							+ d.getField(FieldNames.FILEID)[0]
+							+ " has no body!");
+				}
+			}
+
 			// now add the fileID to the posting for the given term
-			m_termIndex.get(termID).add(
-					m_fileDict.elementToID(d.getField(FieldNames.FILEID)[0]));
+			m_termIndex.get(termID).add(m_fileDict.elementToID(d));
 
 			// if we're above the number of mappings, write to disk
 			if (m_termIndex.values().size() > m_maxMappingSize) {
@@ -166,15 +182,13 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		ArrayList<BufferedInputStream> files = new ArrayList<BufferedInputStream>();
 		// open pieces of each file
 		for (int i = 0; i < numIndexes; i++) {
-			Path indexPath = Paths.get(m_indexPath, "tempIndex"
-					+ i + ".index");
-			if(!indexPath.toFile().exists())
-			{
-				assert(false);
+			Path indexPath = Paths.get(m_indexPath, "tempIndex" + i + ".index");
+			if (!indexPath.toFile().exists()) {
+				assert (false);
 			}
 			try {
-				files.add(new BufferedInputStream(
-						new FileInputStream(indexPath.toString())));
+				files.add(new BufferedInputStream(new FileInputStream(indexPath
+						.toString())));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				throw new IndexerException();
@@ -222,7 +236,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			byte[] rInt = new byte[4];
 			try {
 				files.get(i).read(rInt);
-				 
+
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new IndexerException();
@@ -283,9 +297,9 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 				} else if (lowestElement == ifeArr[i].getTermID()) {
 					lowestElements.add(i);
 				}
-				
+
 			}
-			assert(priorLowestElement < lowestElement);
+			assert (priorLowestElement < lowestElement);
 			priorLowestElement = lowestElement;
 			/*
 			 * Now, for each index in the lowestElements array combine/merge all
@@ -343,10 +357,34 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		// Finally, write the term data
 		try {
 			writeTermDictionary();
+			writeStatsFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new IndexerException();
 		}
+
+	}
+
+	private void writeStatsFile() throws IOException {
+		// TODO Auto-generated method stub
+		BufferedOutputStream fileOut;
+		Path indexPath = Paths.get(m_indexPath,
+				IndexGlobalVariables.statsFileName);
+		if (indexPath.toFile().exists()) {
+			indexPath.toFile().delete();
+		}
+		FileOutputStream fos = new FileOutputStream(indexPath.toString(), true);
+		fileOut = new BufferedOutputStream(fos);
+
+		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		// don't need this, we already keep track of the number of documents
+		// out.writeInt(m_fileDict.size());
+
+		out.writeDouble(totalWords/m_fileDict.size());
+		System.out.println("totalWords " + totalWords/m_fileDict.size());
+		out.close();
+		fileOut.close();
+		fos.close();
 
 	}
 }

@@ -5,7 +5,6 @@ public class Sentence {
 	private boolean allCaps;
 	private boolean isSecondUpper;
 	private Token firstToken;
-	private Token secondToken;
 	private Token lastToken;
 	
 	public Sentence()
@@ -27,10 +26,6 @@ public class Sentence {
 	public void setFirstToken(Token input)
 	{
 		firstToken = input;
-	}
-	
-	public void setSecondToken(Token input) {
-		secondToken = input;
 	}
 	
 	// Test if the initial letter in the second token

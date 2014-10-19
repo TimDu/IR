@@ -4,13 +4,11 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.math.BigDecimal;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.TreeSet;
 
 public class IndexFileReader implements IndexReaderInterface {
@@ -166,10 +164,32 @@ public class IndexFileReader implements IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> query(String... terms) {
-		// TODO Need to implement for extra credit
-		 
-
+		List<Integer> termIDs = new LinkedList<Integer>();
+		
+		// Map terms to termIDs
+		for (String term: terms) {
+			termIDs.add(m_termDict.elementToID(term));
+		}
+		
+		// Get posting list for each term
+		for (int tID: termIDs) {
+			try {
+				tifr.getPostings(tID);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see edu.buffalo.cse.irf14.index.IndexReaderInterface#queryOR(java.lang.String[])
+	 */
+	@Override
+	public Map<String, Integer> queryOR(String... terms) {
+		
+		return null;
+	}
 }

@@ -2,7 +2,6 @@ package edu.buffalo.cse.irf14;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -12,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
 import edu.buffalo.cse.irf14.query.Query;
 import edu.buffalo.cse.irf14.query.QueryParser;
 
@@ -46,6 +46,8 @@ public class SearchRunner {
 	 */
 	public void query(String userQuery, ScoringModel model) {
 		//TODO: IMPLEMENT THIS METHOD
+		Query query = QueryParser.parse(userQuery, null);
+		
 	}
 	
 	/**
@@ -137,6 +139,16 @@ public class SearchRunner {
 	 */
 	public List<String> getCorrections() {
 		//TODO: IMPLEMENT THIS METHOD IFF SPELLCHECK EXECUTED
+		return null;
+	}
+	
+	/**
+	 * Method that searches all document IDs based on query request
+	 * 
+	 * @param query
+	 * @return
+	 */
+	private List<TermFrequencyPerFile> rawSearch(Query query) {
 		return null;
 	}
 }

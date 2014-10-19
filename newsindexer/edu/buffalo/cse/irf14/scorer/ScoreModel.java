@@ -56,6 +56,7 @@ public abstract class ScoreModel {
 		} else {
 			this.docIDs = docIDs;
 		}
+		scores.clear();
 		for (int i = 0; i < this.docIDs.size(); ++i) {
 			scores.add(0.0);
 		}

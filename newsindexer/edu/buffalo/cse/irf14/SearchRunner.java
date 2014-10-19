@@ -46,6 +46,8 @@ public class SearchRunner {
 	 */
 	public void query(String userQuery, ScoringModel model) {
 		//TODO: IMPLEMENT THIS METHOD
+		// perform step 1, get relevant documents with no terms negated
+		// perform step 2, on the remaining document list
 	}
 	
 	/**
@@ -85,6 +87,10 @@ public class SearchRunner {
 			}
 			
 			// Perform algorithm
+			for(int i = 0; i < queryList.size(); i++)
+			{
+				performQuerySearch(queryList.get(i));
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (NumberFormatException e) {
@@ -92,6 +98,11 @@ public class SearchRunner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+	}
+	
+	void performQuerySearch(Query input)
+	{
 		
 	}
 	

@@ -161,10 +161,16 @@ public class SearchRunner {
 	}
 	
 	/**
-	 * Method that searches all document IDs based on query request
+	 * Method that searches all document IDs based on query request.<br>
+	 * It first categorize all clauses into group of terms connected
+	 * with the same operator(AND|OR), and assign different groups
+	 * to searcher proxies.<br>
+	 * After the clauses in the same query level has been processed by
+	 * worker threads, this method collect them and process with NOT
+	 * operator in this single thread.
 	 * 
-	 * @param query
-	 * @return
+	 * @param query initial query
+	 * @return result posting
 	 */
 	private TreeSet<TermFrequencyPerFile> rawSearch(Query query) {
 		

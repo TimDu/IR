@@ -231,15 +231,30 @@ public class IndexFileReader implements IndexReaderInterface {
 						currentPosting.descendingIterator();
 				Iterator<TermFrequencyPerFile> iter1 =
 						postings.get(i).descendingIterator();
-				TermFrequencyPerFile value0;
-				TermFrequencyPerFile value1;
+				TermFrequencyPerFile value0 = null;
+				TermFrequencyPerFile value1 = null;
 				while (iter0.hasNext() && iter1.hasNext()) {
-					value0 = iter0.next();
-					value1 = iter1.next();
-					if (value1.equals(value0)) {
+					if (value0 == null) {
+						value0 = iter0.next();
+						value1 = iter1.next();
+						continue;
+					}
+					if (value1.getDocID() == value0.getDocID()) {
 						tempPosting.add(value1);
+						value0 = iter0.next();
+						value1 = iter1.next();
+					} else if (value1.getDocID() > value0.getDocID()) {
+						value0 = iter0.next();
+					} else if (value1.getDocID() < value0.getDocID()) {
+						value1 = iter1.next();
 					}
 				}
+				if (value1.getDocID() == value0.getDocID()) {
+					tempPosting.add(value1);
+					value0 = iter0.next();
+					value1 = iter1.next();
+				}
+				
 				if (!tempPosting.isEmpty()) {
 					currentPosting = tempPosting;
 					tempPosting = new TreeSet<TermFrequencyPerFile>();
@@ -270,7 +285,7 @@ public class IndexFileReader implements IndexReaderInterface {
 	 * @see edu.buffalo.cse.irf14.index.IndexReaderInterface#queryOR(java.lang.String[])
 	 */
 	@Override
-	public Map<String, Integer> queryOR(String... terms) {
+	public Map<Integer, Integer> queryOR(String... terms) {
 		if (m_termDict == null) {
 			// Hacked
 			return null;
@@ -279,7 +294,7 @@ public class IndexFileReader implements IndexReaderInterface {
 		TreeSet<TermFrequencyPerFile> currentPosting =
 				new TreeSet<TermFrequencyPerFile>();
 		List<Integer> termIDs = new LinkedList<Integer>();
-		Map<String, Integer> result = new HashMap<String, Integer>();
+		Map<Integer, Integer> result = new HashMap<Integer, Integer>();
 		
 		// Map terms to termIDs
 		for (String term: terms) {
@@ -297,8 +312,7 @@ public class IndexFileReader implements IndexReaderInterface {
 		
 		// Get map result
 		for (TermFrequencyPerFile tfd: currentPosting) {
-			result.put(m_fileDict.getElementfromID(tfd.getDocID())
-					, tfd.getTermFrequency());
+			result.put(tfd.getDocID(), tfd.getTermFrequency());
 		}
 		
 		return result;

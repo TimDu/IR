@@ -121,9 +121,9 @@ public class IndexReader {
 	 * Method to implement a boolean OR query on given index
 	 * 
 	 * @param terms set of terms connected with OR
-	 * @return A map of FileID-TermFrequency pair
+	 * @return A map of docID-TermFrequency pair
 	 */
-	public Map<String, Integer> queryOR(String...terms) {
+	public Map<Integer, Integer> queryOR(String...terms) {
 		return iri.queryOR(terms);
 	}
 }

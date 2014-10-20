@@ -15,5 +15,5 @@ public interface IndexReaderInterface {
 
 	public abstract Map<String, Integer> query(String... terms);
 
-	public abstract Map<String, Integer> queryOR(String...terms);
+	public abstract Map<Integer, Integer> queryOR(String...terms);
 }

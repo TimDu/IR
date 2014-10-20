@@ -75,6 +75,8 @@ public class TermAnalyzer implements Analyzer{
 				tempTok = null;
 			}
 		}
+		
+		term = FilterUtility.updateSpecialCharExtended(tok);
 		// Stemmer filter
 		FilterUtility.updateStemmer(tok);
 		// Stop words filter

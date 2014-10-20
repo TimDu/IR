@@ -59,7 +59,7 @@ public class Runner {
 
 		Document d = null;
 		IndexWriter writer = new IndexWriter(indexDir);
-		boolean readonly = false;
+		boolean readonly = true;
 		if (!readonly) {
 			long startTime = System.currentTimeMillis();
 			long stopTime = System.currentTimeMillis();
@@ -112,9 +112,9 @@ public class Runner {
 		System.out.println("term values " + termReader.getTotalValueTerms());
 		Map<String, Integer> posts = termReader.getPostings("home");
 
-		for (String i : posts.keySet()) {
-			System.out.println(i);
-		}
+//		for (String i : posts.keySet()) {
+//			System.out.println(i);
+//		}
 
 		String query = getAnalyzer("home", FieldNames.CONTENT);
 		Map<String, Integer> map = termReader.getPostings(query);
@@ -145,6 +145,10 @@ public class Runner {
 		query = getAnalyzer("Reuter", FieldNames.AUTHORORG);
 		map = authorReader.getPostings(query);
 		System.out.println("Reuter: " + map.keySet());
+		
+		query = getAnalyzer("Reuters", FieldNames.AUTHORORG);
+		map = authorReader.getPostings(query);
+		System.out.println("Reuters: " + map.size());
 
 	}
 

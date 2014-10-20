@@ -151,14 +151,39 @@ public class TermIndexFileReader {
 			if (termIDread == m_termID) {
 
 				for (int j = 0; j < numFileIDs; j++) {
-					retVal.add(new TermFrequencyPerFile(raf.readInt(), raf.readInt()));
+					retVal.add(readTermFrequencyData(raf));
 				}
 			} else {
 				// file id is paired with term frequency, two integers = 8 bytes
-				raf.skipBytes(numFileIDs * 8);
+				for(int k = 0; k < numFileIDs; k++)
+				{
+					// skip the document id
+					raf.skipBytes(4);
+					// get the total number of positions this term appears in that document 
+					int termFreqTotal = raf.readInt();
+					// skip over all those terms
+					raf.skipBytes(termFreqTotal * 4);
+				}
 			}
 		}
 		raf.close();
 		return retVal;
+	}
+	
+	
+	protected TermFrequencyPerFile readTermFrequencyData(RandomAccessFile raf) throws IOException
+	{
+		//new TermFrequencyPerFile(raf.readInt(), raf.readInt(), null) 
+		int docID = raf.readInt();
+		int freqTerm = raf.readInt();
+		
+		TreeSet<Integer> posIndex = new TreeSet<Integer>(); 
+		
+		for(int j = 0; j < freqTerm; j++)
+		{ 
+			posIndex.add(raf.readInt());
+		} 
+		
+		return new TermFrequencyPerFile(docID, freqTerm, posIndex);
 	}
 }

@@ -128,8 +128,14 @@ public class FilterUtility {
 		if (term == null) {
 			throw new TokenizerException();
 		}
+		
+		if (tok.getIsDate())
+		{
+			return term;
+		}
+				
 		String []eliminates = NumericMatcher.getMatches(term);
-
+		
 		if (eliminates != null) {
 			// Start numeric elimination
 			for (String e: eliminates) {
@@ -143,6 +149,34 @@ public class FilterUtility {
 	
 		return term;
 	}
+	
+	public static String updateSpecialCharExtended(Token tok) throws TokenizerException
+	{
+		// Apply the result on term
+		if (tok == null) {
+			throw new TokenizerException();
+		}
+		 
+		
+		char []termBuff = tok.getTermBuffer();
+		if (termBuff == null) {
+			throw new TokenizerException();
+		}
+		String term = new String();
+		List<Character> words = new LinkedList<Character>();
+		for (char word: termBuff) {
+			words.add(word);
+		} 
+		
+		for (char word: words) {
+			if(Character.isAlphabetic(word) || Character.isDigit(word))
+			{
+				term += word;
+			}
+		}
+		return term;
+	}
+	
 
 	/**
 	 * Special Characters filter utility.
@@ -154,7 +188,6 @@ public class FilterUtility {
 			throws TokenizerException {
 		final char []specials =
 				{'.', '!', '?', '\'', ' ', '-', '/'};
-
 		if (tok == null) {
 			throw new TokenizerException();
 		}
@@ -240,7 +273,11 @@ public class FilterUtility {
 			break;
 		}
 		
-		// Apply the result on term
+		
+		
+		
+		
+		
 		for (char word: words) {
 			term += word;
 		}
@@ -426,6 +463,7 @@ public class FilterUtility {
 			// Merging step
 			while (DateMatcher.hasNext(tempTerm)) {
 				if (stream.hasNext()) {
+					
 					Token tempTok = stream.next();
 					tempTerm = tempTok.toString();
 					
@@ -439,9 +477,11 @@ public class FilterUtility {
 							term = tok.toString();
 							term += tempTerm.trim();
 							tok.setTermText(term);
+							
 						} else {
 							tok.merge(tempTok);
 						}
+						tok.setIsDate(true);
 						stream.remove();
 					} else {
 						// Do not merge this token,

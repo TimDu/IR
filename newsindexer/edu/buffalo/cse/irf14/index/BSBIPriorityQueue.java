@@ -3,7 +3,9 @@ package edu.buffalo.cse.irf14.index;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.PriorityQueue;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class BSBIPriorityQueue extends TreeSet<TermFrequencyPerFile> {
@@ -13,15 +15,10 @@ public class BSBIPriorityQueue extends TreeSet<TermFrequencyPerFile> {
 	 */
 	private static final long serialVersionUID = 4523912505130300498L;
 	
-	private int internalSize()
-	{
-		// each element contains 2 integers
-		return super.size()*2;
-	}
+	 
 	
 	public int size()
-	{
-		
+	{ 
 		return super.size();
 	}
 	
@@ -34,7 +31,25 @@ public class BSBIPriorityQueue extends TreeSet<TermFrequencyPerFile> {
         }
         else
         {
-        	super.headSet(e, true).first().incrementTermFrequency(e.m_termFreq);
+        	super.ceiling(e).addAllTerms(e.m_posIndex);
+        }
+        return isAdded;
+    }
+	 
+	public boolean addAll(Collection<? extends TermFrequencyPerFile> e) 
+    {
+		
+        boolean isAdded = true; 
+        for(TermFrequencyPerFile tfpf: e)
+        {
+	        if(!super.contains(tfpf))
+	        {
+	            isAdded = super.add(tfpf);
+	        }
+	        else
+	        {
+	        	super.ceiling(tfpf).addAllTerms(tfpf.m_posIndex);
+	        }
         }
         return isAdded;
     }
@@ -45,7 +60,21 @@ public class BSBIPriorityQueue extends TreeSet<TermFrequencyPerFile> {
 		for (TermFrequencyPerFile entry : this) {
 			
 			o.write(IndexerUtilityFunction.getByteArray( entry.getDocID()));
-			o.write(IndexerUtilityFunction.getByteArray( entry.getTermFrequency()));
+			byte[] rInt;
+			rInt = IndexerUtilityFunction.getByteArray( entry.getTermFrequency());
+			o.write(rInt);
+			int testCase = IndexerUtilityFunction.getInteger(rInt);
+			if(entry.getTermFrequency() == -2 ||  testCase == -2)
+			{
+				System.out.println("winner");
+			}
+			assert entry.getTermFrequency() == entry.getPosIndex().size();
+			TreeSet<Integer> posIndex = entry.getPosIndex(); 
+			
+			for(Integer i : posIndex)
+			{
+				o.write(IndexerUtilityFunction.getByteArray(i));
+			}
 		}
 	}
 
@@ -59,9 +88,21 @@ public class BSBIPriorityQueue extends TreeSet<TermFrequencyPerFile> {
 			int docID = IndexerUtilityFunction.getInteger(rInt);
 			o.read(rInt); 
 			int freqTerm =IndexerUtilityFunction.getInteger(rInt);
-			add(new TermFrequencyPerFile(docID, freqTerm));
+			if(freqTerm == -2)
+			{
+				System.out.println("winner");
+			}
+			TreeSet<Integer> posIndex = new TreeSet<Integer>();  
+			
+			for(int j = 0; j < freqTerm; j++)
+			{
+				o.read(rInt);
+				posIndex.add(IndexerUtilityFunction.getInteger(rInt));
+			}
+			add(new TermFrequencyPerFile(docID, freqTerm, posIndex));
 		}
-
 	}
+	
+	
 
 }

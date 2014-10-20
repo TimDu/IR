@@ -110,6 +110,25 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		if (tstream == null) {
 			throw new IndexerException();
 		}
+		// only add the words if the file doesn't already exist
+		if (!m_fileDict.exists(d)) {
+			if (d.getField(FieldNames.LENGTH).length > 0) {
+
+				totalWords += Integer
+						.parseInt(d.getField(FieldNames.LENGTH)[0]);
+
+			} else {
+				System.out.println("Document "
+						+ d.getField(FieldNames.FILEID)[0]
+						+ " has no body!");
+			}
+		}
+		else
+		{
+			return;
+		}
+		
+		
 		AnalyzerFactory af = AnalyzerFactory.getInstance();
 		Analyzer analyzer = af.getAnalyzerForField(fn, tstream);
 		try {
@@ -134,22 +153,10 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 				m_termIndex.put(termID, new BSBIPriorityQueue());
 			}
 
-			// only add the words if the file doesn't already exist
-			if (!m_fileDict.exists(d)) {
-				if (d.getField(FieldNames.LENGTH).length > 0) {
-
-					totalWords += Integer
-							.parseInt(d.getField(FieldNames.LENGTH)[0]);
-
-				} else {
-					System.out.println("Document "
-							+ d.getField(FieldNames.FILEID)[0]
-							+ " has no body!");
-				}
-			}
+			
 
 			// now add the fileID to the posting for the given term
-			m_termIndex.get(termID).add(new TermFrequencyPerFile(m_fileDict.elementToID(d)));
+			m_termIndex.get(termID).add(new TermFrequencyPerFile(m_fileDict.elementToID(d), term.getPosition()));
 
 			// if we're above the number of mappings, write to disk
 			if (m_termIndex.values().size() > m_maxMappingSize) {
@@ -299,13 +306,14 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 				}
 
 			}
+			 
 			assert (priorLowestElement < lowestElement);
 			priorLowestElement = lowestElement;
 			/*
 			 * Now, for each index in the lowestElements array combine/merge all
 			 * postings. Note that duplicates of fileIDs are the way we store
 			 * term frequency and should not be removed.
-			 */
+			 */ 
 			if(!lowestElements.isEmpty())
 			{
 				if (!m_termIndex.containsKey(ifeArr[lowestElements.get(0)].getTermID())) {
@@ -313,16 +321,16 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 							new BSBIPriorityQueue());
 				}
 			}
+			
 			for (Integer i : lowestElements) {
-				if (!m_termIndex.containsKey(ifeArr[i].getTermID())) {
-					m_termIndex.put(ifeArr[i].getTermID(),
-							new BSBIPriorityQueue());
-				}
+				 
 
 				m_termIndex.get(ifeArr[i].getTermID()).addAll(
 						ifeArr[i].getFileIDs());
 				ifeArr[i] = null;
 			}
+			
+			 
 			/*
 			 * If the number of values in our in-memory term index is enough
 			 * then we need to flush to disk.

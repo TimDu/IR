@@ -56,8 +56,7 @@ public class IndexFileReader implements IndexReaderInterface {
 				new FileInputStream(Paths.get(m_indexDir,
 						IndexGlobalVariables.statsFileName).toString()));
 		ObjectInputStream instream = new ObjectInputStream(fileIn);
-		m_avgDocLength = instream.readDouble();
-		System.out.println("m_avgDocLength: " + m_avgDocLength);
+		m_avgDocLength = instream.readDouble(); 
 		instream.close();
 		fileIn.close();
 	}

@@ -55,6 +55,7 @@ public class Tokenizer {
 			tokens[i] = new Token();
 			tokens[i].setTermText(terms[i]);
 			tokens[i].setSentenceContainer(contSentence);
+			tokens[i].setPosition(i);
 			
 			if (isSecondTerm) {
 				

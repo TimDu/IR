@@ -18,6 +18,32 @@ public class Token {
 	private char[] termBuffer;
 	// sentence reference
 	private Sentence containingSentence;
+	
+	private boolean m_isDate = false;
+	
+	public void setIsDate(boolean isDate)
+	{
+		m_isDate = isDate;
+	}
+
+	public boolean getIsDate()
+	{
+		return m_isDate;
+	}
+	
+	private int position;
+	
+	public int getPosition()
+	{
+		return position;
+	}
+	
+	public void setPosition(int pos)
+	{
+		 
+		position = pos;
+	}
+	
 	// sentence start
 	// all caps
 	// sentence end
@@ -27,6 +53,7 @@ public class Token {
 	 */
 	public Token() {
 		termText = new String();
+		position = 0;
 	}
 	
 	protected void setSentenceContainer(Sentence input)

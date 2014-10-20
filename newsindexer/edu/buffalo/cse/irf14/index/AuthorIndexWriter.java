@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
+import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
@@ -89,14 +90,15 @@ public class AuthorIndexWriter implements PerformIndexWriterLogic {
 
 		// Edit term dictionary
 		while (stream.hasNext()) {
-			String authorName = stream.next().toString();
+			Token tempToken = stream.next();
+			String authorName = tempToken.toString();
 			int id = termDict.AddGetElementToID(authorName);
 
 			if (!indexList.containsKey(id)) {
 				indexList.put(id, new BSBIPriorityQueue());
 			}
 			indexList.get(id).add(
-					new TermFrequencyPerFile(docDict.elementToID(d)));
+					new TermFrequencyPerFile(docDict.elementToID(d), -2));
 
 			// Edit index list
 			if (indexList.size() > MAX_MEM_ENTRY) {

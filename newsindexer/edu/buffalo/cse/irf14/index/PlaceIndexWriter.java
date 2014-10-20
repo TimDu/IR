@@ -85,7 +85,7 @@ public class PlaceIndexWriter implements PerformIndexWriterLogic {
 				indexList.put(id, new BSBIPriorityQueue());
 			}
 			indexList.get(id).add(
-					new TermFrequencyPerFile(docDict.elementToID(d)));
+					new TermFrequencyPerFile(docDict.elementToID(d), -2));
 
 			// Edit index list
 			if (indexList.size() > MAX_MEM_ENTRY) {

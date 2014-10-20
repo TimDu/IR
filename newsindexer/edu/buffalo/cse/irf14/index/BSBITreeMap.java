@@ -20,7 +20,11 @@ public class BSBITreeMap extends TreeMap<Integer, BSBIPriorityQueue> {
 			// the key
 			size += 1;
 			// the value
-			size += entry.getValue().size();
+			BSBIPriorityQueue temp = entry.getValue();
+			for(TermFrequencyPerFile t: temp){
+				size += t.size();
+			}
+			 
 		}
 		// 4*size() = the number key's * 4 (as they're integers)
 		// size * 4 = the number of values for each priority queue * 4

@@ -16,11 +16,6 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 	public int size() { 
 		return 2 + m_termFreq;
 	}
-
-	public int compareTo(TermFrequencyPerFile o1) {
-		//
-		return m_docID - o1.m_docID;
-	}
 	
 	@Override
 	public boolean equals(Object o) {
@@ -31,6 +26,15 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 		return false;
 	}
 	
+	@Override
+	public int compareTo(TermFrequencyPerFile o1)
+	{
+	  // 
+	  //return m_docID - o1.m_docID;
+		return o1.m_docID - m_docID;	// Need ascending order in TreeSet
+	}
+	
+	 
 	@Override
 	public int hashCode() {
 	    return m_docID.hashCode();

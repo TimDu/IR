@@ -111,10 +111,7 @@ public class Runner {
 		System.out.println("term keys " + termReader.getTotalKeyTerms());
 		System.out.println("term values " + termReader.getTotalValueTerms());
 		Map<String, Integer> posts = termReader.getPostings("home");
-
-//		for (String i : posts.keySet()) {
-//			System.out.println(i);
-//		}
+ 
 
 		String query = getAnalyzer("home", FieldNames.CONTENT);
 		Map<String, Integer> map = termReader.getPostings(query);

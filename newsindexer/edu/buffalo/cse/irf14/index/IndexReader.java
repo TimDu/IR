@@ -49,7 +49,6 @@ public class IndexReader {
 			break;
 		}
 		m_indexDir = indexDir;
-
 	}
 
 	/**
@@ -116,5 +115,15 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> query(String... terms) {
 		return iri.query(terms);
+	}
+	
+	/**
+	 * Method to implement a boolean OR query on given index
+	 * 
+	 * @param terms set of terms connected with OR
+	 * @return A map of docID-TermFrequency pair
+	 */
+	public Map<Integer, Integer> queryOR(String...terms) {
+		return iri.queryOR(terms);
 	}
 }

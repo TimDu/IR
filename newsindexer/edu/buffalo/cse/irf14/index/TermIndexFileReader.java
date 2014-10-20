@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.PriorityQueue;
 import java.util.TreeSet;
 
 public class TermIndexFileReader {

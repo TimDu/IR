@@ -46,11 +46,13 @@ public abstract class ScoreModel {
 	public abstract void run();
 	
 	/**
-	 * Set document ID collection
+	 * Set document ID collection. And do some clean works
+	 * before reset document collections.
 	 * 
 	 * @param docIDs collection of document IDs
 	 */
 	public void setDocuments(List<Integer> docIDs) {
+		docTermFreqs.clear();
 		if (!(docIDs instanceof ArrayList)) {
 			this.docIDs = new ArrayList<Integer>(docIDs);
 		} else {

@@ -2,7 +2,6 @@ package edu.buffalo.cse.irf14;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,9 +10,22 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import edu.buffalo.cse.irf14.index.IndexReader;
+import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
+import edu.buffalo.cse.irf14.query.Clause;
+import edu.buffalo.cse.irf14.query.Operator;
 import edu.buffalo.cse.irf14.query.Query;
 import edu.buffalo.cse.irf14.query.QueryParser;
+import edu.buffalo.cse.irf14.query.Term;
+import edu.buffalo.cse.irf14.searcher.EndlessSearcher;
+import edu.buffalo.cse.irf14.searcher.SearcherException;
+import edu.buffalo.cse.irf14.searcher.AndProxy;
 
 /**
  * Main class to run the searcher.
@@ -23,8 +35,14 @@ import edu.buffalo.cse.irf14.query.QueryParser;
  */
 public class SearchRunner {
 	public enum ScoringModel {TFIDF, OKAPI};
+	private enum Mode {QUERY, EVALUATION};
 	
 	private BufferedOutputStream writer;
+	private String indexDir;
+	private String corpusDir;
+	private Mode mode;
+	private ExecutorService exe;
+	private EndlessSearcher searcher;
 	
 	/**
 	 * Default (and only public) constuctor
@@ -36,7 +54,12 @@ public class SearchRunner {
 	public SearchRunner(String indexDir, String corpusDir, 
 			char mode, PrintStream stream) {
 		//TODO: IMPLEMENT THIS METHOD
+		this.indexDir = indexDir;
+		this.corpusDir = corpusDir;
+		this.mode = (mode == 'Q') ? Mode.QUERY : Mode.EVALUATION;  
 		writer = new BufferedOutputStream(stream);
+		exe = Executors.newFixedThreadPool(20);
+		searcher = new EndlessSearcher(exe, indexDir);
 	}
 	
 	/**
@@ -46,8 +69,24 @@ public class SearchRunner {
 	 */
 	public void query(String userQuery, ScoringModel model) {
 		//TODO: IMPLEMENT THIS METHOD
-		// perform step 1, get relevant documents with no terms negated
-		// perform step 2, on the remaining document list
+		Query query = QueryParser.parse(userQuery, null);
+		TreeSet<TermFrequencyPerFile> posting;
+
+		// Step 1, get relevant documents
+		try {
+			posting = searcher.search(query);
+		} catch (SearcherException | InterruptedException
+				| ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// Step 2, rank document list
+		if (model.equals(ScoringModel.TFIDF)) {
+			
+		} else if (model.equals(ScoringModel.OKAPI)) {
+			
+		}
 	}
 	
 	/**
@@ -89,8 +128,15 @@ public class SearchRunner {
 			// Perform algorithm
 			for(int i = 0; i < queryList.size(); i++)
 			{
-				performQuerySearch(queryList.get(i));
+				try {
+					searcher.search(queryList.get(i));
+				} catch (SearcherException | InterruptedException
+						| ExecutionException e) {
+					e.printStackTrace();
+				}
 			}
+			
+			// Rank document list
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (NumberFormatException e) {
@@ -101,16 +147,12 @@ public class SearchRunner {
 		
 	}
 	
-	void performQuerySearch(Query input)
-	{
-		
-	}
-	
 	/**
 	 * General cleanup method
 	 */
 	public void close() {
 		//TODO : IMPLEMENT THIS METHOD
+		exe.shutdown();
 	}
 	
 	/**

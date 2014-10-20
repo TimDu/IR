@@ -4,24 +4,31 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.math.BigDecimal;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.TreeSet;
 
 public class IndexFileReader implements IndexReaderInterface {
-	protected String m_indexDir;
-	protected String m_indexName;
-	protected String m_dictName;
-	protected TermIndexFileReader tifr;
-	protected TermIndexDictionary m_termDict;
-	protected FileIndexDictionary m_fileDict;
+
+	protected String m_indexDir = null;
+	protected String m_indexName = null;
+	protected String m_dictName = null;
+	protected TermIndexDictionary m_termDict = null;
+	protected FileIndexDictionary m_fileDict = null;
+	protected TermIndexFileReader tifr = null;
 	protected double m_avgDocLength = 0;
 
+	/**
+	 * Hacked constructor for getting file dictionary
+	 */
+	public IndexFileReader() {
+		// Hacked
+	}
+	
 	public IndexFileReader(String indexDir, String indexName, String dictName) {
 		m_indexDir = indexDir;
 		m_indexName = indexName;
@@ -50,25 +57,27 @@ public class IndexFileReader implements IndexReaderInterface {
 		}
 
 	}
+	
+	public FileIndexDictionary OpenFileDictionary()
+			throws IOException,ClassNotFoundException {
+		BufferedInputStream fileIn = new BufferedInputStream(
+				new FileInputStream(Paths.get(m_indexDir,
+						IndexGlobalVariables.fileDicFileName).toString()));
+		ObjectInputStream instream = new ObjectInputStream(fileIn);
+		m_fileDict = (FileIndexDictionary) instream.readObject();
+		
+		instream.close();
+		fileIn.close();
+		return m_fileDict;
+	}
 
 	protected void OpenFileStats() throws IOException, ClassNotFoundException {
 		BufferedInputStream fileIn = new BufferedInputStream(
 				new FileInputStream(Paths.get(m_indexDir,
 						IndexGlobalVariables.statsFileName).toString()));
 		ObjectInputStream instream = new ObjectInputStream(fileIn);
-		m_avgDocLength = instream.readDouble(); 
-		instream.close();
-		fileIn.close();
-	}
-
-	protected void OpenFileDictionary() throws IOException,
-			ClassNotFoundException {
-		BufferedInputStream fileIn = new BufferedInputStream(
-				new FileInputStream(Paths.get(m_indexDir,
-						IndexGlobalVariables.fileDicFileName).toString()));
-		ObjectInputStream instream = new ObjectInputStream(fileIn);
-		m_fileDict = (FileIndexDictionary) instream.readObject();
-
+		m_avgDocLength = instream.readDouble();
+		System.out.println("m_avgDocLength: " + m_avgDocLength);
 		instream.close();
 		fileIn.close();
 	}
@@ -94,7 +103,12 @@ public class IndexFileReader implements IndexReaderInterface {
 
 	@Override
 	public int getTotalKeyTerms() {
-		return m_termDict.size();
+		if (m_termDict != null) {
+			return m_termDict.size();
+		} else {
+			// Hacked
+			return -1;
+		}
 	}
 
 	/*
@@ -106,7 +120,12 @@ public class IndexFileReader implements IndexReaderInterface {
 
 	@Override
 	public int getTotalValueTerms() {
-		return m_fileDict.size();
+		if (m_fileDict != null) {
+			return m_fileDict.size();
+		} else {
+			// Hacked
+			return -1;
+		}
 	}
 
 	/**
@@ -120,7 +139,7 @@ public class IndexFileReader implements IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> getPostings(String term) {
-		if (!m_termDict.exists(term)) {
+		if ((m_termDict == null) && !m_termDict.exists(term)) {
 			return null;
 		}
 
@@ -153,8 +172,12 @@ public class IndexFileReader implements IndexReaderInterface {
 	 */
 	@Override
 	public List<String> getTopK(int k) {
-
-		return m_termDict.getTopK(k);
+		if (m_termDict != null) {
+			return m_termDict.getTopK(k);
+		} else {
+			// Hacked
+			return null;
+		}
 	}
 
 	/*
@@ -165,10 +188,133 @@ public class IndexFileReader implements IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> query(String... terms) {
-		// TODO Need to implement for extra credit
-		 
-
-		return null;
+		if (tifr == null) {
+			// Hacked
+			return null;
+		}
+		
+		int index = -1;	// Index ID for the shortest posting list
+		int minSize = -1;	// The size of current shortest posting
+		TreeSet<TermFrequencyPerFile> currentPosting;
+		TreeSet<TermFrequencyPerFile> tempPosting;
+		List<Integer> termIDs = new LinkedList<Integer>();
+		List<TreeSet<TermFrequencyPerFile>> postings =
+				new LinkedList<TreeSet<TermFrequencyPerFile>>();
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		
+		// Map terms to termIDs
+		for (String term: terms) {
+			termIDs.add(m_termDict.elementToID(term));
+		}
+		
+		// Get posting list for each term
+		for (int tID: termIDs) {
+			try {
+				currentPosting = tifr.getPostings(tID);
+				postings.add(currentPosting);
+				if (currentPosting.size() > minSize) {
+					minSize = currentPosting.size();
+					index = postings.size() - 1;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// Perform postings intersection starting from
+		// the shortest list
+		currentPosting = postings.get(index); 
+		tempPosting = new TreeSet<TermFrequencyPerFile>();
+		for (int i = 0; i < postings.size(); ++i) {
+			if (i != index) {
+				Iterator<TermFrequencyPerFile> iter0 =
+						currentPosting.descendingIterator();
+				Iterator<TermFrequencyPerFile> iter1 =
+						postings.get(i).descendingIterator();
+				TermFrequencyPerFile value0 = null;
+				TermFrequencyPerFile value1 = null;
+				while (iter0.hasNext() && iter1.hasNext()) {
+					if (value0 == null) {
+						value0 = iter0.next();
+						value1 = iter1.next();
+						continue;
+					}
+					if (value1.getDocID() == value0.getDocID()) {
+						tempPosting.add(value1);
+						value0 = iter0.next();
+						value1 = iter1.next();
+					} else if (value1.getDocID() > value0.getDocID()) {
+						value0 = iter0.next();
+					} else if (value1.getDocID() < value0.getDocID()) {
+						value1 = iter1.next();
+					}
+				}
+				if (value1.getDocID() == value0.getDocID()) {
+					tempPosting.add(value1);
+					value0 = iter0.next();
+					value1 = iter1.next();
+				}
+				
+				if (!tempPosting.isEmpty()) {
+					currentPosting = tempPosting;
+					tempPosting = new TreeSet<TermFrequencyPerFile>();
+				} else {
+					// Exit intersection before no qualified document
+					// is left!
+					System.err.print("AND query on [ ");
+					for (String term: terms) {
+						System.err.print(term + " ");
+					}
+					System.err.println("] terminated at " + terms[i]);
+					break;
+				}
+			}
+		}
+		
+		// Get map result
+		for (TermFrequencyPerFile tfd: currentPosting) {
+			result.put(m_fileDict.getElementfromID(tfd.getDocID())
+					, tfd.getTermFrequency());
+		}
+		
+		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see edu.buffalo.cse.irf14.index.IndexReaderInterface#queryOR(java.lang.String[])
+	 */
+	@Override
+	public Map<Integer, Integer> queryOR(String... terms) {
+		if (m_termDict == null) {
+			// Hacked
+			return null;
+		}
+		
+		TreeSet<TermFrequencyPerFile> currentPosting =
+				new TreeSet<TermFrequencyPerFile>();
+		List<Integer> termIDs = new LinkedList<Integer>();
+		Map<Integer, Integer> result = new HashMap<Integer, Integer>();
+		
+		// Map terms to termIDs
+		for (String term: terms) {
+			termIDs.add(m_termDict.elementToID(term));
+		}
+		
+		// Get posting list for each term
+		for (int tID: termIDs) {
+			try {
+				currentPosting.addAll(tifr.getPostings(tID));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// Get map result
+		for (TermFrequencyPerFile tfd: currentPosting) {
+			result.put(tfd.getDocID(), tfd.getTermFrequency());
+		}
+		
+		return result;
+	}
 }

@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.buffalo.cse.irf14.query.Clause;
-import edu.buffalo.cse.irf14.query.Index;
+import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.query.Operator;
 
 public class ClauseTest {
@@ -16,27 +16,27 @@ public class ClauseTest {
 	@Before
 	public void setUpTerm0() throws Exception {
 		clause = new Clause(null, Operator.AND);
-		clause.setIndex(Index.AUTHOR);
+		clause.setIndex(IndexType.AUTHOR);
 		clause.setTerm("Alice", false);
 	}
 	
 	@Before
 	public void setUpTerm1() throws Exception {
 		clause = new Clause(Operator.AND, null);
-		clause.setIndex(Index.AUTHOR);
+		clause.setIndex(IndexType.AUTHOR);
 		clause.setTerm("Alice Bob", false);
 	}
 	@Before
 	public void setUpTerm2() throws Exception {
 		clause = new Clause(null, Operator.NOT);
-		clause.setIndex(Index.PLACE);
+		clause.setIndex(IndexType.PLACE);
 		clause.setFirst();
 		clause.setTerm("Alice Bob", true);
 	}
 	@Before
 	public void setUpQuery1() throws Exception {
 		clause = new Clause(Operator.AND, Operator.NOT);
-		clause.setIndex(Index.TERM);
+		clause.setIndex(IndexType.TERM);
 		clause.setQuery("(Alice Bob)", true, true);
 	}
 
@@ -50,7 +50,7 @@ public class ClauseTest {
 		assertEquals("[ <Place:Alice> AND <Place:Bob> ]", clause.toString());
 		setUpQuery1();
 		assertEquals(Operator.NOT, clause.getStartOP());
-		assertEquals(Index.TERM, clause.getIndex());
+		assertEquals(IndexType.TERM, clause.getIndex());
 	}
 
 }

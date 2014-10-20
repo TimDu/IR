@@ -65,6 +65,10 @@ public class Clause {
 		return startOP;
 	}
 	
+	public Operator getDefaultOP() {
+		return defaultOP;
+	}
+	
 	@Override
 	public String toString() {
 		// Null check. Either term or query must be not null

@@ -11,11 +11,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
+import edu.buffalo.cse.irf14.query.Clause;
+import edu.buffalo.cse.irf14.query.Operator;
 import edu.buffalo.cse.irf14.query.Query;
 import edu.buffalo.cse.irf14.query.QueryParser;
+import edu.buffalo.cse.irf14.query.Term;
+import edu.buffalo.cse.irf14.searcher.SearcherException;
+import edu.buffalo.cse.irf14.searcher.andProxy;
 
 /**
  * Main class to run the searcher.
@@ -31,6 +39,7 @@ public class SearchRunner {
 	private String indexDir;
 	private String corpusDir;
 	private Mode mode;
+	private ExecutorService exe;
 	
 	/**
 	 * Default (and only public) constuctor
@@ -46,6 +55,7 @@ public class SearchRunner {
 		this.corpusDir = corpusDir;
 		this.mode = (mode == 'Q') ? Mode.QUERY : Mode.EVALUATION;  
 		writer = new BufferedOutputStream(stream);
+		exe = Executors.newFixedThreadPool(20);
 	}
 	
 	/**
@@ -120,6 +130,7 @@ public class SearchRunner {
 	 */
 	public void close() {
 		//TODO : IMPLEMENT THIS METHOD
+		exe.shutdown();
 	}
 	
 	/**
@@ -159,7 +170,7 @@ public class SearchRunner {
 		//TODO: IMPLEMENT THIS METHOD IFF SPELLCHECK EXECUTED
 		return null;
 	}
-	
+
 	/**
 	 * Method that searches all document IDs based on query request.<br>
 	 * It first categorize all clauses into group of terms connected
@@ -172,9 +183,132 @@ public class SearchRunner {
 	 * @param query initial query
 	 * @return result posting
 	 */
-	private TreeSet<TermFrequencyPerFile> rawSearch(Query query) {
+	private TreeSet<TermFrequencyPerFile> endlessSearcher(Query query) {
+		Clause tempClause;
+		List<Clause> andClauses = new LinkedList<Clause>();
+		List<Clause> orClauses = new LinkedList<Clause>();
+		List<Future<TreeSet<TermFrequencyPerFile>>> andSets =
+				new LinkedList<Future<TreeSet<TermFrequencyPerFile>>>();
+		List<Future<TreeSet<TermFrequencyPerFile>>> orSets =
+				new LinkedList<Future<TreeSet<TermFrequencyPerFile>>>();
 		
+		for (int i = 0; i < query.size(); ++i) {
+			tempClause = query.getClause(i);
+			
+			if (tempClause.isQuery()) {
+				if (!andClauses.isEmpty()) {
+					try {
+						andSets.add(
+								exe.submit(new andProxy(
+										indexDir, andClauses, exe)));
+					} catch (SearcherException e) {
+						e.printStackTrace();
+					}
+					andClauses = new LinkedList<Clause>();
+				}
+				if (!orClauses.isEmpty()) {
+					try {
+						orSets.add(
+								exe.submit(new andProxy(
+										indexDir, orClauses, exe)));
+					} catch (SearcherException e) {
+						e.printStackTrace();
+					}
+					orClauses = new LinkedList<Clause>();
+				}
+				endlessSearcher((Query) tempClause.getComponent());
+			}
+			
+			if (andClauses.isEmpty() 
+					&& tempClause.getStartOP().equals(Operator.AND)) {
+				// First AND clause encountered
+				andClauses.add(tempClause);
+			} else if (orClauses.isEmpty()
+					&& tempClause.getStartOP().equals(Operator.OR)) {
+				// First OR clause encountered
+				orClauses.add(tempClause);
+			}
+			
+			// And clauses analysis
+			if (!andClauses.isEmpty()) {
+				if (isStrictAnd(tempClause)) {
+					andClauses.add(tempClause);
+				} else {
+					try {
+						andSets.add(
+								exe.submit(new andProxy(
+										indexDir, andClauses, exe)));
+					} catch (SearcherException e) {
+						e.printStackTrace();
+					}
+					andClauses = new LinkedList<Clause>();
+				}
+			}
+			
+			// Or clauses analysis
+			if (!orClauses.isEmpty()) {
+				if (isStrictOR(tempClause)) {
+					orClauses.add(tempClause);
+				} else {
+					try {
+						orSets.add(
+								exe.submit(new andProxy(
+										indexDir, orClauses, exe)));
+					} catch (SearcherException e) {
+						e.printStackTrace();
+					}
+					orClauses = new LinkedList<Clause>();
+				}
+			}
+		}
+		
+		// TODO combine andSet and orSet
+		// TODO Exclude NOT queries
 		
 		return null;
+	}
+	
+	/**
+	 * Method that tells if current clause is strictly
+	 * connected with AND. That is to say, even the result
+	 * returns {@code false}, a clause may still have an
+	 * AND start operator.
+	 * 
+	 * @param clause clause to be tested
+	 * @return {@code true} if this clause has strict AND relation;
+	 * otherwise, {@code false}
+	 */
+	private boolean isStrictAnd(Clause clause) {
+		if (clause.isQuery()) {
+			return false;
+		}
+		if (((clause.getStartOP() == null)
+				|| clause.getStartOP().equals(Operator.AND))
+				&& (clause.getDefaultOP().equals(Operator.AND))) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Method that tells if current clause is strictly
+	 * connected with OR. That is to say, even the result
+	 * returns {@code false}, a clause may still have an
+	 * OR start operator.
+	 * 
+	 * @param clause clause to be tested
+	 * @return {@code true} if this clause has strict OR relation;
+	 * otherwise, {@code false}
+	 */
+	private boolean isStrictOR(Clause clause) {
+		if (clause.isQuery()) {
+			return false;
+		}
+		if (((clause.getStartOP() == null)
+				|| clause.getStartOP().equals(Operator.OR))
+				&& (clause.getDefaultOP().equals(Operator.OR))) {
+			return true;
+		}
+		return false;
 	}
 }

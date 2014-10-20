@@ -12,13 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-public class IndexFileReader implements IndexReaderInterface {
-	protected String m_indexDir;
+public class IndexFileReader extends IndexReaderInterface {
 	protected String m_indexName;
 	protected String m_dictName;
 	protected TermIndexFileReader tifr;
-	protected TermIndexDictionary m_termDict;
-	protected FileIndexDictionary m_fileDict;
 	protected double m_avgDocLength = 0;
 
 	public IndexFileReader(String indexDir, String indexName, String dictName) {
@@ -57,18 +54,6 @@ public class IndexFileReader implements IndexReaderInterface {
 		ObjectInputStream instream = new ObjectInputStream(fileIn);
 		m_avgDocLength = instream.readDouble();
 		System.out.println("m_avgDocLength: " + m_avgDocLength);
-		instream.close();
-		fileIn.close();
-	}
-
-	protected void OpenFileDictionary() throws IOException,
-			ClassNotFoundException {
-		BufferedInputStream fileIn = new BufferedInputStream(
-				new FileInputStream(Paths.get(m_indexDir,
-						IndexGlobalVariables.fileDicFileName).toString()));
-		ObjectInputStream instream = new ObjectInputStream(fileIn);
-		m_fileDict = (FileIndexDictionary) instream.readObject();
-
 		instream.close();
 		fileIn.close();
 	}

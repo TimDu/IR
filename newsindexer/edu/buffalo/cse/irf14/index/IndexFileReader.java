@@ -13,11 +13,22 @@ import java.util.Map;
 import java.util.TreeSet;
 
 public class IndexFileReader extends IndexReaderInterface {
-	protected String m_indexName;
-	protected String m_dictName;
-	protected TermIndexFileReader tifr;
+
+	protected String m_indexDir = null;
+	protected String m_indexName = null;
+	protected String m_dictName = null;
+	protected TermIndexDictionary m_termDict = null;
+	protected FileIndexDictionary m_fileDict = null;
+	protected TermIndexFileReader tifr = null;
 	protected double m_avgDocLength = 0;
 
+	/**
+	 * Hacked constructor for getting file dictionary
+	 */
+	public IndexFileReader() {
+		// Hacked
+	}
+	
 	public IndexFileReader(String indexDir, String indexName, String dictName) {
 		m_indexDir = indexDir;
 		m_indexName = indexName;
@@ -45,6 +56,19 @@ public class IndexFileReader extends IndexReaderInterface {
 			assert (false);
 		}
 
+	}
+	
+	public FileIndexDictionary OpenFileDictionary()
+			throws IOException,ClassNotFoundException {
+		BufferedInputStream fileIn = new BufferedInputStream(
+				new FileInputStream(Paths.get(m_indexDir,
+						IndexGlobalVariables.fileDicFileName).toString()));
+		ObjectInputStream instream = new ObjectInputStream(fileIn);
+		m_fileDict = (FileIndexDictionary) instream.readObject();
+		
+		instream.close();
+		fileIn.close();
+		return m_fileDict;
 	}
 
 	protected void OpenFileStats() throws IOException, ClassNotFoundException {
@@ -79,7 +103,12 @@ public class IndexFileReader extends IndexReaderInterface {
 
 	@Override
 	public int getTotalKeyTerms() {
-		return m_termDict.size();
+		if (m_termDict != null) {
+			return m_termDict.size();
+		} else {
+			// Hacked
+			return -1;
+		}
 	}
 
 	/*
@@ -91,7 +120,12 @@ public class IndexFileReader extends IndexReaderInterface {
 
 	@Override
 	public int getTotalValueTerms() {
-		return m_fileDict.size();
+		if (m_fileDict != null) {
+			return m_fileDict.size();
+		} else {
+			// Hacked
+			return -1;
+		}
 	}
 
 	/**
@@ -105,7 +139,7 @@ public class IndexFileReader extends IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> getPostings(String term) {
-		if (!m_termDict.exists(term)) {
+		if ((m_termDict == null) && !m_termDict.exists(term)) {
 			return null;
 		}
 
@@ -138,8 +172,12 @@ public class IndexFileReader extends IndexReaderInterface {
 	 */
 	@Override
 	public List<String> getTopK(int k) {
-
-		return m_termDict.getTopK(k);
+		if (m_termDict != null) {
+			return m_termDict.getTopK(k);
+		} else {
+			// Hacked
+			return null;
+		}
 	}
 
 	/*
@@ -150,6 +188,11 @@ public class IndexFileReader extends IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> query(String... terms) {
+		if (tifr == null) {
+			// Hacked
+			return null;
+		}
+		
 		int index = -1;	// Index ID for the shortest posting list
 		int minSize = -1;	// The size of current shortest posting
 		TreeSet<TermFrequencyPerFile> currentPosting;
@@ -228,6 +271,11 @@ public class IndexFileReader extends IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> queryOR(String... terms) {
+		if (m_termDict == null) {
+			// Hacked
+			return null;
+		}
+		
 		TreeSet<TermFrequencyPerFile> currentPosting =
 				new TreeSet<TermFrequencyPerFile>();
 		List<Integer> termIDs = new LinkedList<Integer>();

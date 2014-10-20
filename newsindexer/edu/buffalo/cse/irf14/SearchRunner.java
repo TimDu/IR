@@ -10,7 +10,9 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
+import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
 import edu.buffalo.cse.irf14.query.Query;
 import edu.buffalo.cse.irf14.query.QueryParser;
@@ -23,8 +25,12 @@ import edu.buffalo.cse.irf14.query.QueryParser;
  */
 public class SearchRunner {
 	public enum ScoringModel {TFIDF, OKAPI};
+	private enum Mode {QUERY, EVALUATION};
 	
 	private BufferedOutputStream writer;
+	private String indexDir;
+	private String corpusDir;
+	private Mode mode;
 	
 	/**
 	 * Default (and only public) constuctor
@@ -36,6 +42,9 @@ public class SearchRunner {
 	public SearchRunner(String indexDir, String corpusDir, 
 			char mode, PrintStream stream) {
 		//TODO: IMPLEMENT THIS METHOD
+		this.indexDir = indexDir;
+		this.corpusDir = corpusDir;
+		this.mode = (mode == 'Q') ? Mode.QUERY : Mode.EVALUATION;  
 		writer = new BufferedOutputStream(stream);
 	}
 	
@@ -46,9 +55,13 @@ public class SearchRunner {
 	 */
 	public void query(String userQuery, ScoringModel model) {
 		//TODO: IMPLEMENT THIS METHOD
-		// perform step 1, get relevant documents with no terms negated
-		// perform step 2, on the remaining document list
+		IndexReader reader;
 		Query query = QueryParser.parse(userQuery, null);
+
+		// Step 1, get relevant documents with no terms negated
+		
+		
+		// Step 2, on the remaining document list
 	}
 	
 	/**
@@ -90,7 +103,7 @@ public class SearchRunner {
 			// Perform algorithm
 			for(int i = 0; i < queryList.size(); i++)
 			{
-				performQuerySearch(queryList.get(i));
+				//performQuerySearch(queryList.get(i));
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -99,11 +112,6 @@ public class SearchRunner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-	}
-	
-	void performQuerySearch(Query input)
-	{
 		
 	}
 	
@@ -158,7 +166,9 @@ public class SearchRunner {
 	 * @param query
 	 * @return
 	 */
-	private List<TermFrequencyPerFile> rawSearch(Query query) {
+	private TreeSet<TermFrequencyPerFile> rawSearch(Query query) {
+		
+		
 		return null;
 	}
 }

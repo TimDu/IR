@@ -1,5 +1,7 @@
 package edu.buffalo.cse.irf14.query;
 
+import edu.buffalo.cse.irf14.index.IndexType;
+
 /**
  * A component in a clause, which stores the term content.
  * @author tianmiao
@@ -8,15 +10,15 @@ package edu.buffalo.cse.irf14.query;
 public class Term extends QueryComponent {
 
 	private String []values;
-	private Index []indexes;
+	private IndexType []indexes;
 	
-	public Term(Index index, String content) {
+	public Term(IndexType index, String content) {
 		if (!content.startsWith("\"") && !content.endsWith("\"")) {
 			// This is group of terms
 			String []segs = content.split(" ");
 			String []temp;
 			values = new String[segs.length];
-			indexes = new Index[segs.length];
+			indexes = new IndexType[segs.length];
 			
 			for (int i = 0; i < segs.length; ++i) {
 				temp = segs[i].split(":");
@@ -26,11 +28,11 @@ public class Term extends QueryComponent {
 						values[i] += temp[j] + ":";
 					}
 					values[i] = values[i].substring(0, values[i].length() - 1);
-					indexes[i] = Index.getIndex(temp[0]);
+					indexes[i] = IndexType.getIndex(temp[0]);
 				} else {
 					values[i] = segs[i];
 					indexes[i] = (index == null) 
-							? Index.TERM : index;
+							? IndexType.TERM : index;
 				}
 			}
 		} else {
@@ -38,18 +40,18 @@ public class Term extends QueryComponent {
 			
 			// This is a term phrase
 			values = new String[1];
-			indexes = new Index[1];
+			indexes = new IndexType[1];
 			temp = content.split(":");
 			if (temp.length > 1) {
 				for (int i = 1; i < temp.length; ++i) {
 					values[0] += temp[i] + ":";
 				}
 				values[0] = values[0].substring(0, values[0].length() - 1);
-				indexes[0] = Index.getIndex(temp[0]);
+				indexes[0] = IndexType.getIndex(temp[0]);
 			} else {
 				values[0] = content;
 				indexes[0] = (index == null) 
-						? Index.TERM : index;
+						? IndexType.TERM : index;
 			}
 		}
 	}
@@ -62,7 +64,7 @@ public class Term extends QueryComponent {
 		return values[i];
 	}
 	
-	public Index getIndex(int i) {
+	public IndexType getIndex(int i) {
 		return (indexes[i] == null)
 				? index : indexes[i];
 	}

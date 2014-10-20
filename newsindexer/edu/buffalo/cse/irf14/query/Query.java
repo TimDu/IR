@@ -3,6 +3,8 @@ package edu.buffalo.cse.irf14.query;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.buffalo.cse.irf14.index.IndexType;
+
 /**
  * Class that represents a parsed query<br>
  * NOTE:<br>
@@ -19,7 +21,7 @@ public class Query extends QueryComponent {
 	private List<Clause> clauses;
 	private boolean isOriginal;	// Tells if this is the original query
 	
-	public Query(Index index, String content, boolean isOrg) {
+	public Query(IndexType index, String content, boolean isOrg) {
 		this.index = index;
 		raw = content; 
 		clauses = new LinkedList<Clause>();
@@ -48,7 +50,7 @@ public class Query extends QueryComponent {
 	 */
 	public Query addClause(String clause
 			, Operator op, Operator startOP, boolean isBegin) {
-		int ind = 0;	// Index that a term or query starts with
+		int ind = 0;	// IndexType that a term or query starts with
 		String []seg = clause.trim().split(":");
 		String tempStr;
 		if (this.startOP != null) {
@@ -75,7 +77,7 @@ public class Query extends QueryComponent {
 		Query subQuery = null;
 		
 		if (seg.length > 1) {
-			Index type = Index.getIndex(seg[0].trim());
+			IndexType type = IndexType.getIndex(seg[0].trim());
 			if (type != null) {
 				tempClause.setIndex(type);
 				ind = 1;

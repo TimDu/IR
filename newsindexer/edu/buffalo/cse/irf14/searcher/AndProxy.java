@@ -18,7 +18,7 @@ import edu.buffalo.cse.irf14.query.Term;
  * A class that manages document search with 
  * {@code AND} query relation.
  */
-public class andProxy implements Callable<TreeSet<TermFrequencyPerFile>> {
+public class AndProxy implements Callable<TreeSet<TermFrequencyPerFile>> {
 
 	private String indexDir;
 	private List<Clause> clauses;
@@ -32,7 +32,7 @@ public class andProxy implements Callable<TreeSet<TermFrequencyPerFile>> {
 	 * clauses
 	 * @throws SearcherException 
 	 */
-	public andProxy(String indexDir, List<Clause> clauses
+	public AndProxy(String indexDir, List<Clause> clauses
 			, ExecutorService exe) throws SearcherException {
 		for (Clause cl: clauses) {
 			if ((cl.getStartOP() != null)
@@ -42,7 +42,8 @@ public class andProxy implements Callable<TreeSet<TermFrequencyPerFile>> {
 			}
 		}
 		this.indexDir = indexDir;
-		this.clauses = clauses;
+		this.clauses = new LinkedList<Clause>();
+		this.clauses.addAll(clauses);
 		result = new TreeSet<TermFrequencyPerFile>();
 		this.exe = exe;
 	}
@@ -64,14 +65,14 @@ public class andProxy implements Callable<TreeSet<TermFrequencyPerFile>> {
 					terms.add(term.getTerm(i));
 				} else {
 					futureList.add(exe.submit(
-									new andWorker(indexDir, type, terms)));
+									new AndWorker(indexDir, type, terms)));
 					terms.clear();
 					type = term.getIndex(i);
 					terms.add(term.getTerm(i));
 				}
 			}
 		}
-		futureList.add(exe.submit(new andWorker(indexDir, type, terms)));
+		futureList.add(exe.submit(new AndWorker(indexDir, type, terms)));
 		
 		// Collect step
 		for (Future<TreeSet<TermFrequencyPerFile>> future: futureList) {

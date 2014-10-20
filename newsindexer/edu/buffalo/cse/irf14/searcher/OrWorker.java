@@ -5,40 +5,34 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 
-import edu.buffalo.cse.irf14.index.IndexFileReader;
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
 
 /**
- * {@code And} relation worker thread. <b>Only
- * called by</b> {@link andProxy} <b>class</b>
+ * {@code Or} relation worker thread. <b>Only
+ * called by</b> {@link OrProxy} <b>class</b>
  */
-class andWorker implements Callable<TreeSet<TermFrequencyPerFile>> {
+public class OrWorker implements Callable<TreeSet<TermFrequencyPerFile>> {
 
 	private IndexReader reader;
 	private String []terms;
 	
-	public andWorker(String indexDir, IndexType type
+	public OrWorker(String indexDir, IndexType type
 			, List<String> terms) {
 		reader = new IndexReader(indexDir, type);
 		this.terms = terms.toArray(new String[terms.size()]);
 	}
 
-	/**
-	 * @return map of document ID and its term frequency pair
-	 */
 	@Override
 	public TreeSet<TermFrequencyPerFile> call() throws Exception {
-		Map<String, Integer> temp = reader.query(terms);
+		Map<Integer, Integer> temp = reader.queryOR(terms);
 		TreeSet<TermFrequencyPerFile> result =
 				new TreeSet<TermFrequencyPerFile>();
 		TermFrequencyPerFile tfpf;
 		
-		for (String fID: temp.keySet()) {
-			tfpf  = new TermFrequencyPerFile(
-							new IndexFileReader().OpenFileDictionary()
-							.elementToID(fID), temp.get(fID));
+		for (Integer dID: temp.keySet()) {
+			tfpf  = new TermFrequencyPerFile(dID, temp.get(dID));
 			result.add(tfpf);
 		}
 		

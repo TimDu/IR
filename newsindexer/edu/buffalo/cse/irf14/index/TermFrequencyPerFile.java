@@ -7,11 +7,22 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 	protected int m_termFreq;
 	protected int m_docID;
 	
+	@Override
 	public int compareTo(TermFrequencyPerFile o1)
 	{
 	  // 
 	  //return m_docID - o1.m_docID;
 		return o1.m_docID - m_docID;	// Need ascending order in TreeSet
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof TermFrequencyPerFile) {
+			if (((TermFrequencyPerFile)o).getDocID() == m_docID) {
+				return true;
+			}
+		}
+		return false;
 	}
 			  
 	public TermFrequencyPerFile(int fileID)

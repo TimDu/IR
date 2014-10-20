@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.HashMap;
 
 import edu.buffalo.cse.irf14.document.Document;
@@ -59,6 +58,13 @@ public class FileIndexDictionary implements Serializable {
 		
 		m_idDict.put(m_elementDict.size(), element);
 		return m_elementDict.size();
+	}
+	
+	public int elementToID(String id) {
+		if (m_elementDict.containsKey(id)) {
+			return m_elementDict.get(id)[0];
+		}
+		return -1;
 	}
 	
 	public void setFileLength(int fileId, int length)

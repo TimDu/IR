@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-public class IndexFileReader extends IndexReaderInterface {
+public class IndexFileReader implements IndexReaderInterface {
 
 	protected String m_indexDir = null;
 	protected String m_indexName = null;

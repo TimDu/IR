@@ -8,10 +8,11 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 	protected int m_docID;
 	
 	public int compareTo(TermFrequencyPerFile o1)
-			  {
-			  // 
-			  return m_docID - o1.m_docID;
-			  }
+	{
+	  // 
+	  //return m_docID - o1.m_docID;
+		return o1.m_docID - m_docID;	// Need ascending order in TreeSet
+	}
 			  
 	public TermFrequencyPerFile(int fileID)
 	{

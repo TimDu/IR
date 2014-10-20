@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +165,14 @@ public class IndexFileReader implements IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> query(String... terms) {
+		int index = -1;	// Index ID for the shortest posting list
+		int minSize = -1;	// The size of current shortest posting
+		TreeSet<TermFrequencyPerFile> currentPosting;
+		TreeSet<TermFrequencyPerFile> tempPosting;
 		List<Integer> termIDs = new LinkedList<Integer>();
+		List<TreeSet<TermFrequencyPerFile>> postings =
+				new LinkedList<TreeSet<TermFrequencyPerFile>>();
+		Map<String, Integer> result = new HashMap<String, Integer>();
 		
 		// Map terms to termIDs
 		for (String term: terms) {
@@ -174,13 +182,59 @@ public class IndexFileReader implements IndexReaderInterface {
 		// Get posting list for each term
 		for (int tID: termIDs) {
 			try {
-				tifr.getPostings(tID);
+				currentPosting = tifr.getPostings(tID);
+				postings.add(currentPosting);
+				if (currentPosting.size() > minSize) {
+					minSize = currentPosting.size();
+					index = postings.size() - 1;
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		return null;
+		// Perform postings intersection starting from
+		// the shortest list
+		currentPosting = postings.get(index); 
+		tempPosting = new TreeSet<TermFrequencyPerFile>();
+		for (int i = 0; i < postings.size(); ++i) {
+			if (i != index) {
+				Iterator<TermFrequencyPerFile> iter0 =
+						currentPosting.descendingIterator();
+				Iterator<TermFrequencyPerFile> iter1 =
+						postings.get(i).descendingIterator();
+				TermFrequencyPerFile value0;
+				TermFrequencyPerFile value1;
+				while (iter0.hasNext() && iter1.hasNext()) {
+					value0 = iter0.next();
+					value1 = iter1.next();
+					if (value1.equals(value0)) {
+						tempPosting.add(value1);
+					}
+				}
+				if (!tempPosting.isEmpty()) {
+					currentPosting = tempPosting;
+					tempPosting = new TreeSet<TermFrequencyPerFile>();
+				} else {
+					// Exit intersection before no qualified document
+					// is left!
+					System.err.print("AND query on [ ");
+					for (String term: terms) {
+						System.err.print(term + " ");
+					}
+					System.err.println("] terminated at " + terms[i]);
+					break;
+				}
+			}
+		}
+		
+		// Get map result
+		for (TermFrequencyPerFile tfd: currentPosting) {
+			result.put(m_fileDict.getElementfromID(tfd.getDocID())
+					, tfd.getTermFrequency());
+		}
+		
+		return result;
 	}
 
 	/*
@@ -189,7 +243,31 @@ public class IndexFileReader implements IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> queryOR(String... terms) {
+		TreeSet<TermFrequencyPerFile> currentPosting =
+				new TreeSet<TermFrequencyPerFile>();
+		List<Integer> termIDs = new LinkedList<Integer>();
+		Map<String, Integer> result = new HashMap<String, Integer>();
 		
-		return null;
+		// Map terms to termIDs
+		for (String term: terms) {
+			termIDs.add(m_termDict.elementToID(term));
+		}
+		
+		// Get posting list for each term
+		for (int tID: termIDs) {
+			try {
+				currentPosting.addAll(tifr.getPostings(tID));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// Get map result
+		for (TermFrequencyPerFile tfd: currentPosting) {
+			result.put(m_fileDict.getElementfromID(tfd.getDocID())
+					, tfd.getTermFrequency());
+		}
+		
+		return result;
 	}
 }

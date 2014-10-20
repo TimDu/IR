@@ -49,7 +49,6 @@ public class IndexReader {
 			break;
 		}
 		m_indexDir = indexDir;
-
 	}
 
 	/**

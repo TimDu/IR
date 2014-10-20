@@ -26,7 +26,7 @@ public abstract class IndexReaderInterface {
 
 	public abstract Map<String, Integer> queryOR(String...terms);
 	
-	public void OpenFileDictionary()
+	public FileIndexDictionary OpenFileDictionary()
 			throws IOException,ClassNotFoundException {
 		BufferedInputStream fileIn = new BufferedInputStream(
 				new FileInputStream(Paths.get(m_indexDir,
@@ -36,5 +36,6 @@ public abstract class IndexReaderInterface {
 		
 		instream.close();
 		fileIn.close();
+		return m_fileDict;
 	}
 }

@@ -36,6 +36,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	protected int m_tempIndexNum = 0;
 	protected int m_currentInternalIndexNumber = 0;
 	protected double totalWords = 0;
+	protected boolean lastDocAlreadyProcessed = false;
 	final protected int m_maxMappingSize;
 
 	public TermIndexWriter(FileIndexDictionary fileDict, String indexPath) {
@@ -52,6 +53,21 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 	private TokenStream createTermStream(Document d, FieldNames type) {
 		Tokenizer tknizer = new Tokenizer();
 		TokenStream tstream = new TokenStream();
+		int newsDateOffset = 0;
+		if(d.getField(FieldNames.NEWSDATE) != null)
+		{
+			newsDateOffset = 8;
+		}
+		if(FieldNames.NEWSDATE == type)
+		{
+			tknizer.offsetTokenPositions(d.getField(FieldNames.TITLE).length);
+		}
+		else if(FieldNames.CONTENT == type)
+		{
+			// the title + 8 for the date if the newsdate is not null
+			tknizer.offsetTokenPositions(d.getField(FieldNames.TITLE).length + newsDateOffset);
+		}
+		
 		String[] arr = d.getField(type);
 		try {
 
@@ -59,7 +75,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 				if (s.isEmpty())
 					continue;
 				tstream.append(tknizer.consume(s));
-			}
+			} 
 
 		} catch (TokenizerException e) {
 			e.printStackTrace();
@@ -84,6 +100,11 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			assert (false);
 			e.printStackTrace();
 		}
+	}
+	
+	public boolean getLastDocProcessed()
+	{
+		return lastDocAlreadyProcessed;
 	}
 
 	private void writeTermDictionary() throws IOException {
@@ -123,8 +144,9 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 						+ " has no body!");
 			}
 		}
-		else
+		else if(fn == FieldNames.CONTENT)
 		{
+			lastDocAlreadyProcessed = true;
 			return;
 		}
 		
@@ -164,6 +186,8 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 				createTempIndex();
 			}
 		}
+		
+		lastDocAlreadyProcessed = false;
 
 	}
 
@@ -323,7 +347,10 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			}
 			
 			for (Integer i : lowestElements) {
-				 
+				if (!m_termIndex.containsKey(ifeArr[lowestElements.get(0)].getTermID())) {
+					m_termIndex.put(ifeArr[lowestElements.get(0)].getTermID(),
+							new BSBIPriorityQueue());
+				} 
 
 				m_termIndex.get(ifeArr[i].getTermID()).addAll(
 						ifeArr[i].getFileIDs());

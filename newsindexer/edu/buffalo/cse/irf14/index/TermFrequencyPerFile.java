@@ -11,9 +11,10 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 	protected TreeSet<Integer> m_posIndex;
 	protected final int oddFreq = 40;
 	protected boolean informed = false;
- 
+	
 
 	public int size() { 
+		//debugFunc();
 		return 2 + m_termFreq;
 	}
 	
@@ -44,6 +45,7 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 		m_posIndex = new TreeSet<Integer>();
 		addTerm(pos);
 		m_docID = fileID;  
+		//debugFunc();
 	}
 
 	public TermFrequencyPerFile(int fileID, int termFreq, TreeSet<Integer> pos) {
@@ -53,6 +55,7 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 		addAllTerms(pos);
 		m_docID = fileID;
 		m_termFreq = termFreq; 
+		//debugFunc();
 	}
 
 	public void addTerm(int pos) {
@@ -65,6 +68,7 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 		else{
 			m_termFreq++;
 		}
+		//debugFunc();
 		 
 	}
 
@@ -79,6 +83,7 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 		{
 			m_termFreq += posList.size();
 		}
+		//debugFunc();
 		 
 	}
 	
@@ -92,21 +97,25 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 			informed = true;
 		}
 		
-		if(m_termFreq == -1)
+		if(m_termFreq != m_posIndex.size())
 		{
 			System.out.println("Winner!");
 		}
 	}
 
 	public int getTermFrequency() {
+		//debugFunc();
 		return m_termFreq;
+		
 	}
 
 	public int getDocID() {
+		//debugFunc();
 		return m_docID;
 	}
 
 	public TreeSet<Integer> getPosIndex() {
+		//debugFunc();
 		return m_posIndex;
 	}
 

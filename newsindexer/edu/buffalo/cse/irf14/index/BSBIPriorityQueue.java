@@ -55,19 +55,21 @@ public class BSBIPriorityQueue extends TreeSet<TermFrequencyPerFile> {
     }
 	
 	
-	public void writeObject(BufferedOutputStream o) throws IOException {		 
+	public void writeObject(BufferedOutputStream o) throws IOException {	
+		//o.write(IndexerUtilityFunction.getByteArray(0xFADE0011));
 		o.write(IndexerUtilityFunction.getByteArray(size()));
+		
 		for (TermFrequencyPerFile entry : this) {
-			
+			//o.write(IndexerUtilityFunction.getByteArray(0xDEADBEEF));
 			o.write(IndexerUtilityFunction.getByteArray( entry.getDocID()));
 			byte[] rInt;
 			rInt = IndexerUtilityFunction.getByteArray( entry.getTermFrequency());
 			o.write(rInt);
-			int testCase = IndexerUtilityFunction.getInteger(rInt);
-			if(entry.getTermFrequency() == -2 ||  testCase == -2)
-			{
-				System.out.println("winner");
-			}
+			
+//			if(entry.getTermFrequency() == -2 ||  testCase == -2)
+//			{
+//				System.out.println("winner");
+//			}
 			assert entry.getTermFrequency() == entry.getPosIndex().size();
 			TreeSet<Integer> posIndex = entry.getPosIndex(); 
 			
@@ -81,9 +83,23 @@ public class BSBIPriorityQueue extends TreeSet<TermFrequencyPerFile> {
 	public void readObject(BufferedInputStream o) throws IOException,
 			ClassNotFoundException {
 		byte[] rInt = new byte[4];
+//		o.read(rInt);
+//		
+//		if(IndexerUtilityFunction.getInteger(rInt) != 0xFADE0011)
+//		{
+//			System.out.println("Deadbeef Winner");
+//		}
 		o.read(rInt);
 		int numFiles = IndexerUtilityFunction.getInteger(rInt);
+		
+		
 		for (int i = 0; i < numFiles; i++) {
+//			o.read(rInt); 
+//			 
+//			if(IndexerUtilityFunction.getInteger(rInt) != 0xDEADBEEF)
+//			{
+//				System.out.println("Deadbeef Winner");
+//			}
 			o.read(rInt); 
 			int docID = IndexerUtilityFunction.getInteger(rInt);
 			o.read(rInt); 

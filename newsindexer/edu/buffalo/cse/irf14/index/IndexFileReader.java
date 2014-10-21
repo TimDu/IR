@@ -39,12 +39,13 @@ public class IndexFileReader implements IndexReaderInterface {
 	}
 
 	protected void setup() {
-		tifr = new TermIndexFileReader(m_indexDir, m_indexName);
+		
 		m_termDict = new TermIndexDictionary();
 		m_fileDict = new FileIndexDictionary();
 
 		try {
 			OpenTermDictionary();
+			tifr = new TermIndexFileReader(m_indexDir, m_indexName, m_termDict);
 			OpenFileDictionary();
 			OpenFileStats();
 		} catch (IOException e) {

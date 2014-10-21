@@ -113,8 +113,14 @@ public class SearchRunner {
 					System.out.println(content + " ...");
 					System.out.println("\nScore: " + scoreMod.getTextScore(i));
 				}
-				System.out.println();
+			} else {
+				t1 = System.currentTimeMillis();
+				System.out.println("QUERY: " + userQuery);
+				System.out.printf("TIME USED: %5.3f seconds.", (t1 - t0) / 1000.0);
+				System.out.println("----------");
+				System.out.println("Empty result!");
 			}
+			System.out.println();
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		} catch (SearcherException e) {

@@ -59,7 +59,7 @@ public class Runner {
 
 		Document d = null;
 		IndexWriter writer = new IndexWriter(indexDir);
-		boolean readonly = true;
+		boolean readonly = false;
 		if (!readonly) {
 			long startTime = System.currentTimeMillis();
 			long stopTime = System.currentTimeMillis();
@@ -96,22 +96,38 @@ public class Runner {
 		}
 		readTest();
 	}
+	
+	static IndexReader termReader;
+	static IndexReader placeReader;
+	static IndexReader authorReader;
+	static IndexReader categoryReader;
 
 	public static void readTest() {
-		IndexReader termReader;
-		IndexReader placeReader;
-		IndexReader authorReader;
-		IndexReader categoryReader;
-
 		termReader = new IndexReader(indexDir, IndexType.TERM);
 		placeReader = new IndexReader(indexDir, IndexType.PLACE);
 		authorReader = new IndexReader(indexDir, IndexType.AUTHOR);
 		categoryReader = new IndexReader(indexDir, IndexType.CATEGORY);
 
+		
+		Map<String, Integer> map;
+		
+		map = GetAllPostings("Adobe");
+		if(map != null)
+		{
+			System.out.println("Adobe: " + map.keySet());
+		}
+		map = GetAllPostings("adobe");
+		if(map != null)
+		{
+			System.out.println("adobe: " + map.keySet());
+		}
+
+	}
+	
+	public static void baseReadTest()
+	{
 		System.out.println("term keys " + termReader.getTotalKeyTerms());
 		System.out.println("term values " + termReader.getTotalValueTerms());
-		Map<String, Integer> posts = termReader.getPostings("home");
- 
 
 		String query = getAnalyzer("home", FieldNames.CONTENT);
 		Map<String, Integer> map = termReader.getPostings(query);
@@ -142,11 +158,55 @@ public class Runner {
 		query = getAnalyzer("Reuter", FieldNames.AUTHORORG);
 		map = authorReader.getPostings(query);
 		System.out.println("Reuter: " + map.keySet());
+	}
+	
+	private static Map<String, Integer> GetAllPostings(String term)
+	{
+		HashMap<String, Integer> rmap = new HashMap<String, Integer>();
+		Map <String, Integer> map;
+		 
 		
-		query = getAnalyzer("Reuters", FieldNames.AUTHORORG);
+		String query = getAnalyzer(term, FieldNames.CONTENT);
+		map = termReader.getPostings(query);
+		
+		if(map != null)
+		{
+			rmap.putAll(map);
+		}
+		
+		query = getAnalyzer(term, FieldNames.AUTHOR);
 		map = authorReader.getPostings(query);
-		System.out.println("Reuters: " + map.size());
-
+		
+		if(map != null)
+		{
+			rmap.putAll(map);
+		}
+		
+		query = getAnalyzer(term, FieldNames.AUTHORORG);
+		map = authorReader.getPostings(query);
+		
+		if(map != null)
+		{
+			rmap.putAll(map);
+		}
+		
+		query = getAnalyzer(term, FieldNames.PLACE);
+		map = placeReader.getPostings(query);
+		
+		if(map != null)
+		{
+			rmap.putAll(map);
+		}
+		
+		query = getAnalyzer(term, FieldNames.CATEGORY);
+		map = categoryReader.getPostings(query);
+		
+		if(map != null)
+		{
+			rmap.putAll(map);
+		}
+		
+		return rmap;
 	}
 
 	private static String getAnalyzer(String string, FieldNames fn) {

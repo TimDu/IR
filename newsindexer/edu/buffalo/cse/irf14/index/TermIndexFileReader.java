@@ -44,7 +44,8 @@ public class TermIndexFileReader {
 				m_indexFileName);
 
 		assert (indexPath.toFile().exists());
-		RandomAccessFile raf = new RandomAccessFile(indexPath.toFile(), "rw");
+		RandomAccessFile raf = new RandomAccessFile(indexPath.toFile(), "r");
+		
 		
 		m_termID = termID;
 		// algorithm for getting a particular posting
@@ -145,7 +146,11 @@ public class TermIndexFileReader {
 			{
 				throw new IOException();
 			}
-			int numFileIDs = raf.readInt();
+			int numFileIDs = raf.readInt();  
+			if(numFileIDs == 6996)
+			{
+				System.out.println("Winner");
+			}
 			if (termIDread == m_termID) {
 
 				for (int j = 0; j < numFileIDs; j++) {
@@ -157,8 +162,16 @@ public class TermIndexFileReader {
 				{
 					// skip the document id
 					raf.skipBytes(4);
-					// get the total number of positions this term appears in that document 
-					int termFreqTotal = raf.readInt();
+					// get the total number of positions this term appears in that document
+					int termFreqTotal = 0;
+					try{
+					termFreqTotal = raf.readInt();
+					}
+					catch(IOException e)
+					{
+						System.out.println(e.toString());
+					}
+					
 					// skip over all those terms
 					raf.skipBytes(termFreqTotal * 4);
 				}

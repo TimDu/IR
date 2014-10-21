@@ -10,6 +10,7 @@ package edu.buffalo.cse.irf14.analysis;
 public class Tokenizer {
 	
 	private String delimiter;
+	private int tokenOffset = 0;
 	
 	/**
 	 * Default constructor. Assumes tokens are whitespace delimited
@@ -25,6 +26,11 @@ public class Tokenizer {
 	public Tokenizer(String delim) {
 		delimiter = delim;
 		delimiter = delimiter.replace("\\", "\\\\");
+	}
+	
+	public void offsetTokenPositions(int offset)
+	{
+		tokenOffset = offset;
 	}
 	
 	/**
@@ -55,7 +61,7 @@ public class Tokenizer {
 			tokens[i] = new Token();
 			tokens[i].setTermText(terms[i]);
 			tokens[i].setSentenceContainer(contSentence);
-			tokens[i].setPosition(i);
+			tokens[i].setPosition(i + tokenOffset);
 			
 			if (isSecondTerm) {
 				

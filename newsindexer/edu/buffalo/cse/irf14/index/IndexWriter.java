@@ -60,8 +60,12 @@ public class IndexWriter {
 		 */
 
 		m_tiw.performIndexLogic(d, FieldNames.CONTENT);
-		if (d.getField(FieldNames.NEWSDATE) != null) {
+		boolean addNewsAndTitle = !m_tiw.getLastDocProcessed();
+		if (d.getField(FieldNames.NEWSDATE) != null && addNewsAndTitle) {
 			m_tiw.performIndexLogic(d, FieldNames.NEWSDATE);
+		}
+		if (d.getField(FieldNames.TITLE) != null && addNewsAndTitle) {
+			m_tiw.performIndexLogic(d, FieldNames.TITLE);
 		}
 		if (d.getField(FieldNames.PLACE) != null) {
 			m_piw.performIndexLogic(d, FieldNames.PLACE);

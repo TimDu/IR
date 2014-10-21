@@ -89,7 +89,7 @@ public class SearchRunner {
 
 		try {
 			// Search unranked list
-			posting = searcher.search(query);
+			posting = searcher.search(query);long t2 = System.currentTimeMillis();
 			if (posting.size() > 0) {
 				// Rank searched list
 				scoreMod = getRankedModel(query, model, posting);
@@ -97,7 +97,7 @@ public class SearchRunner {
 				t1 = System.currentTimeMillis();
 				// Print result
 				System.out.println("QUERY: " + userQuery);
-				System.out.printf("TIME USED: %5.3f seconds.", (t1 - t0) / 1000.0);
+				System.out.printf("TIME USED: %5.3f seconds.\n", (t1 - t0) / 1000.0);
 				System.out.println("----------");
 				for (int i = 0; i < k; ++i) {
 					String path = Paths.get(
@@ -261,7 +261,7 @@ public class SearchRunner {
 			postingList.add(temp.getDocID());
 		}
 		scoreMod.setDocuments(postingList);
-		scoreMod = new RankingManager(crawler, scoreMod, indexDir).run();
+		scoreMod = new RankingManager(crawler, scoreMod, indexDir, exe).run();
 		
 		return scoreMod;
 	}

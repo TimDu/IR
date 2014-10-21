@@ -68,14 +68,14 @@ public class OrProxy implements Callable<TreeSet<TermFrequencyPerFile>> {
 					terms.add(strTerm);
 				} else {
 					futureList.add(exe.submit(
-									new AndWorker(indexDir, type, terms)));
+									new OrWorker(indexDir, type, terms)));
 					terms.clear();
 					type = term.getIndex(i);
 					terms.add(strTerm);
 				}
 			}
 		}
-		futureList.add(exe.submit(new AndWorker(indexDir, type, terms)));
+		futureList.add(exe.submit(new OrWorker(indexDir, type, terms)));
 		
 		// Collect step
 		for (Future<TreeSet<TermFrequencyPerFile>> future: futureList) {

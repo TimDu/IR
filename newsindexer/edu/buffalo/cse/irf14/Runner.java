@@ -104,7 +104,7 @@ public class Runner {
 		
 		SearchRunner runner = new SearchRunner(indexDir, ipDir, 'Q', null);
 		System.out.println(ScoringModel.TFIDF);
-		runner.query(query1, ScoringModel.TFIDF);
+		//runner.query(query1, ScoringModel.TFIDF);
 		System.out.println(ScoringModel.OKAPI);
 		runner.query(query1, ScoringModel.OKAPI);
 		runner.close();

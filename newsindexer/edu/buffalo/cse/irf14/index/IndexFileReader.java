@@ -25,8 +25,9 @@ public class IndexFileReader implements IndexReaderInterface {
 	/**
 	 * Hacked constructor for getting file dictionary
 	 */
-	public IndexFileReader() {
+	public IndexFileReader(String indexDir) {
 		// Hacked
+		m_indexDir = indexDir;
 	}
 	
 	public IndexFileReader(String indexDir, String indexName, String dictName) {
@@ -71,15 +72,16 @@ public class IndexFileReader implements IndexReaderInterface {
 		return m_fileDict;
 	}
 
-	protected void OpenFileStats() throws IOException, ClassNotFoundException {
+	public double OpenFileStats() throws IOException, ClassNotFoundException {
 		BufferedInputStream fileIn = new BufferedInputStream(
 				new FileInputStream(Paths.get(m_indexDir,
 						IndexGlobalVariables.statsFileName).toString()));
 		ObjectInputStream instream = new ObjectInputStream(fileIn);
 		m_avgDocLength = instream.readDouble();
-		System.out.println("m_avgDocLength: " + m_avgDocLength);
+		//System.out.println("m_avgDocLength: " + m_avgDocLength);
 		instream.close();
 		fileIn.close();
+		return m_avgDocLength;
 	}
 
 	protected void OpenTermDictionary() throws IOException,

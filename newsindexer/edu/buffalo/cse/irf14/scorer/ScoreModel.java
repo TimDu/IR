@@ -43,7 +43,7 @@ public abstract class ScoreModel {
 	 * Method that runs the algorithm for current query
 	 * term.
 	 */
-	public abstract void run();
+	protected abstract void run();
 	
 	/**
 	 * Set document ID collection. And do some clean works
@@ -52,16 +52,20 @@ public abstract class ScoreModel {
 	 * @param docIDs collection of document IDs
 	 */
 	public void setDocuments(List<Integer> docIDs) {
-		docTermFreqs.clear();
 		if (!(docIDs instanceof ArrayList)) {
 			this.docIDs = new ArrayList<Integer>(docIDs);
 		} else {
 			this.docIDs = docIDs;
 		}
-		scores.clear();
 		for (int i = 0; i < this.docIDs.size(); ++i) {
 			scores.add(0.0);
 		}
+	}
+	
+	public void clear() {
+		docIDs.clear();
+		scores.clear();
+		docTermFreqs.clear();
 	}
 	
 	/**
@@ -70,7 +74,7 @@ public abstract class ScoreModel {
 	 * @param docID document IDs
 	 * @param termFreq document term frequency
 	 */
-	public void setDocTermFreq(int docID, long termFreq) {
+	protected void setDocTermFreq(int docID, long termFreq) {
 		docTermFreqs.put(docID, termFreq);
 	}
 	
@@ -79,7 +83,7 @@ public abstract class ScoreModel {
 	 * 
 	 * @param termFreq query term frequency
 	 */
-	public void setQueryTermFreq(long termFreq) {
+	protected void setQueryTermFreq(long termFreq) {
 		queryTermFreq = termFreq;
 	}
 	
@@ -88,8 +92,12 @@ public abstract class ScoreModel {
 	 * 
 	 * @param docFreq document frequency
 	 */
-	public void setDocFreq(long docFreq) {
+	protected void setDocFreq(long docFreq) {
 		this.docFreq = docFreq;
+	}
+	
+	protected List<Integer> getDocIDs() {
+		return docIDs;
 	}
 	
 	/**
@@ -127,19 +135,6 @@ public abstract class ScoreModel {
 	 */
 	public List<Integer> getRankedList() {
 		return rank();
-	}
-	
-	/**
-	 * Set score to a document.<br>
-	 * <b>NOTE:</b> It is assumed that each score in the list
-	 * has a corresponding document ID in another list at the
-	 * same position.
-	 * 
-	 * @param index position index in score list
-	 * @param score a given score
-	 */
-	protected void setScore(int index, double score) {
-		scores.set(index, score);
 	}
 
 	/**

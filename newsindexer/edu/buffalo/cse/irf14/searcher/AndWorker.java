@@ -17,10 +17,12 @@ import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
 class AndWorker implements Callable<TreeSet<TermFrequencyPerFile>> {
 
 	private IndexReader reader;
+	private String indexDir;
 	private String []terms;
 	
 	public AndWorker(String indexDir, IndexType type
 			, List<String> terms) {
+		this.indexDir = indexDir;
 		reader = new IndexReader(indexDir, type);
 		this.terms = terms.toArray(new String[terms.size()]);
 	}
@@ -37,7 +39,7 @@ class AndWorker implements Callable<TreeSet<TermFrequencyPerFile>> {
 		
 		for (String fID: temp.keySet()) {
 			tfpf  = new TermFrequencyPerFile(
-							new IndexFileReader().OpenFileDictionary()
+							new IndexFileReader(indexDir).OpenFileDictionary()
 							.elementToID(fID), temp.get(fID));
 			result.add(tfpf);
 		}

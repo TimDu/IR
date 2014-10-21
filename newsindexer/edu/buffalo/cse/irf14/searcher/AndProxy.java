@@ -58,17 +58,21 @@ public class AndProxy implements Callable<TreeSet<TermFrequencyPerFile>> {
 		for (Clause cl: clauses) {
 			Term term = (Term)cl.getComponent();
 			for (int i = 0; i < term.size(); ++i) {
+				String strTerm = term.getTerm(i);
+				if (strTerm.startsWith("\"") && strTerm.endsWith("\"")) {
+					strTerm = strTerm.substring(1, strTerm.length() - 1);
+				}
 				if (type == null) {
 					type = term.getIndex(i);
-					terms.add(term.getTerm(i));
+					terms.add(strTerm);
 				} else if (type.equals(term.getIndex(i))) {
-					terms.add(term.getTerm(i));
+					terms.add(strTerm);
 				} else {
 					futureList.add(exe.submit(
 									new AndWorker(indexDir, type, terms)));
 					terms.clear();
 					type = term.getIndex(i);
-					terms.add(term.getTerm(i));
+					terms.add(strTerm);
 				}
 			}
 		}

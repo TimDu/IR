@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,18 +15,18 @@ import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
-import edu.buffalo.cse.irf14.index.IndexReader;
+import edu.buffalo.cse.irf14.index.IndexFileReader;
 import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
-import edu.buffalo.cse.irf14.query.Clause;
-import edu.buffalo.cse.irf14.query.Operator;
 import edu.buffalo.cse.irf14.query.Query;
 import edu.buffalo.cse.irf14.query.QueryParser;
-import edu.buffalo.cse.irf14.query.Term;
+import edu.buffalo.cse.irf14.query.TermCrawler;
+import edu.buffalo.cse.irf14.scorer.Okapi;
+import edu.buffalo.cse.irf14.scorer.RankingManager;
+import edu.buffalo.cse.irf14.scorer.ScoreModel;
+import edu.buffalo.cse.irf14.scorer.TFIDF;
 import edu.buffalo.cse.irf14.searcher.EndlessSearcher;
 import edu.buffalo.cse.irf14.searcher.SearcherException;
-import edu.buffalo.cse.irf14.searcher.AndProxy;
 
 /**
  * Main class to run the searcher.
@@ -71,21 +72,23 @@ public class SearchRunner {
 		//TODO: IMPLEMENT THIS METHOD
 		Query query = QueryParser.parse(userQuery, null);
 		TreeSet<TermFrequencyPerFile> posting;
+		ScoreModel scoreMod;
 
-		// Step 1, get relevant documents
 		try {
+			// Search unranked list
 			posting = searcher.search(query);
-		} catch (SearcherException | InterruptedException
-				| ExecutionException e) {
-			// TODO Auto-generated catch block
+			// Rank searched list
+			scoreMod = getRankedModel(query, model, posting);
+			// Print result
+			
+		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
-		}
-		
-		// Step 2, rank document list
-		if (model.equals(ScoringModel.TFIDF)) {
-			
-		} else if (model.equals(ScoringModel.OKAPI)) {
-			
+		} catch (SearcherException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -191,5 +194,32 @@ public class SearchRunner {
 	public List<String> getCorrections() {
 		//TODO: IMPLEMENT THIS METHOD IFF SPELLCHECK EXECUTED
 		return null;
+	}
+	
+	private ScoreModel getRankedModel(Query query
+			, ScoringModel model, TreeSet<TermFrequencyPerFile> posting)
+					throws ClassNotFoundException, IOException {
+		List<Integer> postingList =	new LinkedList<Integer>();
+		
+		ScoreModel scoreMod = null;
+		TermCrawler crawler = new TermCrawler(query);
+		if (model.equals(ScoringModel.TFIDF)) {
+			scoreMod = new TFIDF(
+					new IndexFileReader(indexDir)
+					.OpenFileDictionary().size());
+		} else if (model.equals(ScoringModel.OKAPI)) {
+			scoreMod = new Okapi(new IndexFileReader(indexDir)
+					.OpenFileDictionary().size()
+					, new IndexFileReader(indexDir).OpenFileStats());
+		}
+		Iterator<TermFrequencyPerFile> iter = posting.iterator();
+		while (iter.hasNext()) {
+			TermFrequencyPerFile temp = iter.next();
+			postingList.add(temp.getDocID());
+		}
+		scoreMod.setDocuments(postingList);
+		scoreMod = new RankingManager(crawler, scoreMod, indexDir).run();
+		
+		return scoreMod;
 	}
 }

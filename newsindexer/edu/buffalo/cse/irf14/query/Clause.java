@@ -1,7 +1,6 @@
 package edu.buffalo.cse.irf14.query;
 
 import edu.buffalo.cse.irf14.index.IndexType;
-import edu.buffalo.cse.irf14.query.QueryComponent.QueryType;
 
 /**
  * Class that represents a clause in a query.

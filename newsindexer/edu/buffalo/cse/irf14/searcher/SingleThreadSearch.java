@@ -9,7 +9,6 @@ import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
 import edu.buffalo.cse.irf14.query.Clause;
 import edu.buffalo.cse.irf14.query.Operator;
 import edu.buffalo.cse.irf14.query.Query;
-import edu.buffalo.cse.irf14.query.QueryComponent.QueryType;
 import edu.buffalo.cse.irf14.query.Term;
 
 public class SingleThreadSearch {
@@ -89,7 +88,7 @@ public class SingleThreadSearch {
 	}
 
 	public TreeSet<TermFrequencyPerFile> andRecurse(Clause input1, Clause input2) {
-		if (input2.getComponent().getType() == QueryType.Term) {
+		if (!input2.isQuery()) {
 			return intersect(getClausePosting(input1),
 					getTermPosting((Term) input2.getComponent()));
 		} else {
@@ -103,7 +102,7 @@ public class SingleThreadSearch {
 	}
 
 	public TreeSet<TermFrequencyPerFile> getClausePosting(Clause input) {
-		if (input.getComponent().getType() == QueryType.Term) {
+		if (!input.isQuery()) {
 			return getTermPosting((Term) input.getComponent());
 		}
 		Query q = (Query) input.getComponent();

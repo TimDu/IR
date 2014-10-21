@@ -42,17 +42,16 @@ public class QueryParserTest {
 		results.add("{ Term:test AND [ <Term:easy> OR <Term:clean> ] }");
 
 		testAdd("A B C D", "{ Term:A OR Term:B OR Term:C OR Term:D }");
-		testAdd("(A OR (B AND (D C E F))) C D",
-				"{ [ Term:A OR [ Term:B AND [ Term:D OR Term:C OR Term:E OR Term:F ]" +
-		"] ] OR [ Term:C OR Term:D ]}");
+		//testAdd("A B (C NOT D)",
+		//"{ Term:A OR Term:B OR [ Term:C AND <TERM:D>]}");
 		testAdd("(A OR B OR C OR D) AND ((E AND F) OR (G AND H)) "
 				+ "AND ((I OR J OR K) AND (L OR M OR N OR O)) AND "
 				+ "(P OR (Q OR (R OR (S AND T))))", 
-				"[ Term:A OR Term:B OR Term:C OR Term:D ] AND "+
-				"[ [Term:E AND Term:F ] OR [ Term: G AND Term: H ] ] " +
+				"{ [ Term:A OR Term:B OR Term:C OR Term:D ] AND "+
+				"[ [ Term:E AND Term:F ] OR [ Term:G AND Term:H ] ] " +
 				"AND [ [ Term:I OR Term:J OR Term:K ] AND " + 
 				"[ Term:L OR Term:M OR Term:N OR Term:O ] ] AND " +
-				"[ Term:P OR [Term:Q OR [Term:R OR [Term:S AND T]]]]");
+				"[ Term:P OR [ Term:Q OR [ Term:R OR [ Term:S AND Term:T ] ] ] ] }");
 
 	}
 

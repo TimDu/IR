@@ -1,7 +1,6 @@
 package edu.buffalo.cse.irf14.query;
 
 import edu.buffalo.cse.irf14.index.IndexType;
-import edu.buffalo.cse.irf14.query.QueryComponent.QueryType;
 
 /**
  * A component in a clause, which stores the term content.
@@ -14,7 +13,6 @@ public class Term extends QueryComponent {
 	private IndexType []indexes;
 	
 	public Term(IndexType index, String content) {
-		m_queryType = QueryType.Term;
 		if (!content.startsWith("\"") && !content.endsWith("\"")) {
 			// This is group of terms
 			String []segs = content.split(" ");

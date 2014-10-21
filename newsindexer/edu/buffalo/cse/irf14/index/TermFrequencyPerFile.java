@@ -11,7 +11,7 @@ public class TermFrequencyPerFile implements Comparable<TermFrequencyPerFile> {
 	protected TreeSet<Integer> m_posIndex;
 	protected final int oddFreq = 40;
 	protected boolean informed = false;
- 
+	
 
 	public int size() { 
 		//debugFunc();

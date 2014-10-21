@@ -59,7 +59,7 @@ public class Runner {
 
 		Document d = null;
 		IndexWriter writer = new IndexWriter(indexDir);
-		boolean readonly = false;
+		boolean readonly = true;
 		if (!readonly) {
 			long startTime = System.currentTimeMillis();
 			long stopTime = System.currentTimeMillis();
@@ -121,6 +121,8 @@ public class Runner {
 		{
 			System.out.println("adobe: " + map.keySet());
 		}
+		
+		baseReadTest();
 
 	}
 	

@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.Vector;
 
 public class TermIndexDictionary extends IndexDictionary implements
@@ -16,13 +17,14 @@ public class TermIndexDictionary extends IndexDictionary implements
 	 * 
 	 */
 	private static final long serialVersionUID = -1504994408982239030L;
-
+	protected HashMap<Integer, TreeSet<Integer>> m_termSyn;
 	protected HashMap<Integer, Integer> m_termCount;
 	protected TopListings m_termSortedCount;
 
 	public TermIndexDictionary() {
 		m_termCount = new HashMap<Integer, Integer>();
 		m_termSortedCount = null;
+		m_termSyn = new HashMap<Integer, TreeSet<Integer>>();
 	}
 
 	@Override
@@ -51,10 +53,40 @@ public class TermIndexDictionary extends IndexDictionary implements
 		}
 		return -1;
 	}
+	
+	protected TreeSet<Integer> getSimilarTerms(int termID)
+	{
+		if(m_termSyn.containsKey(termID))
+		{
+			return m_termSyn.get(termID);
+		}
+		return null;
+	}
 
 	public int AddGetElementToID(String element) {
+		
 		int id = super.elementToID(element);
 		increaseTermOccurence(id);
+		
+		if(element.contains(" "))
+		{
+			String[] results = element.split(" ");
+			if(!m_termSyn.containsKey(id))
+			{
+				m_termSyn.put(id, new TreeSet<Integer>());
+			}
+			for(String i: results)
+			{
+				int tempElement = super.elementToID(i);
+				m_termSyn.get(id).add(tempElement);
+				if(!m_termSyn.containsKey(tempElement))
+				{
+					m_termSyn.put(tempElement, new TreeSet<Integer>());
+				}
+				m_termSyn.get(tempElement).add(id);
+			}
+		}
+		
 		return id;
 	}
 
@@ -67,6 +99,7 @@ public class TermIndexDictionary extends IndexDictionary implements
 		o.writeObject(m_termCount);
 		o.writeObject(m_idDict);
 		o.writeObject(m_elementDict);
+		o.writeObject(m_termSyn);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -76,6 +109,7 @@ public class TermIndexDictionary extends IndexDictionary implements
 		m_termCount = (HashMap<Integer, Integer>) o.readObject();
 		m_idDict = (HashMap<Integer, String>) o.readObject();
 		m_elementDict = (HashMap<String, Integer>) o.readObject();
+		m_termSyn =  (HashMap<Integer, TreeSet<Integer>>) o.readObject();
 		for (Map.Entry<Integer, Integer> entry : m_termCount.entrySet()) {
 			m_termSortedCount.insertSorted(new TermIndexDictionaryElement(
 					entry.getKey(), entry.getValue()));

@@ -27,35 +27,43 @@ public class TermIndexFileReader {
 	protected long m_offsetValue;
 	protected long m_termID;
 	protected String m_indexFileName;
-	
+	protected TermIndexDictionary m_termDic;
 
-	public TermIndexFileReader(String indexPath, String indexFileName) {
+	public TermIndexFileReader(String indexPath, String indexFileName,
+			TermIndexDictionary tid) {
 		m_indexPath = indexPath;
 		m_indexFileName = indexFileName;
-		
+		m_termDic = tid;
 		m_maxEntries = 0;
 		m_offsetValue = 0L;
 	}
-	
-	 
 
-	public TreeSet<TermFrequencyPerFile> getPostings(int termID) throws IOException {
-		Path indexPath = Paths.get(m_indexPath,
-				m_indexFileName);
+	public TreeSet<TermFrequencyPerFile> getPostings(int termID)
+			throws IOException {
+		Path indexPath = Paths.get(m_indexPath, m_indexFileName);
 
 		assert (indexPath.toFile().exists());
 		RandomAccessFile raf = new RandomAccessFile(indexPath.toFile(), "r");
-		
-		
+
 		m_termID = termID;
 		// algorithm for getting a particular posting
 		// 1. Find the chunk containing the term ID
 		long offset = FindChunkOffset(raf, indexPath);
 
 		// 2. Search within the chunk containing the term ID for the posting
-		 
-		 
-		return FindTermInChunk(raf, offset); 
+		TreeSet<TermFrequencyPerFile> results = FindTermInChunk(raf, offset);
+
+		TreeSet<Integer> simTerms = m_termDic.getSimilarTerms(termID);
+		if (simTerms != null) {
+			for (int i : simTerms) {
+				raf = new RandomAccessFile(indexPath.toFile(), "r");
+				m_termID = i;
+				offset = FindChunkOffset(raf, indexPath);
+				results.addAll(FindTermInChunk(raf, offset));
+			}
+		}
+
+		return results;
 	}
 
 	private long FindChunkOffset(RandomAccessFile raf, Path indexPath)
@@ -75,15 +83,12 @@ public class TermIndexFileReader {
 		// Repeat until the chunk that bounds the term id is found.
 		long offset = RecurseFindChunk(raf, 0, m_maxEntries - 1);
 
-		 
-
 		return offset;
 	}
 
 	private long RecurseFindChunk(RandomAccessFile raf, int firstChunk,
 			int lastChunk) throws IOException {
-		
-		
+
 		// if the input term id is greater than the last go to the chunk
 		// in between the middle and the last, e.g. (N/2 + N)/2
 		//
@@ -94,8 +99,7 @@ public class TermIndexFileReader {
 		int middleChunk = (firstChunk + lastChunk) / 2;
 		raf.seek(4 + middleChunk * (Long.SIZE / 8));
 		long minOffset = raf.readLong();
-		if(firstChunk == lastChunk)
-		{
+		if (firstChunk == lastChunk) {
 			return minOffset;
 		}
 		long maxOffset = raf.readLong();
@@ -127,28 +131,23 @@ public class TermIndexFileReader {
 		// id's match, if not, seek 4*#FileIDs bytes to get to the next term.
 		// Rinse and repeat.
 		raf.seek(offset);
-		
+
 		TreeSet<TermFrequencyPerFile> retVal = new TreeSet<TermFrequencyPerFile>();
 		int numTermIDs = raf.readInt();
 		int termIDread = 0;
-		
+
 		for (int i = 0; i < numTermIDs; i++) {
-			try{
-			termIDread = raf.readInt();
-			}
-			catch(IOException e)
-			{
+			try {
+				termIDread = raf.readInt();
+			} catch (IOException e) {
 				e.printStackTrace();
-				
+
+				throw new IOException();
+			} catch (Exception e) {
 				throw new IOException();
 			}
-			catch(Exception e)
-			{
-				throw new IOException();
-			}
-			int numFileIDs = raf.readInt();  
-			if(numFileIDs == 6996)
-			{
+			int numFileIDs = raf.readInt();
+			if (numFileIDs == 6996) {
 				System.out.println("Winner");
 			}
 			if (termIDread == m_termID) {
@@ -158,20 +157,18 @@ public class TermIndexFileReader {
 				}
 			} else {
 				// file id is paired with term frequency, two integers = 8 bytes
-				for(int k = 0; k < numFileIDs; k++)
-				{
+				for (int k = 0; k < numFileIDs; k++) {
 					// skip the document id
 					raf.skipBytes(4);
-					// get the total number of positions this term appears in that document
+					// get the total number of positions this term appears in
+					// that document
 					int termFreqTotal = 0;
-					try{
-					termFreqTotal = raf.readInt();
-					}
-					catch(IOException e)
-					{
+					try {
+						termFreqTotal = raf.readInt();
+					} catch (IOException e) {
 						System.out.println(e.toString());
 					}
-					
+
 					// skip over all those terms
 					raf.skipBytes(termFreqTotal * 4);
 				}
@@ -180,21 +177,19 @@ public class TermIndexFileReader {
 		raf.close();
 		return retVal;
 	}
-	
-	
-	protected TermFrequencyPerFile readTermFrequencyData(RandomAccessFile raf) throws IOException
-	{
-		//new TermFrequencyPerFile(raf.readInt(), raf.readInt(), null) 
+
+	protected TermFrequencyPerFile readTermFrequencyData(RandomAccessFile raf)
+			throws IOException {
+		// new TermFrequencyPerFile(raf.readInt(), raf.readInt(), null)
 		int docID = raf.readInt();
 		int freqTerm = raf.readInt();
-		
-		TreeSet<Integer> posIndex = new TreeSet<Integer>(); 
-		
-		for(int j = 0; j < freqTerm; j++)
-		{ 
+
+		TreeSet<Integer> posIndex = new TreeSet<Integer>();
+
+		for (int j = 0; j < freqTerm; j++) {
 			posIndex.add(raf.readInt());
-		} 
-		
+		}
+
 		return new TermFrequencyPerFile(docID, freqTerm, posIndex);
 	}
 }

@@ -1,6 +1,7 @@
 package edu.buffalo.cse.irf14.query;
 
 import edu.buffalo.cse.irf14.index.IndexType;
+import edu.buffalo.cse.irf14.query.QueryComponent.QueryType;
 
 /**
  * Class that represents a clause in a query.
@@ -17,6 +18,7 @@ public class Clause {
 	private Operator defaultOP;
 	
 	public Clause (Operator op, Operator sOP) {
+		 
 		isFirst = false;
 		index = IndexType.TERM;
 		component = null;

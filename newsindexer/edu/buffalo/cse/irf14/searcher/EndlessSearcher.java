@@ -30,10 +30,18 @@ public class EndlessSearcher {
 	
 	private ExecutorService exe;
 	private String indexDir;
+	private SingleThreadSearch sts;
 
 	public EndlessSearcher(ExecutorService exe, String indexDir) {
 		this.exe = exe;
 		this.indexDir = indexDir;
+		sts = new SingleThreadSearch(indexDir);
+	}
+	
+	public TreeSet<TermFrequencyPerFile> searchNoThread(Query query)
+	throws SearcherException, InterruptedException, ExecutionException
+	{
+		return sts.search(query);
 	}
 	
 	/**

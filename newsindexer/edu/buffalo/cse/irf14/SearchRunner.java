@@ -90,7 +90,7 @@ public class SearchRunner {
 
 		try {
 			// Search unranked list
-			posting = searcher.search(query);
+			posting = searcher.searchNoThread(query);
 			IndexFileReader ifr = new IndexFileReader(indexDir);
 			FileIndexDictionary fid = ifr.OpenFileDictionary();
 			System.out.println("Unranked results: " + userQuery);

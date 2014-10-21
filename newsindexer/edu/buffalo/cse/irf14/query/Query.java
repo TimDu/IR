@@ -26,6 +26,7 @@ public class Query extends QueryComponent {
 		raw = content; 
 		clauses = new LinkedList<Clause>();
 		isOriginal = isOrg;
+		m_queryType = QueryType.Query;
 	}
 	
 	@Override
@@ -146,7 +147,9 @@ public class Query extends QueryComponent {
 			query = clauses.get(0).toString();
 			
 			for (int i = 1; i < clauses.size(); ++i) {
-				query += " " + clauses.get(i).toString();
+				String connector = (defaultOP == null)
+						? "OR " : defaultOP.name() + " ";
+				query += " " + connector + clauses.get(i).toString();
 			}
 			// Eliminate unnecessary column pair
 			if (clauses.size() == 1) {

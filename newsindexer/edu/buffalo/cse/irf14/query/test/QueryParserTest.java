@@ -2,48 +2,76 @@ package edu.buffalo.cse.irf14.query.test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.buffalo.cse.irf14.query.QueryParser;
 
 public class QueryParserTest {
-	
-	private static String []userQuery;
-	private static String []result;
+
+	private static ArrayList<String> userQuery;
+	private static ArrayList<String> results;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		userQuery = new String[9];
-		result = new String[9];
-		userQuery[0] = "hello";
-		userQuery[1] = "hello world";
-		userQuery[2] = "\"hello world\"";
-		userQuery[3] = "orange AND yellow";
-		userQuery[4] = "(black OR blue) AND bruises";
-		userQuery[5] = "Author:rushdie NOT jihad";
-		userQuery[6] = "Category:War AND Author:Dutt AND Place:Baghdad AND prisoners detainees rebels";
-		userQuery[7] = "(Love NOT War) AND Category:(movies NOT crime)";
-		userQuery[8] = "test NOT (easy AND clean)";
+		userQuery = new ArrayList<String>();
+		results = new ArrayList<String>();
+		userQuery.add("hello");
+		userQuery.add("hello world");
+		userQuery.add("\"hello world\"");
+		userQuery.add("orange AND yellow");
+		userQuery.add("(black OR blue) AND bruises");
+		userQuery.add("Author:rushdie NOT jihad");
+		userQuery.add("Category:War AND Author:Dutt "
+				+ "AND Place:Baghdad AND prisoners detainees rebels");
+		userQuery.add("(Love NOT War) AND Category:(movies NOT crime)");
+		userQuery.add("test NOT (easy AND clean)");
 
-		
-		result[0] = "{ Term:hello }";
-		result[1] = "{ Term:hello OR Term:world }";
-		result[2] = "{ Term:\"hello world\" }";
-		result[3] = "{ Term:orange AND Term:yellow }";
-		result[4] = "{ [ Term:black OR Term:blue ] AND Term:bruises }";
-		result[5] = "{ Author:rushdie AND <Term:jihad> }";
-		result[6] = "{ Category:War AND Author:Dutt AND Place:Baghdad AND [ Term:prisoners OR Term:detainees OR Term:rebels ] }";
-		result[7] = "{ [ Term:Love AND <Term:War> ] AND [ Category:movies AND <Category:crime> ] }";
-		result[8] = "{ Term:test AND [ <Term:easy> OR <Term:clean> ] }";
+		results.add("{ Term:hello }");
+		results.add("{ Term:hello OR Term:world }");
+		results.add("{ Term:\"hello world\" }");
+		results.add("{ Term:orange AND Term:yellow }");
+		results.add("{ [ Term:black OR Term:blue ] AND Term:bruises }");
+		results.add("{ Author:rushdie AND <Term:jihad> }");
+		results.add("{ Category:War AND Author:Dutt AND "
+				+ "Place:Baghdad AND [ Term:prisoners OR "
+				+ "Term:detainees OR Term:rebels ] }");
+		results.add("{ [ Term:Love AND <Term:War> ] AND [ Category:movies AND <Category:crime> ] }");
+		results.add("{ Term:test AND [ <Term:easy> OR <Term:clean> ] }");
 
+		testAdd("A B C D", "{ Term:A OR Term:B OR Term:C OR Term:D }");
+		testAdd("(A OR (B AND (D C E F))) C D",
+				"{ [ Term:A OR [ Term:B AND [ Term:D OR Term:C OR Term:E OR Term:F ]" +
+		"] ] OR [ Term:C OR Term:D ]}");
+		testAdd("(A OR B OR C OR D) AND ((E AND F) OR (G AND H)) "
+				+ "AND ((I OR J OR K) AND (L OR M OR N OR O)) AND "
+				+ "(P OR (Q OR (R OR (S AND T))))", 
+				"[ Term:A OR Term:B OR Term:C OR Term:D ] AND "+
+				"[ [Term:E AND Term:F ] OR [ Term: G AND Term: H ] ] " +
+				"AND [ [ Term:I OR Term:J OR Term:K ] AND " + 
+				"[ Term:L OR Term:M OR Term:N OR Term:O ] ] AND " +
+				"[ Term:P OR [Term:Q OR [Term:R OR [Term:S AND T]]]]");
+
+	}
+
+	protected static void testAdd(String query, String result) {
+		userQuery.add(query);
+		results.add(result);
 	}
 
 	@Test
 	public void test() {
-		for (int i = 0; i < 9; ++i) {
-			System.out.println(result[i]);
-			assertEquals(result[i], QueryParser.parse(userQuery[i], null).toString());
+		for (int i = 0; i < userQuery.size(); ++i) {
+			System.out.print("User Query Raw: ");
+			System.out.println(userQuery.get(i));
+			System.out.print("User Query Parsed: ");
+			System.out.println(QueryParser.parse(userQuery.get(i), null).toString());
+			System.out.print("Expected Result: ");
+			System.out.println(results.get(i));
+			assertEquals(results.get(i),
+					QueryParser.parse(userQuery.get(i), null).toString());
 		}
 		System.out.println("PASSED.");
 	}

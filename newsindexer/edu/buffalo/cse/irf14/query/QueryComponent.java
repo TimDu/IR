@@ -13,7 +13,17 @@ public abstract class QueryComponent {
 	protected Operator defaultOP;
 	protected Operator startOP;	// true if this component follows with 'NOT'
 	protected boolean begin;	// true if this component starts a query
-
+	
+	public enum QueryType {
+	      Term, Query 
+	}
+	
+	protected QueryType m_queryType;
+	
+	public QueryType getType()
+	{
+		return m_queryType;
+	}
 	
 	public IndexType getIndex() {
 		return index;

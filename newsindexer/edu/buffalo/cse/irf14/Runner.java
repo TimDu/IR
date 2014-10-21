@@ -137,11 +137,24 @@ public class Runner {
 		
 		baseReadTest();
 		
-		map = GetAllPostings("controlling interest");
-		if(map != null)
-		{
-			System.out.println("controlling interest: " + map.keySet());
-		}
+		String query = getAnalyzer("Washington", FieldNames.PLACE);
+		map = placeReader.getPostings(query);
+		System.out.println("Washington: " + map.keySet());
+		
+		query = getAnalyzer("federal", FieldNames.CONTENT);
+		map = termReader.getPostings(query);
+		System.out.println("federal: " + map.keySet());
+		
+		query = getAnalyzer("treasury", FieldNames.CONTENT);
+		map = termReader.getPostings(query);
+		System.out.println("treasury: " + map.keySet());
+		
+		
+//		map = GetAllPostings("controlling interest");
+//		if(map != null)
+//		{
+//			System.out.println("controlling interest: " + map.keySet());
+//		}
 		
 		
 

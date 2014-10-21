@@ -25,6 +25,7 @@ import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 import edu.buffalo.cse.irf14.document.Parser;
 import edu.buffalo.cse.irf14.document.ParserException;
+import edu.buffalo.cse.irf14.index.FileIndexDictionary;
 import edu.buffalo.cse.irf14.index.IndexFileReader;
 import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
 import edu.buffalo.cse.irf14.query.Query;
@@ -89,7 +90,18 @@ public class SearchRunner {
 
 		try {
 			// Search unranked list
-			posting = searcher.search(query);long t2 = System.currentTimeMillis();
+			posting = searcher.search(query);
+			IndexFileReader ifr = new IndexFileReader(indexDir);
+			FileIndexDictionary fid = ifr.OpenFileDictionary();
+			System.out.println("Unranked results: " + userQuery);
+			 
+			for(TermFrequencyPerFile tfpf: posting)
+			{
+				String fileName = fid.getElementfromID(tfpf.getDocID());
+				System.out.print(fileName + ", ");
+			}
+			System.out.println();
+			long t2 = System.currentTimeMillis();
 			if (posting.size() > 0) {
 				// Rank searched list
 				scoreMod = getRankedModel(query, model, posting);
@@ -99,11 +111,14 @@ public class SearchRunner {
 				System.out.println("QUERY: " + userQuery);
 				System.out.printf("TIME USED: %5.3f seconds.\n", (t1 - t0) / 1000.0);
 				System.out.println("----------");
-				for (int i = 0; i < k; ++i) {
+				
+				
+				for (int i = 0; i < result.size() && i < k; ++i) {
+					String fileName = fid.getElementfromID(result.get(i));
+					String firstCategory = fid.getCategories(fileName).get(0);
+					
 					String path = Paths.get(
-							corpusDir, new IndexFileReader(indexDir)
-							.OpenFileDictionary().getElementfromID(
-									result.get(i))).toString();
+							corpusDir, firstCategory, fileName).toString();
 					Document doc = Parser.parse(path);
 					String content = doc.getField(FieldNames.CONTENT)[0];
 					content = content.substring(0, content.indexOf('.'));

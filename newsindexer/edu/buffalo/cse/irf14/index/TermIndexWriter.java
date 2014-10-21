@@ -146,6 +146,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		}
 		else if(fn == FieldNames.CONTENT)
 		{
+			m_fileDict.addCategory(d);
 			lastDocAlreadyProcessed = true;
 			return;
 		}

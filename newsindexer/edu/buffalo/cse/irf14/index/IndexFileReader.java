@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class IndexFileReader implements IndexReaderInterface {
@@ -71,6 +72,11 @@ public class IndexFileReader implements IndexReaderInterface {
 
 		instream.close();
 		fileIn.close();
+		return m_fileDict;
+	}
+	
+	public FileIndexDictionary getFileDictionary()
+	{
 		return m_fileDict;
 	}
 
@@ -146,7 +152,7 @@ public class IndexFileReader implements IndexReaderInterface {
 		if ((m_termDict == null) && !m_termDict.exists(term)) {
 			return null;
 		}
-		Map<String, Integer> retVal = new HashMap<String, Integer>();
+		Map<String, Integer> retVal = new TreeMap<String, Integer>();
 
 		try {
 

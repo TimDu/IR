@@ -251,10 +251,12 @@ public class IndexFileReader implements IndexReaderInterface {
 						value1 = iter1.next();
 					}
 				}
-				if (value1.getDocID() == value0.getDocID()) {
-					tempPosting.add(value1);
-					value0 = iter0.next();
-					value1 = iter1.next();
+				if ((value1 != null) && (value0 != null)) {
+					if (value1.getDocID() == value0.getDocID()) {
+						tempPosting.add(value1);
+						value0 = iter0.next();
+						value1 = iter1.next();
+					}
 				}
 				
 				if (!tempPosting.isEmpty()) {

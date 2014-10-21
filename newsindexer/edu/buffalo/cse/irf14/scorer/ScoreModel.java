@@ -25,6 +25,7 @@ import java.util.Map;
 public abstract class ScoreModel {
 
 	private DecimalFormat decimal;
+	private boolean isRanked;
 	protected long totalDocNum;
 	protected long docFreq;
 	protected long queryTermFreq;
@@ -33,6 +34,7 @@ public abstract class ScoreModel {
 	protected List<Double> scores;
 	
 	public ScoreModel() {
+		isRanked = false;
 		decimal = new DecimalFormat("#.#####");
 		docIDs = null;
 		docTermFreqs = new HashMap<Integer, Long>(30);
@@ -134,7 +136,20 @@ public abstract class ScoreModel {
 	 * @return ranked document ID list
 	 */
 	public List<Integer> getRankedList() {
-		return rank();
+		if (isRanked) {
+			return docIDs;
+		} else {
+			return rank();
+		}
+	}
+	
+	public List<Integer> getFirstK(int k) {
+		k = (k > docIDs.size()) ? docIDs.size() : k;
+		if (isRanked) {
+			return docIDs.subList(0, k);
+		} else {
+			return rank().subList(0, k);
+		}
 	}
 
 	/**
@@ -194,5 +209,6 @@ public abstract class ScoreModel {
 				}
 			}
 		}
+		isRanked = true;
 	}
 }

@@ -13,7 +13,7 @@ public class Okapi extends ScoreModel {
 	private double k1;
 	private double b;
 	private double k3;
-	private Map<Integer, Long> docLength;	// Map of documents length
+	private Map<Integer, Integer> docLength;	// Map of documents length
 	
 	/**
 	 * Constructor.
@@ -26,7 +26,7 @@ public class Okapi extends ScoreModel {
 		k1 = 1.2;
 		k3 = 2.0;
 		b = 0.75;
-		this.docLength = new HashMap<Integer, Long>(30);
+		this.docLength = new HashMap<Integer, Integer>(30);
 		this.totalDocNum = totalDocNum;
 		this.avgDocLen = avgDocLen;
 	}
@@ -59,7 +59,7 @@ public class Okapi extends ScoreModel {
 	 * @param id document ID
 	 * @param len document length
 	 */
-	protected void setDocLength(int id, long len) {
+	protected void setDocLength(int id, int len) {
 		this.docLength.put(id, len);
 	}
 

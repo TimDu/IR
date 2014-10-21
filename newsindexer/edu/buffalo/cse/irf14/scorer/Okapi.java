@@ -1,7 +1,6 @@
 package edu.buffalo.cse.irf14.scorer;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +9,7 @@ import java.util.Map;
  */
 public class Okapi extends ScoreModel {
 
-	private long avgDocLen;
+	private double avgDocLen;
 	private double k1;
 	private double b;
 	private double k3;
@@ -22,7 +21,7 @@ public class Okapi extends ScoreModel {
 	 * @param totalDocNum total number of documents
 	 * @param avgDocLen average document length
 	 */
-	public Okapi (long totalDocNum, long avgDocLen) {
+	public Okapi (long totalDocNum, double avgDocLen) {
 		super();
 		k1 = 1.2;
 		k3 = 2.0;
@@ -40,15 +39,16 @@ public class Okapi extends ScoreModel {
 	 * @param b document length scaling factor
 	 * @param k3 query frequency scaling factor
 	 */
-	public void setParameters(double k1, double b, double k3) {
+	public Okapi setParameters(double k1, double b, double k3) {
 		this.k1 = k1;
 		this.b = b;
 		this.k3 = k3;
+		return this;
 	}
 
 	@Override
-	public void setDocuments(List<Integer> docIDs) {
-		super.setDocuments(docIDs);
+	public void clear() {
+		super.clear();
 		docLength.clear();
 	}
 	
@@ -59,7 +59,7 @@ public class Okapi extends ScoreModel {
 	 * @param id document ID
 	 * @param len document length
 	 */
-	public void setDocLength(int id, long len) {
+	protected void setDocLength(int id, long len) {
 		this.docLength.put(id, len);
 	}
 

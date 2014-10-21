@@ -222,7 +222,7 @@ public class EndlessSearcher {
 		
 		for (String fID: temp.keySet()) {
 			tfpf  = new TermFrequencyPerFile(
-							new IndexFileReader().OpenFileDictionary()
+							new IndexFileReader(indexDir).OpenFileDictionary()
 							.elementToID(fID), temp.get(fID));
 			result.add(tfpf);
 		}

@@ -2,15 +2,16 @@ package edu.buffalo.cse.irf14.scorer.test;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.buffalo.cse.irf14.scorer.Okapi;
+import edu.buffalo.cse.irf14.scorer.ScoreModel;
 
 public class OkapiTest {
 
@@ -18,15 +19,46 @@ public class OkapiTest {
 	final private static int avgDocLen = 7;
 	private static Okapi okapi;
 	private static List<Integer> docIDs;
+
+	private static Method method1 = null;
+	private static Method method2 = null;
+	private static Method method3 = null;
+	private static Method method4 = null;
 	
 	@BeforeClass
 	public static void setupBeforeClass() {
-		
+		try {
+			method1 = Okapi.class.getDeclaredMethod("setDocLength", Integer.class, Integer.class);
+			method2 = ScoreModel.class.getDeclaredMethod("setDocFreq", Long.class);
+			method3 = ScoreModel.class.getDeclaredMethod("setDocTermFreq", Integer.class, Long.class);
+			method4 = ScoreModel.class.getDeclaredMethod("setQueryTermFreq", Long.class);
+		} catch (NoSuchMethodException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		method1.setAccessible(true);
+		method2.setAccessible(true);
+		method3.setAccessible(true);
+		method4.setAccessible(true);
 		okapi = new Okapi(3 * docNum, avgDocLen);
 		docIDs = new LinkedList<Integer>();
 		for (int i = 0; i < docNum; ++i) {
 			docIDs.add(i);
-			okapi.setDocLength(i, (7 * (i + 1) + 2) % 11);
+			try {
+				method1.invoke(okapi, i, (7 * (i + 1) + 2) % 11);
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		okapi.setDocuments(docIDs);
 	}
@@ -49,10 +81,21 @@ public class OkapiTest {
 	}
 	
 	private void setup(long df, long tfd, long tfq) {
-		okapi.setDocFreq(df);
-		for (int i = 0; i < docNum; ++i) {
-			okapi.setDocTermFreq(i, (tfd * (3 + i)) % 7);
+		try {
+			method2.invoke(okapi, df);
+			for (int i = 0; i < docNum; ++i) {
+				method3.invoke(okapi, i, (tfd * (3 + i)) % 7);
+			}
+			method4.invoke(okapi, tfq);
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		okapi.setQueryTermFreq(tfq);
 	}
 }

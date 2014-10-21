@@ -114,6 +114,8 @@ public class EndlessSearcher {
 				}
 			}
 		}
+		assignAllWorks(andAndClauses, andOrClauses
+				, orAndClauses, orOrClauses, andSets, orSets);
 		
 		// Wait for AND set result
 		for (Future<TreeSet<TermFrequencyPerFile>> future: andSets) {
@@ -129,7 +131,7 @@ public class EndlessSearcher {
 		for (TreeSet<TermFrequencyPerFile> set: subOrSet) {
 			result.addAll(set);
 		}
-		
+
 		// Exclude NOT queries
 		result.removeAll(subNotSet);
 		
@@ -159,7 +161,8 @@ public class EndlessSearcher {
 		// Find the minimum sized set
 		for (int i = 0; i < sets.size(); ++i) {
 			if (index < 0) {
-				index = sets.get(i).size();
+				index = i;
+				size = sets.get(i).size();
 			} else {
 				if (sets.get(i).size() < size) {
 					index = i;

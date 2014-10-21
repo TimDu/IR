@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import edu.buffalo.cse.irf14.SearchRunner.ScoringModel;
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
@@ -94,7 +95,19 @@ public class Runner {
 			System.out.println("Elapsed time was " + (stopTime - startTime)
 					+ " miliseconds.");
 		}
-		readTest();
+		//readTest();
+		queryTest();
+	}
+	
+	public static void queryTest() {
+		String query1 = "place:washington AND federal treasury";
+		
+		SearchRunner runner = new SearchRunner(indexDir, ipDir, 'Q', null);
+		System.out.println(ScoringModel.TFIDF);
+		//runner.query(query1, ScoringModel.TFIDF);
+		System.out.println(ScoringModel.OKAPI);
+		runner.query(query1, ScoringModel.OKAPI);
+		runner.close();
 	}
 	
 	static IndexReader termReader;
@@ -138,6 +151,8 @@ public class Runner {
 	{
 		System.out.println("term keys " + termReader.getTotalKeyTerms());
 		System.out.println("term values " + termReader.getTotalValueTerms());
+		Map<String, Integer> posts = termReader.getPostings("manhattan");
+		System.out.println(posts.keySet());
 
 		String query = getAnalyzer("home", FieldNames.CONTENT);
 		Map<String, Integer> map = termReader.getPostings(query);

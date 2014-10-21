@@ -1,12 +1,17 @@
 package edu.buffalo.cse.irf14;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Paths;
+import java.sql.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +21,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import edu.buffalo.cse.irf14.document.Document;
+import edu.buffalo.cse.irf14.document.FieldNames;
+import edu.buffalo.cse.irf14.document.Parser;
+import edu.buffalo.cse.irf14.document.ParserException;
 import edu.buffalo.cse.irf14.index.IndexFileReader;
 import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
 import edu.buffalo.cse.irf14.query.Query;
@@ -73,14 +82,45 @@ public class SearchRunner {
 		Query query = QueryParser.parse(userQuery, null);
 		TreeSet<TermFrequencyPerFile> posting;
 		ScoreModel scoreMod;
+		List<Integer> result;
+		final int k = 10;
+		long t0 = System.currentTimeMillis();
+		long t1;
 
 		try {
 			// Search unranked list
-			posting = searcher.search(query);
-			// Rank searched list
-			scoreMod = getRankedModel(query, model, posting);
-			// Print result
-			
+			posting = searcher.search(query);long t2 = System.currentTimeMillis();
+			if (posting.size() > 0) {
+				// Rank searched list
+				scoreMod = getRankedModel(query, model, posting);
+				result = scoreMod.getFirstK(k);
+				t1 = System.currentTimeMillis();
+				// Print result
+				System.out.println("QUERY: " + userQuery);
+				System.out.printf("TIME USED: %5.3f seconds.\n", (t1 - t0) / 1000.0);
+				System.out.println("----------");
+				for (int i = 0; i < k; ++i) {
+					String path = Paths.get(
+							corpusDir, new IndexFileReader(indexDir)
+							.OpenFileDictionary().getElementfromID(
+									result.get(i))).toString();
+					Document doc = Parser.parse(path);
+					String content = doc.getField(FieldNames.CONTENT)[0];
+					content = content.substring(0, content.indexOf('.'));
+					
+					System.out.println((k + 1) + "." 
+							+ doc.getField(FieldNames.TITLE)[0] + "\n");
+					System.out.println(content + " ...");
+					System.out.println("\nScore: " + scoreMod.getTextScore(i));
+				}
+			} else {
+				t1 = System.currentTimeMillis();
+				System.out.println("QUERY: " + userQuery);
+				System.out.printf("TIME USED: %5.3f seconds.", (t1 - t0) / 1000.0);
+				System.out.println("----------");
+				System.out.println("Empty result!");
+			}
+			System.out.println();
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		} catch (SearcherException e) {
@@ -88,6 +128,8 @@ public class SearchRunner {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (ParserException e) {
 			e.printStackTrace();
 		}
 	}
@@ -140,6 +182,7 @@ public class SearchRunner {
 			}
 			
 			// Rank document list
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (NumberFormatException e) {
@@ -218,7 +261,7 @@ public class SearchRunner {
 			postingList.add(temp.getDocID());
 		}
 		scoreMod.setDocuments(postingList);
-		scoreMod = new RankingManager(crawler, scoreMod, indexDir).run();
+		scoreMod = new RankingManager(crawler, scoreMod, indexDir, exe).run();
 		
 		return scoreMod;
 	}

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 public class TermIndexFileReader {
@@ -37,6 +39,63 @@ public class TermIndexFileReader {
 		m_maxEntries = 0;
 		m_offsetValue = 0L;
 	}
+	
+	public TreeSet<TermFrequencyPerFile> getPostings(ArrayList<Integer> termIDs) throws IOException
+	{
+		TreeSet<TermFrequencyPerFile> retVal = new TreeSet<TermFrequencyPerFile>(); 
+		ArrayList<TreeSet<TermFrequencyPerFile>> retSet = new ArrayList<TreeSet<TermFrequencyPerFile>>();
+		for(int i = 0; i < termIDs.size(); i++)
+		{
+			//retSet.
+			retSet.add(getPostings(termIDs.get(i)));
+		}
+		
+		for(TermFrequencyPerFile tfpf: retSet.get(0))
+		{
+			TreeSet<Integer> posIndex = tfpf.getPosIndex();
+			for(Integer i: posIndex)
+			{
+				
+				if(checkTermOrder(retSet.subList(1, retSet.size()), i + 1, tfpf.getDocID()))
+				{
+					retVal.add(tfpf);
+				}
+			}
+		}
+		
+		
+		return retVal;
+	}
+	
+	private boolean checkTermOrder(List<TreeSet<TermFrequencyPerFile>> docArr, int pos, int fileID)
+	{
+		if(docArr == null || docArr.size() == 0)
+		{
+			return false;
+		}
+		
+		for(TermFrequencyPerFile tfpf: docArr.get(0))
+		{
+			if(tfpf.getDocID() != fileID)
+			{
+				continue;
+			}
+			TreeSet<Integer> posIndex = tfpf.getPosIndex();
+			for(Integer i: posIndex)
+			{
+				if(i == pos)
+				{
+					if(docArr.size() == 1)
+					{
+						return true;
+					}
+					return checkTermOrder(docArr.subList(1, docArr.size()), i + 1, fileID); 
+				}
+			}
+		}
+		
+		return false;
+	}
 
 	public TreeSet<TermFrequencyPerFile> getPostings(int termID)
 			throws IOException {
@@ -44,7 +103,8 @@ public class TermIndexFileReader {
 
 		assert (indexPath.toFile().exists());
 		RandomAccessFile raf = new RandomAccessFile(indexPath.toFile(), "r");
-
+		
+		
 		m_termID = termID;
 		// algorithm for getting a particular posting
 		// 1. Find the chunk containing the term ID

@@ -43,7 +43,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 		m_termIndex = new BSBITreeMap();
 		m_termDict = new TermIndexDictionary();
 		m_fileDict = fileDict;
-		m_maxMappingSize = 100000;
+		m_maxMappingSize = 1000;
 		m_indexPath = indexPath;
 		m_indexName = IndexGlobalVariables.termIndexFileName;
 		m_dictName = IndexGlobalVariables.termDicFileName; 
@@ -347,10 +347,7 @@ public class TermIndexWriter implements PerformIndexWriterLogic {
 			}
 			
 			for (Integer i : lowestElements) {
-				if (!m_termIndex.containsKey(ifeArr[lowestElements.get(0)].getTermID())) {
-					m_termIndex.put(ifeArr[lowestElements.get(0)].getTermID(),
-							new BSBIPriorityQueue());
-				} 
+				 
 
 				m_termIndex.get(ifeArr[i].getTermID()).addAll(
 						ifeArr[i].getFileIDs());

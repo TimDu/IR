@@ -111,18 +111,26 @@ public class Runner {
 		
 		Map<String, Integer> map;
 		
-		map = GetAllPostings("Adobe");
-		if(map != null)
-		{
-			System.out.println("Adobe: " + map.keySet());
-		}
-		map = GetAllPostings("adobe");
-		if(map != null)
-		{
-			System.out.println("adobe: " + map.keySet());
-		}
+//		map = GetAllPostings("Adobe");
+//		if(map != null)
+//		{
+//			System.out.println("Adobe: " + map.keySet());
+//		}
+//		map = GetAllPostings("adobe");
+//		if(map != null)
+//		{
+//			System.out.println("adobe: " + map.keySet());
+//		}
 		
 		baseReadTest();
+		
+		map = GetAllPostings("controlling interest");
+		if(map != null)
+		{
+			System.out.println("controlling interest: " + map.keySet());
+		}
+		
+		
 
 	}
 	
@@ -231,7 +239,12 @@ public class Runner {
 			stream = analyzer.getStream();
 
 			stream.reset();
-			return stream.next().toString();
+			String retStr =stream.next().toString();
+			while(stream.hasNext())
+			{
+				retStr = retStr + " " + stream.next().toString();
+			}
+			return retStr;
 		} catch (TokenizerException e) {
 			e.printStackTrace();
 		}

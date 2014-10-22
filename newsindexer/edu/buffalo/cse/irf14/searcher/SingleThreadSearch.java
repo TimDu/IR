@@ -91,8 +91,14 @@ public class SingleThreadSearch {
 				case NOTAND:
 				case NOTOR:
 				case NOT:
-					// shouldn't have these at this point
-					debugAssert(false);
+					
+					result = except(result, tfpf);
+					if(  tempOp == Operator.NOTOR)
+					{
+						// shouldn't have these at this point
+						System.out.println(tempOp);
+						debugAssert(false);
+					}
 					break;
 				default:
 					System.out.println("error, bad operator");

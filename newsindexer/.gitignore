@@ -2,3 +2,5 @@
 /indexing/
 /test.txt
 /result.txt
+*.class
+*.orig

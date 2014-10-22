@@ -138,21 +138,21 @@ public class Runner {
 	
 	public static void queryTest() {
 		ArrayList<String> qList = new ArrayList<String>();
-		qList.add("author:\"Patti Domm\" AND american express");
-		qList.add("author:minkwoski OR disney");
+		//qList.add("author:\"Patti Domm\" AND american express");
+		qList.add("author:mankowski OR disney");
 		qList.add("author:miller OR miller");
 		qList.add("place:tokyo NOT bank");
-		qList.add("place:Washington AND federal treasury");
+		qList.add("place:washington AND federal treasury");
 		qList.add("french economy employment government policies");
 		String query2 = "adob";
 		String query1 = "place:Washington AND federal treasury";
 		
 		
 		SearchRunner runner = new SearchRunner(indexDir, ipDir, 'Q', null);
-		System.out.println(ScoringModel.TFIDF);
-		runner.query(query1, ScoringModel.TFIDF);
-		System.out.println(ScoringModel.OKAPI);
-		runner.query(query1, ScoringModel.OKAPI);
+//		System.out.println(ScoringModel.TFIDF);
+//		runner.query(query1, ScoringModel.TFIDF);
+//		System.out.println(ScoringModel.OKAPI);
+//		runner.query(query1, ScoringModel.OKAPI);
 		for(String q: qList)
 		{
 			System.out.println("Query: " + q);

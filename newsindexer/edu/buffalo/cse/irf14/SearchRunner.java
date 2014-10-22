@@ -90,10 +90,9 @@ public class SearchRunner {
 
 		try {
 			// Search unranked list
-			posting = searcher.searchNoThread(query);
+			posting = searcher.search(query);
 			IndexFileReader ifr = new IndexFileReader(indexDir);
 			FileIndexDictionary fid = ifr.OpenFileDictionary();
-			System.out.println("Unranked results: " + userQuery);
 			 
 			for(TermFrequencyPerFile tfpf: posting)
 			{
@@ -101,7 +100,7 @@ public class SearchRunner {
 				System.out.print(fileName + ", ");
 			}
 			System.out.println();
-			long t2 = System.currentTimeMillis();
+
 			if (posting.size() > 0) {
 				// Rank searched list
 				scoreMod = getRankedModel(query, model, posting);
@@ -110,7 +109,7 @@ public class SearchRunner {
 				// Print result
 				System.out.println("QUERY: " + userQuery);
 				System.out.printf("TIME USED: %5.3f seconds.\n", (t1 - t0) / 1000.0);
-				System.out.println("----------");
+				System.out.println();
 				
 				
 				for (int i = 0; i < result.size() && i < k; ++i) {
@@ -121,12 +120,25 @@ public class SearchRunner {
 							corpusDir, firstCategory, fileName).toString();
 					Document doc = Parser.parse(path);
 					String content = doc.getField(FieldNames.CONTENT)[0];
-					content = content.substring(0, content.indexOf('.'));
+					String temp = new String();
+					String []seg = content.substring(
+							0, content.indexOf('.')).split(" ");
+					content = "";
+					for (int j = 0; j < seg.length; ++j) {
+						content += seg[j] + " ";
+						temp += seg[j];
+						if (temp.length() > 50) {
+							temp = new String();
+							content += "\n";
+						}
+					}
 					
-					System.out.println((k + 1) + "." 
-							+ doc.getField(FieldNames.TITLE)[0] + "\n");
-					System.out.println(content + " ...");
-					System.out.println("\nScore: " + scoreMod.getTextScore(i));
+					System.out.println((i + 1) + "." 
+							+ doc.getField(FieldNames.TITLE)[0]);
+					System.out.println("------------");
+					System.out.println(content.trim() + " ...");
+					System.out.println("Score: " + scoreMod.getTextScore(i));
+					System.out.println();
 				}
 			} else {
 				t1 = System.currentTimeMillis();

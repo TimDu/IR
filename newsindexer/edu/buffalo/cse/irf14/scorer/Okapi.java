@@ -74,16 +74,22 @@ public class Okapi extends ScoreModel {
 	@Override
 	public void run() {
 		double tempScore;
-		for (int i = 0; i < docIDs.size(); ++i) {
-			tempScore = scores.get(i);
-			tempScore += (Math.log10(totalDocNum) - Math.log10(docFreq))
-					* ((k1 + 1) * docTermFreqs.get(docIDs.get(i))
-					/ (k1 * (1 - b + b * (docLength.get(docIDs.get(i))
-					/ avgDocLen)) + docTermFreqs.get(docIDs.get(i))))
-					* ((k3 + 1) * queryTermFreq / (k3 + queryTermFreq));
-			scores.set(i, tempScore);
-			if (tempScore > maxScore) {
-				maxScore = tempScore;
+		if (docFreq > 0) {
+			for (int i = 0; i < docIDs.size(); ++i) {
+				if ((docTermFreqs.get(docIDs.get(i)) > 0)) {
+					double docScore = (Math.log10(totalDocNum - docFreq + 0.5)
+							- Math.log10(docFreq + 0.5))
+							* ((k1 + 1) * docTermFreqs.get(docIDs.get(i))
+							/ (k1 * (1 - b + b * (docLength.get(docIDs.get(i))
+							/ avgDocLen)) + docTermFreqs.get(docIDs.get(i))))
+							* ((k3 + 1) * queryTermFreq / (k3 + queryTermFreq));
+					tempScore = scores.get(i);
+					tempScore += docScore;
+					scores.set(i, tempScore);
+					if (tempScore > maxScore) {
+						maxScore = tempScore;
+					}
+				}
 			}
 		}
 	}

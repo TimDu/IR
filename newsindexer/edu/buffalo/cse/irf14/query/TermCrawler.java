@@ -42,7 +42,7 @@ public class TermCrawler {
 				Term term = (Term)temp.getComponent();
 				for (int j = 0; j < term.size(); ++j) {
 					if (termFreqs.containsKey(term.getTerm(j))) {
-						termFreqs.put(term.getTerm(j), termFreqs.get(term) + 1);
+						termFreqs.put(term.getTerm(j), termFreqs.get(term.getTerm(j)) + 1);
 					} else {
 						termFreqs.put(term.getTerm(j), 1);
 						termTypes.put(term.getTerm(j), term.getIndex(j));

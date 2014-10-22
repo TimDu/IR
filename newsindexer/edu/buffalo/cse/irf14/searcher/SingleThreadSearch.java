@@ -2,7 +2,6 @@ package edu.buffalo.cse.irf14.searcher;
 
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
@@ -12,7 +11,6 @@ import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.FieldNames;
 import edu.buffalo.cse.irf14.index.FileIndexDictionary;
 import edu.buffalo.cse.irf14.index.IndexFileReader;
-import edu.buffalo.cse.irf14.index.IndexGlobalVariables;
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.TermFrequencyPerFile;
@@ -219,7 +217,7 @@ public class SingleThreadSearch {
 		}
 	}
 	
-	private static String getAnalyzer(String string, FieldNames fn) {
+	protected static String getAnalyzer(String string, FieldNames fn) {
 		Tokenizer tknizer = new Tokenizer();
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		try {

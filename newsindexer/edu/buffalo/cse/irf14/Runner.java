@@ -102,8 +102,8 @@ public class Runner {
 					+ " miliseconds.");
 		}
 		//readTest();
-		//queryTest();
-		queryFile("test.txt", "result.txt");
+		queryTest();
+		//queryFile("test.txt", "result.txt");
 	}
 	
 	public static void queryFile(String source, String dest) {
@@ -145,8 +145,7 @@ public class Runner {
 		qList.add("place:tokyo NOT bank");
 		qList.add("place:washington AND federal treasury");
 		qList.add("french economy employment government policies");
-		String query2 = "adob";
-		String query1 = "place:Washington AND federal treasury";
+		String query1 = "adobe";
 		
 		SearchRunner runner = new SearchRunner(indexDir, ipDir, 'Q', null);
 		System.out.println(ScoringModel.TFIDF);

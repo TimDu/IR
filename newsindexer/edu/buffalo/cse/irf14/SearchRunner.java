@@ -107,7 +107,6 @@ public class SearchRunner {
 				// Print result 
 				System.out.printf("TIME USED: %5.3f seconds.\n", (t1 - t0) / 1000.0);
 				System.out.println();
-				return;
 			}
 
 			if (posting.size() > 0) {
@@ -131,7 +130,7 @@ public class SearchRunner {
 					String content = doc.getField(FieldNames.CONTENT)[0];
 					String temp = new String();
 					String []seg = content.substring(0
-							, (content.length() > 200)
+							, (content.length() < 200)
 							? content.length() : 200).split(" ");
 					if(content.length() == 0)
 					{
@@ -194,7 +193,7 @@ public class SearchRunner {
 		TreeSet<TermFrequencyPerFile> posting;
 		ScoreModel scoreMod;
 		List<Integer> tempResult = null;
-				
+		
 		try {
 			BufferedReader reader = new BufferedReader(
 					new FileReader(queryFile));
@@ -218,7 +217,10 @@ public class SearchRunner {
 				line = line.substring(line.indexOf(':') + 2);
 				line = line.substring(0, line.length() - 1);
 				queryID.add(elements[0]);
-				queryList.add(QueryParser.parse(line, null));
+				Query q = QueryParser.parse(line, null);
+				if (q != null) {
+					queryList.add(q);
+				}
 			}
 			reader.close();
 			
@@ -229,16 +231,6 @@ public class SearchRunner {
 				//posting = searcher.search(queryList.get(i));
 				posting = searcher.searchNoThread(queryList.get(i));
 				// Rank document list
-				/* IndexFileReader ifr = new IndexFileReader(indexDir);
-				FileIndexDictionary fid = ifr.OpenFileDictionary();
-				
-				for(TermFrequencyPerFile tfpf: posting)
-				{
-					String fileName = fid.getElementfromID(tfpf.getDocID());
-					System.out.print(fileName + ", ");
-				}
-				System.out.println();
-				*/
 				if (posting.size() > 0) {
 					// Rank searched list
 					scoreMod = getRankedModel(queryList.get(i)

@@ -29,11 +29,8 @@ public class SingleThreadSearch {
 	}
 
 	public TreeSet<TermFrequencyPerFile> search(Query query) {
-		Clause firstClause = query.getClause(0);
-		Clause secondClause = query.getClause(1);
 		// query.addClause(clause, op, startOP, isBegin)
-		TreeSet<TermFrequencyPerFile> result = generalClauseRecurse(
-				firstClause, secondClause);
+		TreeSet<TermFrequencyPerFile> result = generalQueryRecurse(query);
 		return result;
 	}
 
@@ -59,55 +56,59 @@ public class SingleThreadSearch {
 		return result;
 	}
 
-	private TreeSet<TermFrequencyPerFile> generalClauseRecurse(Query input) {
-//		TreeSet<TermFrequencyPerFile> result = null;
-//		if (input != null) {
-//
-//			if (input.get() == Operator.AND
-//					|| secondClause.getStartOP() == Operator.NOTAND) {
-//				result = andRecurse(firstClause, secondClause);
-//			} else if (secondClause.getStartOP() == Operator.OR) {
-//				result = orRecurse(firstClause, secondClause);
-//			} else {
-//				System.out.println("Got Not OR, we shouldn't get that! "
-//						+ secondClause.toString());
-//				result = null;
-//			}
-//
-//		}
-//		return result;
-		return null;
-	}
-
-	public TreeSet<TermFrequencyPerFile> andRecurse(Query input) {
-		return null;
-	}
-
-	public TreeSet<TermFrequencyPerFile> orRecurse(Query input) {
-		return null;
-	}
-
-	public TreeSet<TermFrequencyPerFile> andRecurse(Clause input1, Clause input2) {
-		if (!input2.isQuery()) {
-			return intersect(getClausePosting(input1),
-					getTermPosting((Term) input2.getComponent()));
-		} else {
-			return intersect(getClausePosting(input1), getClausePosting(input2));
+	private TreeSet<TermFrequencyPerFile> generalQueryRecurse(Query input) {
+		if (input == null || input.size() == 0) {
+			return null;
 		}
-
-	}
-
-	public TreeSet<TermFrequencyPerFile> orRecurse(Clause input, Clause input2) {
+		Operator clauseOp = input.getClause(0).getStartOP() == null ? input
+				.getClause(0).getDefaultOP() : input.getClause(0).getStartOP();
+		TreeSet<TermFrequencyPerFile> result = new TreeSet<TermFrequencyPerFile>();
+		for (int i = 0; i < input.size(); i++) {
+			Clause temp = input.getClause(i);
+			TreeSet<TermFrequencyPerFile> tfpf = getClausePosting(temp);
+			
+			Operator tempOp = temp.getStartOP() == null ? temp.getDefaultOP()
+					: temp.getStartOP();
+//			if(tempOp == Operator.NOT || 
+//					tempOp == Operator.NOTAND ||
+//					tempOp == Operator.NOTOR)
+//			{
+//				debugAssert (input.size() == 2);
+//			}
+			
+			if (result.size() != 0) {
+				switch (tempOp) {
+				case AND:
+					debugAssert (clauseOp.equals(Operator.AND));
+					result = intersect(result, tfpf);
+					break;
+				case OR:
+					debugAssert (clauseOp.equals(Operator.OR));
+					result = join(result, tfpf);
+					break;
+				case NOTAND:
+				case NOTOR:
+				case NOT:
+					// shouldn't have these at this point
+					debugAssert (false);
+					break;
+				default:
+					System.out.println("error, bad operator");
+				}
+			} else {
+				result.addAll(tfpf);
+			}
+		}
 		return null;
 	}
-
+  
 	public TreeSet<TermFrequencyPerFile> getClausePosting(Clause input) {
 		if (!input.isQuery()) {
 			return getTermPosting((Term) input.getComponent());
 		}
 		Query q = (Query) input.getComponent();
 		if (q.size() > 1) {
-			return generalClauseRecurse(q.getClause(0), q.getClause(1));
+			return generalQueryRecurse(q);
 		}
 		if (q.size() == 0) {
 			System.out.println("clause contained no terms or queries!");
@@ -119,6 +120,11 @@ public class SingleThreadSearch {
 	public TreeSet<TermFrequencyPerFile> getTermPosting(Term input) {
 		return null;
 	}
+	
+	public TreeSet<TermFrequencyPerFile> except(
+			TreeSet<TermFrequencyPerFile> op1, TreeSet<TermFrequencyPerFile> op2) {
+		return null;
+	}
 
 	public TreeSet<TermFrequencyPerFile> intersect(
 			TreeSet<TermFrequencyPerFile> op1, TreeSet<TermFrequencyPerFile> op2) {
@@ -128,6 +134,17 @@ public class SingleThreadSearch {
 	public TreeSet<TermFrequencyPerFile> join(
 			TreeSet<TermFrequencyPerFile> op1, TreeSet<TermFrequencyPerFile> op2) {
 		return null;
+	}
+	
+	public void debugAssert(boolean input)
+	{
+		if(!input)
+		{
+			System.out.println("debug assert failed for");
+			for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+			    System.out.println(ste);
+			}
+		}
 	}
 
 }

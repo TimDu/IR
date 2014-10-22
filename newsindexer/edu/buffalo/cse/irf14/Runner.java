@@ -95,8 +95,8 @@ public class Runner {
 			System.out.println("Elapsed time was " + (stopTime - startTime)
 					+ " miliseconds.");
 		}
-		//readTest();
-		queryTest();
+		readTest();
+		//queryTest();
 	}
 	
 	public static void queryTest() {
@@ -135,7 +135,7 @@ public class Runner {
 //			System.out.println("adobe: " + map.keySet());
 //		}
 		
-		baseReadTest();
+		//baseReadTest();
 		
 		String query = getAnalyzer("Washington", FieldNames.PLACE);
 		map = placeReader.getPostings(query);

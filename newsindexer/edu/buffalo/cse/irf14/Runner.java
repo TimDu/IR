@@ -9,6 +9,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -96,17 +101,48 @@ public class Runner {
 					+ " miliseconds.");
 		}
 		//readTest();
-		queryTest();
+		//queryTest();
+		queryFile("test.txt", "result.txt");
+	}
+	
+	public static void queryFile(String source, String dest) {
+	/*	String test = "numQueries=3" + System.lineSeparator()
+			+ "Q_1A63C:{hello world}" + System.lineSeparator()
+			+ "Q_6V87S:{Category:oil AND place:Dubai AND ( price OR cost )}"
+			+ System.lineSeparator() + "Q_4K66L:{long query with several words}";*/
+		String test = "numQueries=3" + System.lineSeparator()
+				+ "Q_TEST:{adob}";
+		File f = new File(source);
+		FileWriter fw;
+		try {
+			fw = new FileWriter(f, false);
+			fw.write(test);
+			fw.flush();
+			fw.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		String query1 = "adob";
+		
+		SearchRunner runner = null;
+		try {
+			runner = new SearchRunner(indexDir, ipDir, 'E'
+					, new PrintStream(new File("result.txt")));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		runner.query(f);
 	}
 	
 	public static void queryTest() {
-		String query1 = "place:washington AND federal treasury";
+		String query1 = "adob";
 		
 		SearchRunner runner = new SearchRunner(indexDir, ipDir, 'Q', null);
 		System.out.println(ScoringModel.TFIDF);
-		//runner.query(query1, ScoringModel.TFIDF);
+		runner.query(query1, ScoringModel.TFIDF);
 		System.out.println(ScoringModel.OKAPI);
-		runner.query(query1, ScoringModel.OKAPI);
+		//runner.query(query1, ScoringModel.OKAPI);
 		runner.close();
 	}
 	
@@ -124,17 +160,17 @@ public class Runner {
 		
 		Map<String, Integer> map;
 		
-//		map = GetAllPostings("Adobe");
-//		if(map != null)
-//		{
-//			System.out.println("Adobe: " + map.keySet());
-//		}
-//		map = GetAllPostings("adobe");
-//		if(map != null)
-//		{
-//			System.out.println("adobe: " + map.keySet());
-//		}
-		
+		map = GetAllPostings("Adobe");
+		if(map != null)
+		{
+			System.out.println("Adobe: " + map.keySet());
+		}
+		map = GetAllPostings("adobe");
+		if(map != null)
+		{
+			System.out.println("adobe: " + map.keySet());
+		}
+		/*
 		baseReadTest();
 		
 		String query = getAnalyzer("Washington", FieldNames.PLACE);
@@ -147,7 +183,7 @@ public class Runner {
 		
 		query = getAnalyzer("treasury", FieldNames.CONTENT);
 		map = termReader.getPostings(query);
-		System.out.println("treasury: " + map.keySet());
+		System.out.println("treasury: " + map.keySet());*/
 		
 		
 //		map = GetAllPostings("controlling interest");

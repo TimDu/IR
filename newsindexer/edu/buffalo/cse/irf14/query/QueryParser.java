@@ -149,7 +149,8 @@ public class QueryParser {
 						tempOP = Operator.getOperator(tempSegs[index]);
 						// Validation
 						if (tempOP == null) {
-							throw new QueryParserException();
+							// Use default operator
+							tempOP = defaultOperator;
 						}
 					} else if (tempSegs.length > 0) {
 						tempOP = Operator.getOperator(

@@ -13,7 +13,7 @@ public class TFIDF extends ScoreModel {
 		for (int i = 0; i < docIDs.size(); ++i) {
 			tempScore = scores.get(i);
 			tempScore += (Math.log10(totalDocNum) - Math.log10(docFreq))
-					*docTermFreqs.get(docIDs.get(i));
+					*Math.log(1 + docTermFreqs.get(docIDs.get(i)));
 			scores.set(i, tempScore);
 		}
 	}

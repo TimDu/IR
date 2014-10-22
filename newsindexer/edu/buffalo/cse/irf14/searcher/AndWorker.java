@@ -39,7 +39,7 @@ class AndWorker implements Callable<TreeSet<TermFrequencyPerFile>> {
 		
 		for (String fID: temp.keySet()) {
 			tfpf  = new TermFrequencyPerFile(
-							new IndexFileReader(indexDir).OpenFileDictionary()
+							IndexFileReader.getFileDictionary(indexDir)
 							.elementToID(fID), temp.get(fID));
 			result.add(tfpf);
 		}

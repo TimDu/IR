@@ -92,8 +92,8 @@ public class SearchRunner {
 			// Search unranked list
 			posting = searcher.searchNoThread(query);
 			//posting = searcher.search(query);
-			IndexFileReader ifr = new IndexFileReader(indexDir);
-			FileIndexDictionary fid = ifr.OpenFileDictionary();
+			 
+			FileIndexDictionary fid = IndexFileReader.getFileDictionary(indexDir);
 			System.out.println("Unranked results: " + userQuery);
 			 
 			for(TermFrequencyPerFile tfpf: posting)
@@ -190,7 +190,8 @@ public class SearchRunner {
 			for(int i = 0; i < queryList.size(); i++)
 			{
 				try {
-					searcher.search(queryList.get(i));
+					searcher.searchNoThread(queryList.get(i));
+					//searcher.search(queryList.get(i));
 				} catch (SearcherException | InterruptedException
 						| ExecutionException e) {
 					e.printStackTrace();
@@ -264,12 +265,10 @@ public class SearchRunner {
 		TermCrawler crawler = new TermCrawler(query);
 		if (model.equals(ScoringModel.TFIDF)) {
 			scoreMod = new TFIDF(
-					new IndexFileReader(indexDir)
-					.OpenFileDictionary().size());
+					IndexFileReader.getFileDictionary(indexDir).size());
 		} else if (model.equals(ScoringModel.OKAPI)) {
-			scoreMod = new Okapi(new IndexFileReader(indexDir)
-					.OpenFileDictionary().size()
-					, new IndexFileReader(indexDir).OpenFileStats());
+			scoreMod = new Okapi(IndexFileReader.getFileDictionary(indexDir).size()
+					, IndexFileReader.getStatsFile(indexDir));
 		}
 		Iterator<TermFrequencyPerFile> iter = posting.iterator();
 		while (iter.hasNext()) {

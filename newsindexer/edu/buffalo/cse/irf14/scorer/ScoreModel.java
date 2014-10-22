@@ -48,6 +48,12 @@ public abstract class ScoreModel {
 	protected abstract void run();
 	
 	/**
+	 * Internally normalize scores in the range of [0, 1] by the
+	 * maximum score.
+	 */
+	protected abstract void normalize();
+	
+	/**
 	 * Set document ID collection. And do some clean works
 	 * before reset document collections.
 	 * 
@@ -164,16 +170,6 @@ public abstract class ScoreModel {
 		return docIDs;
 	}
 	
-	/**
-	 * Internally normalize scores in the range of [0, 1] by the
-	 * maximum score.
-	 */
-	private void normalize() {
-		double norm = scores.get(0);
-		for (int i = 0; i < scores.size(); ++i) {
-			scores.set(i, scores.get(i) / norm);
-		}
-	}
 	
 	/**
 	 * Internally re-order document IDs according to their computed

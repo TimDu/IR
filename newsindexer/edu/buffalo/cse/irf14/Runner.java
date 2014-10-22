@@ -95,12 +95,12 @@ public class Runner {
 			System.out.println("Elapsed time was " + (stopTime - startTime)
 					+ " miliseconds.");
 		}
-		readTest();
-		//queryTest();
+		//readTest();
+		queryTest();
 	}
 	
 	public static void queryTest() {
-		String query1 = "place:washington AND federal treasury";
+		String query1 = "place:Washington AND federal treasury";
 		
 		SearchRunner runner = new SearchRunner(indexDir, ipDir, 'Q', null);
 		System.out.println(ScoringModel.TFIDF);

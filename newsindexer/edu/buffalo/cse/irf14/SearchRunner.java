@@ -87,7 +87,9 @@ public class SearchRunner {
 			// Search unranked list
 			posting = searcher.searchNoThread(query);
 			FileIndexDictionary fid = IndexFileReader.getFileDictionary(indexDir);
-			 int count = 0;
+
+			int count = 0;
+
 			for(TermFrequencyPerFile tfpf: posting)
 			{
 				String fileName = fid.getElementfromID(tfpf.getDocID());
@@ -128,20 +130,22 @@ public class SearchRunner {
 					Document doc = Parser.parse(path);
 					String content = doc.getField(FieldNames.CONTENT)[0];
 					String temp = new String();
-					int maxSnippetLength = content.indexOf('.') > 0 ? content.indexOf('.') : ((content.length()/2) + 1);
+					String []seg = content.substring(0
+							, (content.length() > 200)
+							? content.length() : 200).split(" ");
 					if(content.length() == 0)
 					{
 						System.out.println("Bad Content: " + doc.getField(FieldNames.FILEID)[0]);
 						continue;
 					}
-					
-					String []seg = content.substring(
-							0, maxSnippetLength).split(" ");
-					
+
 					content = "";
 					for (int j = 0; j < seg.length; ++j) {
 						content += seg[j] + " ";
 						temp += seg[j];
+						if (content.length() > 200) {
+							break;
+						}
 						if (temp.length() > 50) {
 							temp = new String();
 							content += "\n";
@@ -275,13 +279,6 @@ public class SearchRunner {
 	public void close() {
 		//TODO : IMPLEMENT THIS METHOD
 		exe.shutdown();
-		try {
-			if (writer != null) {
-				writer.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	/**

@@ -21,6 +21,7 @@ import edu.buffalo.cse.irf14.query.Term;
 
 public class SingleThreadSearch {
 	String m_indexDir;
+	private boolean extend;
 	private IndexReader m_termReader;
 	private IndexReader m_placeReader;
 	private IndexReader m_authorReader;
@@ -67,6 +68,13 @@ public class SingleThreadSearch {
 		for (int i = 0; i < input.size(); i++) {
 			Clause temp = input.getClause(i);
 			TreeSet<TermFrequencyPerFile> tfpf = getClausePosting(temp);
+			if (tfpf.isEmpty()) {
+				if (!temp.isQuery()) {
+					extend = true;
+					tfpf = getClausePosting(temp);
+				}
+				extend = false;
+			}
 
 			Operator tempOp = temp.getStartOP() == null ? temp.getDefaultOP()
 					: temp.getStartOP();
@@ -131,10 +139,11 @@ public class SingleThreadSearch {
 			results = new TreeSet<TermFrequencyPerFile>();
 			for (int i = 0; i < input.size(); i++) {
 				results.addAll(getSingleTermPosting(input.getTerm(i),
-						input.getIndex(i)));
+						extend ? IndexType.TERM : input.getIndex(i)));
 			}
 		} else if (input.size() == 1) {
-			results = getSingleTermPosting(input.getTerm(0), input.getIndex(0));
+			results = getSingleTermPosting(input.getTerm(0)
+					, extend ? IndexType.TERM : input.getIndex(0));
 		}
 		return results;
 	}

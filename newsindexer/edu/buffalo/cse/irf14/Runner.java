@@ -108,9 +108,11 @@ public class Runner {
 	
 	public static void queryFile(String source, String dest) {
 		String test = "numQueries=3" + System.lineSeparator()
-			+ "Q_1A63C:{hello world}" + System.lineSeparator()
+			+ "Q_6V86S:{Category:crude AND place:Dubai AND ( price OR cost )}"
+			+ System.lineSeparator()
 			+ "Q_6V87S:{Category:oil AND place:Dubai AND ( price OR cost )}"
-			+ System.lineSeparator() + "Q_4K66L:{long query with several words}";
+			+ System.lineSeparator()
+			+ "Q_4K66L:{long query with several words}";
 		//String test = "numQueries=1" + System.lineSeparator()
 		//		+ "Q_TEST:{adobe}";
 		File f = new File(source);

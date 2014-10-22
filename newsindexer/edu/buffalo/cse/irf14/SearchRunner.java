@@ -225,7 +225,8 @@ public class SearchRunner {
 			}
 			reader.close();
 			
-			result = "numResults=" + queryList.size() + System.lineSeparator();
+			result = "";
+			int num = 0;
 			// Perform algorithm
 			for(int i = 0; i < queryList.size(); i++)
 			{
@@ -236,7 +237,7 @@ public class SearchRunner {
 					// Rank searched list
 					scoreMod = getRankedModel(queryList.get(i)
 							, ScoringModel.TFIDF, posting);
-					tempResult = scoreMod.getFirstK(k + k);
+					tempResult = scoreMod.getFirstK(k);
 					/*Iterator<TermFrequencyPerFile> iter =
 							posting.descendingIterator();
 					TreeSet<TermFrequencyPerFile> tfpf =
@@ -253,6 +254,7 @@ public class SearchRunner {
 
 					// Result
 					if (tempResult != null) {
+						++num;
 						result += queryID.get(i) + ":" + "{";
 						for (int j = 0; j < tempResult.size(); ++j) {
 							result += fid.getElementfromID(tempResult.get(j))
@@ -263,6 +265,7 @@ public class SearchRunner {
 					}
 				}
 			}
+			result = "numResults=" + num + System.lineSeparator() + result;
 			
 			writer.write(result.getBytes());
 			writer.flush();

@@ -135,10 +135,8 @@ public class Parser {
 								for (int i = 1; i < cont.length; ++i) {
 									content += cont[i];
 								}
-								startContent = true;
 							}
-							
-
+							startContent = true;
 						} else {
 							content += " " + line;
 						}

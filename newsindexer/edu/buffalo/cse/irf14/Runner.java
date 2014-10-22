@@ -102,17 +102,17 @@ public class Runner {
 					+ " miliseconds.");
 		}
 		//readTest();
-		queryTest();
-		//queryFile("test.txt", "result.txt");
+		//queryTest();
+		queryFile("test.txt", "result.txt");
 	}
 	
 	public static void queryFile(String source, String dest) {
-	/*	String test = "numQueries=3" + System.lineSeparator()
+		String test = "numQueries=3" + System.lineSeparator()
 			+ "Q_1A63C:{hello world}" + System.lineSeparator()
 			+ "Q_6V87S:{Category:oil AND place:Dubai AND ( price OR cost )}"
-			+ System.lineSeparator() + "Q_4K66L:{long query with several words}";*/
-		String test = "numQueries=1" + System.lineSeparator()
-				+ "Q_TEST:{adobe}";
+			+ System.lineSeparator() + "Q_4K66L:{long query with several words}";
+		//String test = "numQueries=1" + System.lineSeparator()
+		//		+ "Q_TEST:{adobe}";
 		File f = new File(source);
 		FileWriter fw;
 		try {
@@ -140,7 +140,7 @@ public class Runner {
 	public static void queryTest() {
 		ArrayList<String> qList = new ArrayList<String>();
 		//qList.add("author:\"Patti Domm\" AND american express");
-		qList.add("author:mankowski OR disney");
+		//qList.add("author:mankowski OR disney");
 		qList.add("author:miller OR miller");
 		qList.add("place:tokyo NOT bank");
 		qList.add("place:washington AND federal treasury");
@@ -149,9 +149,9 @@ public class Runner {
 		
 		SearchRunner runner = new SearchRunner(indexDir, ipDir, 'Q', null);
 		System.out.println(ScoringModel.TFIDF);
-		runner.query(query1, ScoringModel.TFIDF);
+		//runner.query(query1, ScoringModel.TFIDF);
 		System.out.println(ScoringModel.OKAPI);
-		runner.query(query1, ScoringModel.OKAPI);
+		//runner.query(query1, ScoringModel.OKAPI);
 		for(String q: qList)
 		{
 			System.out.println("Query: " + q);

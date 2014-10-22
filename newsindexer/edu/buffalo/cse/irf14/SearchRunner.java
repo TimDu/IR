@@ -119,7 +119,6 @@ public class SearchRunner {
 				System.out.printf("TIME USED: %5.3f seconds.\n", (t1 - t0) / 1000.0);
 				System.out.println();
 				
-				
 				for (int i = 0; i < result.size() && i < k; ++i) {
 					String fileName = fid.getElementfromID(result.get(i));
 					String firstCategory = fid.getCategories(fileName).get(0);
@@ -195,10 +194,12 @@ public class SearchRunner {
 		List<Integer> tempResult = null;
 		
 		try {
+			FileIndexDictionary fid = IndexFileReader.getFileDictionary(indexDir);
 			BufferedReader reader = new BufferedReader(
 					new FileReader(queryFile));
 			String line = reader.readLine();
 			String []elements;	// ID-Query pair in query file
+			
 			// Error Check
 			if ((line == null) || !line.startsWith("numQueries=")
 					|| (line.split("=").length != 2)) {
@@ -236,13 +237,13 @@ public class SearchRunner {
 					scoreMod = getRankedModel(queryList.get(i)
 							, ScoringModel.TFIDF, posting);
 					tempResult = scoreMod.getFirstK(k);
-				
+
 					// Result
 					if (tempResult != null) {
 						result += queryID.get(i) + ":" + "{";
 						for (int j = 0; j < tempResult.size(); ++j) {
-							result += tempResult.get(j) + "#" 
-									+ scoreMod.getScore(j) + ", ";
+							result += fid.getElementfromID(tempResult.get(j))
+									+ "#" + scoreMod.getTextScore(j) + ", ";
 						}
 						result = result.substring(0, result.length() - 2) + "}"
 								+ System.lineSeparator();

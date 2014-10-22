@@ -183,7 +183,7 @@ public class IndexFileReader implements IndexReaderInterface {
 	 */
 	@Override
 	public Map<String, Integer> getPostings(String term) {
-		if ((m_termDict == null) && !m_termDict.exists(term)) {
+		if ((term == null) || (m_termDict == null) || !m_termDict.exists(term)) {
 			return null;
 		}
 		Map<String, Integer> retVal = new TreeMap<String, Integer>();

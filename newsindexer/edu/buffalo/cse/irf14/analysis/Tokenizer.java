@@ -93,7 +93,7 @@ public class Tokenizer {
 				newSentence = true;
 				isSecondTerm = false;
 			}
-			else if(i + 1 == terms.length)
+			else if((i + 1) == terms.length)
 			{
 				contSentence.setLastToken(tokens[i]);
 				contSentence = new Sentence();

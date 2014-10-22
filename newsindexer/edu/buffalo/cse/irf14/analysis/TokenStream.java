@@ -45,7 +45,8 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	@Override
 	public boolean hasNext() {
-		return index < (tokenList.size() - 1);
+		return (index < (tokenList.size() - 1)) 
+				&& (tokenList.get(index + 1) != null);
 	}
 
 	/**

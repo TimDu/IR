@@ -37,6 +37,7 @@ public class ParserTest {
 	
 	// Document object to test with
 	private Document d = null;
+
 	
 	@Test
 	public void testParseNullFile(){
@@ -72,7 +73,8 @@ public class ParserTest {
 	}
 	
 	@Test
-	public void testParseValidFileName() {		
+	public void testParseValidFileName() {					
+		
 		// Valid file name with document testing
 		try {
 			for(int i = 0; i < filenames.length; i++){

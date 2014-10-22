@@ -164,8 +164,8 @@ public abstract class ScoreModel {
 	 * @return list of ranked document IDs
 	 */
 	private List<Integer> rank() {
-		sort(0, docIDs.size() - 1);
 		normalize();
+		sort(0, docIDs.size() - 1);
 		
 		return docIDs;
 	}

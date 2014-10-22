@@ -168,10 +168,12 @@ public class SingleThreadSearch {
 		}
 		TreeSet<TermFrequencyPerFile> tsresults = new TreeSet<TermFrequencyPerFile>();
 		
-		for(String s: results.navigableKeySet())
-		{
-			debugAssert(m_fid.elementToID(s) != -1);
-			tsresults.add(new TermFrequencyPerFile(m_fid.elementToID(s), -1));
+		if (results != null) {
+			for(String s: results.navigableKeySet())
+			{
+				debugAssert(m_fid.elementToID(s) != -1);
+				tsresults.add(new TermFrequencyPerFile(m_fid.elementToID(s), -1));
+			}
 		}
 		
 		return tsresults;
@@ -237,6 +239,9 @@ public class SingleThreadSearch {
 			stream = analyzer.getStream();
 
 			stream.reset();
+			if (!stream.hasNext()) {
+				return null;
+			}
 			String retStr =stream.next().toString();
 			while(stream.hasNext())
 			{

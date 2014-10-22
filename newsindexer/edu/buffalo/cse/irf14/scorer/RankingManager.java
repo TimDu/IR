@@ -101,7 +101,7 @@ public class RankingManager {
 					}
 					try {
 						okapi.setDocLength(id
-								, new IndexFileReader(indexDir).OpenFileDictionary()
+								, IndexFileReader.getFileDictionary(indexDir)
 								.getFileLength(id));
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();

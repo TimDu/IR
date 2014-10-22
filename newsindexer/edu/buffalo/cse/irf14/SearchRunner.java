@@ -1,17 +1,12 @@
 package edu.buffalo.cse.irf14;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Paths;
-import java.sql.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -90,9 +85,8 @@ public class SearchRunner {
 
 		try {
 			// Search unranked list
-			posting = searcher.search(query);
-			IndexFileReader ifr = new IndexFileReader(indexDir);
-			FileIndexDictionary fid = ifr.OpenFileDictionary();
+			posting = searcher.searchNoThread(query);
+			FileIndexDictionary fid = IndexFileReader.getFileDictionary(indexDir);
 			 
 			for(TermFrequencyPerFile tfpf: posting)
 			{
@@ -207,8 +201,8 @@ public class SearchRunner {
 			// Perform algorithm
 			for(int i = 0; i < queryList.size(); i++)
 			{
-				posting = searcher.search(queryList.get(i));
-				
+				//posting = searcher.search(queryList.get(i));
+				posting = searcher.searchNoThread(queryList.get(i));
 				// Rank document list
 				/* IndexFileReader ifr = new IndexFileReader(indexDir);
 				FileIndexDictionary fid = ifr.OpenFileDictionary();
@@ -261,7 +255,9 @@ public class SearchRunner {
 		//TODO : IMPLEMENT THIS METHOD
 		exe.shutdown();
 		try {
-			writer.close();
+			if (writer != null) {
+				writer.close();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -314,12 +310,10 @@ public class SearchRunner {
 		TermCrawler crawler = new TermCrawler(query);
 		if (model.equals(ScoringModel.TFIDF)) {
 			scoreMod = new TFIDF(
-					new IndexFileReader(indexDir)
-					.OpenFileDictionary().size());
+					IndexFileReader.getFileDictionary(indexDir).size());
 		} else if (model.equals(ScoringModel.OKAPI)) {
-			scoreMod = new Okapi(new IndexFileReader(indexDir)
-					.OpenFileDictionary().size()
-					, new IndexFileReader(indexDir).OpenFileStats());
+			scoreMod = new Okapi(IndexFileReader.getFileDictionary(indexDir).size()
+					, IndexFileReader.getStatsFile(indexDir));
 		}
 		Iterator<TermFrequencyPerFile> iter = posting.iterator();
 		while (iter.hasNext()) {

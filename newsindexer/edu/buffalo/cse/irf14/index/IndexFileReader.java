@@ -21,15 +21,50 @@ public class IndexFileReader implements IndexReaderInterface {
 	protected String m_dictName = null;
 	protected TermIndexDictionary m_termDict = null;
 	protected FileIndexDictionary m_fileDict = null;
+	protected static FileIndexDictionary m_sFileDict = null;
+	protected static String m_sIndexDir = null;
 	protected TermIndexFileReader tifr = null;
 	protected double m_avgDocLength = 0;
 
 	/**
 	 * Hacked constructor for getting file dictionary
 	 */
-	public IndexFileReader(String indexDir) {
-		// Hacked
-		m_indexDir = indexDir;
+
+	public static FileIndexDictionary getFileDictionary(String indexDir)
+			throws IOException, ClassNotFoundException {
+
+		if (m_sFileDict == null) {
+			m_sIndexDir = indexDir;
+			BufferedInputStream fileIn = new BufferedInputStream(
+					new FileInputStream(Paths.get(indexDir,
+							IndexGlobalVariables.fileDicFileName).toString()));
+			ObjectInputStream instream = new ObjectInputStream(fileIn);
+			m_sFileDict = (FileIndexDictionary) instream.readObject();
+
+			instream.close();
+			fileIn.close();
+		}
+		if (!m_sIndexDir.equals(indexDir)) {
+			System.out
+					.println("Change in index directory since singelton started, aborting!");
+			assert false;
+		}
+		return m_sFileDict;
+	}
+
+	public static double getStatsFile(String indexDir) throws IOException,
+			ClassNotFoundException {
+
+		BufferedInputStream fileIn = new BufferedInputStream(
+				new FileInputStream(Paths.get(indexDir,
+						IndexGlobalVariables.statsFileName).toString()));
+		ObjectInputStream instream = new ObjectInputStream(fileIn);
+		double avgDocLength = instream.readDouble();
+		// System.out.println("m_avgDocLength: " + m_avgDocLength);
+		instream.close();
+		fileIn.close();
+		return avgDocLength;
+
 	}
 
 	public IndexFileReader(String indexDir, String indexName, String dictName) {
@@ -38,6 +73,10 @@ public class IndexFileReader implements IndexReaderInterface {
 		m_dictName = dictName;
 
 		setup();
+	}
+
+	public TermIndexFileReader getTermIndexFileReader() {
+		return tifr;
 	}
 
 	protected void setup() {
@@ -72,11 +111,6 @@ public class IndexFileReader implements IndexReaderInterface {
 
 		instream.close();
 		fileIn.close();
-		return m_fileDict;
-	}
-	
-	public FileIndexDictionary getFileDictionary()
-	{
 		return m_fileDict;
 	}
 
@@ -157,7 +191,9 @@ public class IndexFileReader implements IndexReaderInterface {
 		try {
 
 			TreeSet<TermFrequencyPerFile> tsTerm;
-			if (term.contains(" ") && m_indexName.equals(IndexGlobalVariables.termIndexFileName)) {
+			if (term.contains(" ")
+					&& m_indexName
+							.equals(IndexGlobalVariables.termIndexFileName)) {
 				String[] termArr = term.trim().split(" ");
 				ArrayList<Integer> termIDS = new ArrayList<Integer>();
 				for (String s : termArr) {
@@ -167,8 +203,7 @@ public class IndexFileReader implements IndexReaderInterface {
 
 				// getPostings
 				tsTerm = tifr.getPostings(termIDS);
-				if(tsTerm == null)
-				{
+				if (tsTerm == null) {
 					return null;
 				}
 
@@ -181,6 +216,44 @@ public class IndexFileReader implements IndexReaderInterface {
 
 				retVal.put(fileName, i.getTermFrequency());
 
+			}
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+			assert (false);
+		}
+
+		return retVal;
+	}
+
+	public TreeSet<TermFrequencyPerFile> getTermFrequency(String term) {
+		if ((m_termDict == null) && !m_termDict.exists(term)) {
+			return null;
+		}
+
+		TreeSet<TermFrequencyPerFile> retVal = null;
+		try {
+
+			if (term.contains(" ")
+					&& m_indexName
+							.equals(IndexGlobalVariables.termIndexFileName)) {
+				String[] termArr = term.trim().split(" ");
+				ArrayList<Integer> termIDS = new ArrayList<Integer>();
+				for (String s : termArr) {
+					termIDS.add(m_termDict.elementToID(s));
+
+				}
+
+				// getPostings
+				retVal = tifr.getPostings(termIDS);
+				if (retVal == null) {
+					return null;
+				}
+
+			} else {
+				int termID = m_termDict.elementToID(term);
+				retVal = tifr.getPostings(termID);
 			}
 
 		} catch (IOException e) {

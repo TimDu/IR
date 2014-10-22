@@ -236,7 +236,20 @@ public class SearchRunner {
 					// Rank searched list
 					scoreMod = getRankedModel(queryList.get(i)
 							, ScoringModel.TFIDF, posting);
-					tempResult = scoreMod.getFirstK(k);
+					tempResult = scoreMod.getFirstK(k + k);
+					/*Iterator<TermFrequencyPerFile> iter =
+							posting.descendingIterator();
+					TreeSet<TermFrequencyPerFile> tfpf =
+							new TreeSet<TermFrequencyPerFile>();
+					while (iter.hasNext()) {
+						TermFrequencyPerFile temp = iter.next();
+						if (tempResult.contains(temp.getDocID())) {
+							tfpf.add(temp);
+						}
+					}
+					scoreMod = getRankedModel(queryList.get(i)
+							, ScoringModel.TFIDF, tfpf);
+					tempResult = scoreMod.getFirstK(k);*/
 
 					// Result
 					if (tempResult != null) {

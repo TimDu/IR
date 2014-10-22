@@ -123,7 +123,7 @@ public class Runner {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+		long t0 = System.currentTimeMillis();
 		SearchRunner runner = null;
 		try {
 			runner = new SearchRunner(indexDir, ipDir, 'E'
@@ -133,7 +133,7 @@ public class Runner {
 			e.printStackTrace();
 		}
 		runner.query(f);
-		System.out.println("done.");
+		System.out.println((System.currentTimeMillis() - t0) + " ms");
 		runner.close();
 	}
 	

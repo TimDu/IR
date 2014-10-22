@@ -61,7 +61,7 @@ public class Clause {
 	public boolean isQuery() {
 		return isQuery;
 	}
-	
+		
 	public Operator getStartOP() {
 		return startOP;
 	}

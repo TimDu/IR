@@ -71,9 +71,10 @@ public class SingleThreadSearch {
 			Operator tempOp = temp.getStartOP() == null ? temp.getDefaultOP()
 					: temp.getStartOP();
 
-			if (result.size() != 0) {
+			if ((i > 0) && (result.size() > 0)) {
 				switch (tempOp) {
 				case AND:
+				case NOTOR:
 					debugAssert(clauseOp.equals(Operator.AND));
 					if (!temp.isQuery()
 							&& temp.getComponent().toString().contains("<")) {
@@ -83,13 +84,11 @@ public class SingleThreadSearch {
 					}
 					break;
 				case OR:
+				case NOTAND:
 					debugAssert(clauseOp.equals(Operator.OR));
 					result = join(result, tfpf);
 					break;
-				case NOTAND:
-				case NOTOR:
 				case NOT:
-					
 					result = except(result, tfpf);
 					if(  tempOp == Operator.NOTOR)
 					{
@@ -101,7 +100,7 @@ public class SingleThreadSearch {
 				default:
 					System.out.println("error, bad operator");
 				}
-			} else {
+			} else if (i == 0) {
 				result.addAll(tfpf);
 			}
 		}

@@ -96,10 +96,5 @@ public class Okapi extends ScoreModel {
 
 	@Override
 	protected void normalize() {
-		if (maxScore > 1) {
-			for (int i = 0; i < docIDs.size(); ++i) {
-				scores.set(i, scores.get(i) / maxScore);
-			}
-		}
 	}
 }

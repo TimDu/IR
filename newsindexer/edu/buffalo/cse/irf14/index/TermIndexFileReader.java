@@ -40,7 +40,7 @@ public class TermIndexFileReader {
 		m_offsetValue = 0L;
 	}
 	
-	public TreeSet<TermFrequencyPerFile> getPostings(ArrayList<Integer> termIDs) throws IOException
+	public TreeSet<TermFrequencyPerFile> getPostings(List<Integer> termIDs) throws IOException
 	{
 		TreeSet<TermFrequencyPerFile> retVal = new TreeSet<TermFrequencyPerFile>(); 
 		ArrayList<TreeSet<TermFrequencyPerFile>> retSet = new ArrayList<TreeSet<TermFrequencyPerFile>>();

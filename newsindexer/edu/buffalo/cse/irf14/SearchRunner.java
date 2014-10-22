@@ -1,17 +1,12 @@
 package edu.buffalo.cse.irf14;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Paths;
-import java.sql.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -187,10 +182,15 @@ public class SearchRunner {
 	 */
 	public void query(File queryFile) {
 		//TODO: IMPLEMENT THIS METHOD
+		final int k = 10;
 		int numQuery = 0;
 		String result; 	// Output to be written
 		List<Query> queryList = new LinkedList<Query>();
 		List<String> queryID = new LinkedList<String>();
+		TreeSet<TermFrequencyPerFile> posting;
+		ScoreModel scoreMod;
+		List<Integer> tempResult = null;
+				
 		try {
 			BufferedReader reader = new BufferedReader(
 					new FileReader(queryFile));
@@ -199,6 +199,7 @@ public class SearchRunner {
 			// Error Check
 			if ((line == null) || !line.startsWith("numQueries=")
 					|| (line.split("=").length != 2)) {
+				reader.close();
 				throw new IOException("Illegal query format!");
 			} else {
 				numQuery = Integer.valueOf(line.split("=")[1]);
@@ -210,34 +211,62 @@ public class SearchRunner {
 					break;
 				}
 				elements = line.split(":");
-				elements[1] = elements[1].substring(
-						elements[1].indexOf("{") + 1
-						, elements[1].indexOf("}"));
+				line = line.substring(line.indexOf(':') + 2);
+				line = line.substring(0, line.length() - 1);
 				queryID.add(elements[0]);
-				queryList.add(QueryParser.parse(elements[1], null));
+				queryList.add(QueryParser.parse(line, null));
 			}
+			reader.close();
 			
+			result = "numResults=" + queryList.size() + System.lineSeparator();
 			// Perform algorithm
 			for(int i = 0; i < queryList.size(); i++)
 			{
-				try {
-					searcher.searchNoThread(queryList.get(i));
-				} catch (SearcherException | InterruptedException
-						| ExecutionException e) {
-					e.printStackTrace();
+				//posting = searcher.search(queryList.get(i));
+				posting = searcher.searchNoThread(queryList.get(i));
+				// Rank document list
+				/* IndexFileReader ifr = new IndexFileReader(indexDir);
+				FileIndexDictionary fid = ifr.OpenFileDictionary();
+				
+				for(TermFrequencyPerFile tfpf: posting)
+				{
+					String fileName = fid.getElementfromID(tfpf.getDocID());
+					System.out.print(fileName + ", ");
+				}
+				System.out.println();
+				*/
+				if (posting.size() > 0) {
+					// Rank searched list
+					scoreMod = getRankedModel(queryList.get(i)
+							, ScoringModel.TFIDF, posting);
+					tempResult = scoreMod.getFirstK(k);
+				
+					// Result
+					if (tempResult != null) {
+						result += queryID.get(i) + ":" + "{";
+						for (int j = 0; j < tempResult.size(); ++j) {
+							result += tempResult.get(j) + "#" 
+									+ scoreMod.getScore(j) + ", ";
+						}
+						result = result.substring(0, result.length() - 2) + "}"
+								+ System.lineSeparator();
+					}
 				}
 			}
 			
-			// Rank document list
-			
-		} catch (FileNotFoundException e) {
+			writer.write(result.getBytes());
+			writer.flush();
+		} catch(IOException e) {
 			e.printStackTrace();
-		} catch (NumberFormatException e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (SearcherException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	/**
@@ -246,6 +275,13 @@ public class SearchRunner {
 	public void close() {
 		//TODO : IMPLEMENT THIS METHOD
 		exe.shutdown();
+		try {
+			if (writer != null) {
+				writer.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**

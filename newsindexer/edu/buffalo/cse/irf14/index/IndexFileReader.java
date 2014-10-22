@@ -395,7 +395,8 @@ public class IndexFileReader implements IndexReaderInterface {
 			return null;
 		}
 
-		TreeSet<TermFrequencyPerFile> currentPosting = new TreeSet<TermFrequencyPerFile>();
+		TreeSet<TermFrequencyPerFile> currentPosting = 
+				new TreeSet<TermFrequencyPerFile>();
 		List<Integer> termIDs = new LinkedList<Integer>();
 		Map<Integer, Integer> result = new HashMap<Integer, Integer>();
 
@@ -405,17 +406,19 @@ public class IndexFileReader implements IndexReaderInterface {
 		}
 
 		// Get posting list for each term
-		for (int tID : termIDs) {
-			try {
-				currentPosting.addAll(tifr.getPostings(tID));
-			} catch (IOException e) {
-				e.printStackTrace();
+		try {
+			for (int id: termIDs) {
+				currentPosting.addAll(tifr.getPostings(id));
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
-		// Get map result
-		for (TermFrequencyPerFile tfd : currentPosting) {
-			result.put(tfd.getDocID(), tfd.getTermFrequency());
+		if (currentPosting != null) {
+			// Get map result
+			for (TermFrequencyPerFile tfd : currentPosting) {
+				result.put(tfd.getDocID(), tfd.getTermFrequency());
+			}
 		}
 
 		return result;

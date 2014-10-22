@@ -149,10 +149,10 @@ public class Runner {
 		String query1 = "place:Washington AND federal treasury";
 		
 		SearchRunner runner = new SearchRunner(indexDir, ipDir, 'Q', null);
-//		System.out.println(ScoringModel.TFIDF);
-//		runner.query(query1, ScoringModel.TFIDF);
-//		System.out.println(ScoringModel.OKAPI);
-//		runner.query(query1, ScoringModel.OKAPI);
+		System.out.println(ScoringModel.TFIDF);
+		runner.query(query1, ScoringModel.TFIDF);
+		System.out.println(ScoringModel.OKAPI);
+		runner.query(query1, ScoringModel.OKAPI);
 		for(String q: qList)
 		{
 			System.out.println("Query: " + q);

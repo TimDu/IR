@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -137,14 +138,26 @@ public class Runner {
 	}
 	
 	public static void queryTest() {
-		String query1 = "adob";
-		//String query1 = "place:Washington AND federal treasury";
+		ArrayList<String> qList = new ArrayList<String>();
+		qList.add("author:\"Patti Domm\" AND american express");
+		qList.add("author:minkwoski OR disney");
+		qList.add("author:miller OR miller");
+		qList.add("place:tokyo NOT bank");
+		qList.add("place:Washington AND federal treasury");
+		qList.add("french economy employment government policies");
+		String query2 = "adob";
+		String query1 = "place:Washington AND federal treasury";
 		
 		SearchRunner runner = new SearchRunner(indexDir, ipDir, 'Q', null);
 		System.out.println(ScoringModel.TFIDF);
 		runner.query(query1, ScoringModel.TFIDF);
 		System.out.println(ScoringModel.OKAPI);
 		runner.query(query1, ScoringModel.OKAPI);
+		for(String q: qList)
+		{
+			System.out.println("Query: " + q);
+			runner.query(q, ScoringModel.OKAPI);
+		}
 		runner.close();
 	}
 	

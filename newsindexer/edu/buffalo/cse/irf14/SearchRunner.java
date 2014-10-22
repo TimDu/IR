@@ -87,13 +87,28 @@ public class SearchRunner {
 			// Search unranked list
 			posting = searcher.searchNoThread(query);
 			FileIndexDictionary fid = IndexFileReader.getFileDictionary(indexDir);
-			
+
+			int count = 0;
+
 			for(TermFrequencyPerFile tfpf: posting)
 			{
 				String fileName = fid.getElementfromID(tfpf.getDocID());
 				System.out.print(fileName + ", ");
+				count++;
+				if(count%10 == 0)
+				{
+					System.out.println();
+				}
 			}
 			System.out.println();
+			if(count > 0)
+			{
+				t1 = System.currentTimeMillis();
+				// Print result 
+				System.out.printf("TIME USED: %5.3f seconds.\n", (t1 - t0) / 1000.0);
+				System.out.println();
+				return;
+			}
 
 			if (posting.size() > 0) {
 				// Rank searched list
@@ -116,8 +131,14 @@ public class SearchRunner {
 					String content = doc.getField(FieldNames.CONTENT)[0];
 					String temp = new String();
 					String []seg = content.substring(0
-							, (content.length() < 100)
-							? content.length() : 100).split(" ");
+							, (content.length() > 200)
+							? content.length() : 200).split(" ");
+					if(content.length() == 0)
+					{
+						System.out.println("Bad Content: " + doc.getField(FieldNames.FILEID)[0]);
+						continue;
+					}
+
 					content = "";
 					for (int j = 0; j < seg.length; ++j) {
 						content += seg[j] + " ";

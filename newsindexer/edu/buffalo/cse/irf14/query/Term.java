@@ -42,10 +42,12 @@ public class Term extends QueryComponent {
 			values = new String[1];
 			indexes = new IndexType[1];
 			temp = content.split(":");
+			values[0] = " ";
 			if (temp.length > 1) {
 				for (int i = 1; i < temp.length; ++i) {
 					values[0] += temp[i] + ":";
 				}
+				values[0] = values[0].trim();
 				values[0] = values[0].substring(0, values[0].length() - 1);
 				indexes[0] = IndexType.getIndex(temp[0]);
 			} else {

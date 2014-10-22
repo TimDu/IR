@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import edu.buffalo.cse.irf14.index.IndexFileReader;
-import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.query.TermCrawler;
 import edu.buffalo.cse.irf14.searcher.RankWorker;
 

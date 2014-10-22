@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public class Okapi extends ScoreModel {
 
+	private double maxScore;
 	private double avgDocLen;
 	private double k1;
 	private double b;
@@ -23,8 +24,8 @@ public class Okapi extends ScoreModel {
 	 */
 	public Okapi (long totalDocNum, double avgDocLen) {
 		super();
-		k1 = 1.2;
-		k3 = 2.0;
+		k1 = 1.5;
+		k3 = 1.8;
 		b = 0.75;
 		this.docLength = new HashMap<Integer, Integer>(30);
 		this.totalDocNum = totalDocNum;
@@ -81,6 +82,18 @@ public class Okapi extends ScoreModel {
 					/ avgDocLen)) + docTermFreqs.get(docIDs.get(i))))
 					* ((k3 + 1) * queryTermFreq / (k3 + queryTermFreq));
 			scores.set(i, tempScore);
+			if (tempScore > maxScore) {
+				maxScore = tempScore;
+			}
+		}
+	}
+
+	@Override
+	protected void normalize() {
+		if (maxScore > 1) {
+			for (int i = 0; i < docIDs.size(); ++i) {
+				scores.set(i, scores.get(i) / maxScore);
+			}
 		}
 	}
 }
